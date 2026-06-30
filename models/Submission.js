@@ -11,8 +11,10 @@ async function create(data) {
       company_size,
       consent_data,
       consent_marketing,
-      ip_address
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ip_address,
+      notes,
+      status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.fullName,
       data.companyName,
@@ -23,6 +25,8 @@ async function create(data) {
       data.consentData ? 1 : 0,
       data.consentMarketing ? 1 : 0,
       data.ipAddress || null,
+      data.notes || null,
+      data.status || 'new',
     ],
   );
 
@@ -30,6 +34,46 @@ async function create(data) {
     id: result.insertId,
     ...data,
   };
+}
+
+async function update(id, data) {
+  await pool.execute(
+    `UPDATE submissions
+     SET full_name = ?,
+         company_name = ?,
+         email = ?,
+         phone = ?,
+         roles = ?,
+         company_size = ?,
+         consent_data = ?,
+         consent_marketing = ?,
+         notes = ?,
+         status = ?
+     WHERE id = ?`,
+    [
+      data.fullName,
+      data.companyName,
+      data.email,
+      data.phone || null,
+      JSON.stringify(data.roles),
+      data.companySize || null,
+      data.consentData ? 1 : 0,
+      data.consentMarketing ? 1 : 0,
+      data.notes || null,
+      data.status || 'new',
+      id,
+    ],
+  );
+
+  return findById(id);
+}
+
+async function remove(id) {
+  const [result] = await pool.execute(
+    'DELETE FROM submissions WHERE id = ?',
+    [id],
+  );
+  return result.affectedRows > 0;
 }
 
 async function findAll(filters = {}) {
@@ -86,6 +130,19 @@ async function findById(id) {
   };
 }
 
+async function findForExport() {
+  const [rows] = await pool.query(
+    `SELECT *
+     FROM submissions
+     ORDER BY created_at DESC`,
+  );
+
+  return rows.map(row => ({
+    ...row,
+    roles: parseRoles(row.roles),
+  }));
+}
+
 function parseRoles(value) {
   if (Array.isArray(value)) return value;
   try {
@@ -98,5 +155,8 @@ function parseRoles(value) {
 module.exports = {
   create,
   findAll,
+  findForExport,
   findById,
+  remove,
+  update,
 };

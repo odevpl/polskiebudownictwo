@@ -1,0 +1,105 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/submissions') %>">Wroc do listy</a>
+
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true"><%= mode === 'edit' ? String(submission.full_name || 'PB').slice(0, 2).toUpperCase() : '+' %></div>
+    <div>
+      <p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p>
+      <h1><%= mode === 'edit' ? ('#' + submission.id) : 'Dodaj zgloszenie' %></h1>
+      <p class="admin-hero__meta">Uzupelnij dane osoby lub firmy w bazie zgloszen.</p>
+    </div>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="adm-alert">
+      <% errors.forEach(error => { %>
+        <div><%= error %></div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <form class="adm-form" method="post" action="<%= action %>">
+    <div class="adm-form-grid">
+      <div class="adm-field">
+        <label class="adm-label" for="fullName">Imie i nazwisko</label>
+        <input class="adm-control" id="fullName" name="fullName" type="text" value="<%= submission.full_name || '' %>" required>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="companyName">Nazwa firmy</label>
+        <input class="adm-control" id="companyName" name="companyName" type="text" value="<%= submission.company_name || '' %>" required>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="email">E-mail</label>
+        <input class="adm-control" id="email" name="email" type="email" value="<%= submission.email || '' %>" required>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="phone">Telefon</label>
+        <input class="adm-control" id="phone" name="phone" type="tel" value="<%= submission.phone || '' %>">
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="companySize">Wielkosc firmy</label>
+        <select class="adm-control" id="companySize" name="companySize" required>
+          <option value="">Wybierz</option>
+          <% companySizes.forEach(size => { %>
+            <option value="<%= size %>" <%= submission.company_size === size ? 'selected' : '' %>><%= size %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="status">Status</label>
+        <select class="adm-control" id="status" name="status" required>
+          <% statuses.forEach(status => { %>
+            <option value="<%= status %>" <%= submission.status === status ? 'selected' : '' %>><%= status %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <fieldset class="adm-field adm-fieldset adm-form-grid__full">
+        <legend class="adm-label">Role w branzy</legend>
+        <div class="adm-check-grid">
+          <% allowedRoles.forEach(role => { %>
+            <label class="adm-check">
+              <input name="roles" type="checkbox" value="<%= role %>" <%= submission.roles && submission.roles.includes(role) ? 'checked' : '' %>>
+              <span><%= role %></span>
+            </label>
+          <% }) %>
+        </div>
+      </fieldset>
+
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="notes">Notatki</label>
+        <textarea class="adm-control adm-textarea" id="notes" name="notes"><%= submission.notes || '' %></textarea>
+      </div>
+
+      <div class="adm-form-grid__full adm-consents">
+        <label class="adm-check">
+          <input name="consentData" type="checkbox" value="1" <%= submission.consent_data ? 'checked' : '' %>>
+          <span>Zgoda na obsluge zgloszenia</span>
+        </label>
+        <label class="adm-check">
+          <input name="consentMarketing" type="checkbox" value="1" <%= submission.consent_marketing ? 'checked' : '' %>>
+          <span>Zgoda marketingowa</span>
+        </label>
+      </div>
+
+      <div class="adm-form-actions adm-form-grid__full">
+        <button class="button" type="submit"><%= mode === 'edit' ? 'Zapisz zmiany' : 'Dodaj zgloszenie' %></button>
+        <a class="button button--ghost" href="<%= adminUrl('/submissions') %>">Anuluj</a>
+        <% if (mode === 'edit') { %>
+          <button class="button button--ghost" type="submit" form="delete-submission-form">Usun</button>
+        <% } %>
+      </div>
+    </div>
+  </form>
+
+  <% if (mode === 'edit') { %>
+    <form id="delete-submission-form" method="post" action="<%= adminUrl('/submissions/' + submission.id + '/delete') %>" onsubmit="return confirm('Na pewno usunac to zgloszenie? Tej operacji nie mozna cofnac.');"></form>
+  <% } %>
+</section>
+<%- include('../../partials/admin-shell-end') %>

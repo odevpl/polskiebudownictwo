@@ -477,6 +477,24 @@ svg {
   margin: 24px 0 18px;
 }
 
+.adm-page-actions,
+.adm-table-actions,
+.adm-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.adm-page-actions {
+  margin-bottom: 24px;
+}
+
+.adm-page-actions form,
+.adm-table-actions form {
+  margin: 0;
+}
+
 .toolbar input {
   width: min(100%, 360px);
   background: transparent;
@@ -570,6 +588,134 @@ td a:hover {
   border-top: 1px solid rgb(255 255 255 / 8%);
 }
 
+/* Forms */
+.adm-form {
+  max-width: 980px;
+  padding: 22px;
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: var(--adm-radius-md);
+  background: rgb(255 255 255 / 4%);
+}
+
+.adm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.adm-form-grid__full {
+  grid-column: 1 / -1;
+}
+
+.adm-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.adm-check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.adm-check {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: var(--adm-radius-sm);
+  background: rgb(0 0 0 / 16%);
+  color: var(--adm-text-muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.adm-check:has(input:checked) {
+  border-color: rgb(29 185 84 / 48%);
+  background: rgb(29 185 84 / 12%);
+  color: var(--adm-text);
+}
+
+.adm-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--adm-accent);
+}
+
+textarea.adm-control.adm-textarea {
+  min-height: 140px;
+  padding: 14px 16px;
+  border-radius: var(--adm-radius-sm) !important;
+  line-height: 1.5;
+  overflow: auto;
+  vertical-align: top;
+  resize: vertical;
+}
+
+.adm-consents {
+  display: grid;
+  gap: 10px;
+}
+
+.adm-form-actions {
+  padding-top: 8px;
+}
+
+/* Modal */
+.adm-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 72%);
+  backdrop-filter: blur(10px);
+}
+
+.adm-modal[hidden] {
+  display: none;
+}
+
+.adm-modal__panel {
+  width: min(100%, 720px);
+  padding: 24px;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-md);
+  background: linear-gradient(180deg, #242424, #121212 70%);
+  box-shadow: var(--adm-shadow);
+}
+
+.adm-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.adm-modal__header h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.adm-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.adm-check-grid--modal {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .detail-row {
   display: grid;
   grid-template-columns: 210px 1fr;
@@ -639,6 +785,21 @@ td a:hover {
   .toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .adm-form-grid,
+  .adm-check-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-modal {
+    align-items: start;
+    padding: 16px;
+  }
+
+  .adm-modal__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 
   .toolbar input,

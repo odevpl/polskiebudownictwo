@@ -23,6 +23,8 @@ app.use(createSessionMiddleware());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.locals.adminBasePath = adminPath;
+app.locals.adminUrl = adminUrl;
 
 app.use(express.static(appPublicRoot));
 app.use(express.static(publicRoot, {
