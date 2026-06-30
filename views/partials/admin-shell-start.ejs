@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %> - Polskie Budownictwo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+  </head>
+  <body>
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <img src="/assets/images/logo.png" alt="Polskie Budownictwo">
+        <nav aria-label="Panel admina">
+          <a href="<%= adminUrl('/submissions') %>" aria-current="page">Zgloszenia</a>
+        </nav>
+      </aside>
+      <main class="admin-main">
+        <header class="topbar">
+          <span class="muted"><%= admin.fullName %></span>
+          <form method="post" action="<%= adminUrl('/logout') %>">
+            <button class="button button--ghost" type="submit">Wyloguj</button>
+          </form>
+        </header>

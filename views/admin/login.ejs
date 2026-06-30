@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %> - Polskie Budownictwo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+  </head>
+  <body>
+    <main class="login-screen">
+      <form class="login-panel" method="post" action="<%= adminUrl('/login') %>">
+        <img src="/assets/images/logo.png" alt="Polskie Budownictwo">
+        <h1>Panel admina</h1>
+        <p class="muted">Zaloguj sie, aby przejsc do zgloszen.</p>
+
+        <% if (error) { %>
+          <p class="alert"><%= error %></p>
+        <% } %>
+
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" value="<%= values.email || '' %>" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Haslo</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+
+        <div class="field">
+          <button class="button" type="submit">Zaloguj</button>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

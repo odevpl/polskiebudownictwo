@@ -1,0 +1,31 @@
+{
+  "name": "polskiebudownictwo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Strona inicjatywy Polskie Budownictwo",
+  "scripts": {
+    "dev": "node server.js",
+    "serve": "node server.js",
+    "start": "node server.js",
+    "migrate": "node scripts/migrate.js",
+    "create-superadmin": "node scripts/createSuperadmin.js",
+    "reset-admin-password": "node scripts/resetAdminPassword.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^4.19.2",
+    "express-mysql-session": "^3.0.3",
+    "express-rate-limit": "^8.5.2",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.2.0",
+    "mysql2": "^3.22.5",
+    "nodemailer": "^9.0.1"
+  }
+}

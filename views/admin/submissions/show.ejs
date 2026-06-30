@@ -1,0 +1,25 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/submissions') %>">Wroc do listy</a>
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true"><%= String(submission.full_name || 'PB').slice(0, 2).toUpperCase() %></div>
+    <div>
+      <p class="adm-kicker">Zgloszenie</p>
+      <h1>#<%= submission.id %></h1>
+      <p class="admin-hero__meta"><%= submission.created_at ? new Date(submission.created_at).toLocaleString('pl-PL') : '' %></p>
+    </div>
+  </div>
+
+  <div class="details">
+    <div class="detail-row"><strong>Imie i nazwisko</strong><span><%= submission.full_name %></span></div>
+    <div class="detail-row"><strong>Firma</strong><span><%= submission.company_name || '-' %></span></div>
+    <div class="detail-row"><strong>E-mail</strong><span><a href="mailto:<%= submission.email %>"><%= submission.email %></a></span></div>
+    <div class="detail-row"><strong>Telefon</strong><span><%= submission.phone || '-' %></span></div>
+    <div class="detail-row"><strong>Role</strong><span><%= submission.roles.join(', ') || '-' %></span></div>
+    <div class="detail-row"><strong>Wielkosc firmy</strong><span><%= submission.company_size || '-' %></span></div>
+    <div class="detail-row"><strong>Status</strong><span><%= submission.status %></span></div>
+    <div class="detail-row"><strong>IP</strong><span><%= submission.ip_address || '-' %></span></div>
+    <div class="detail-row"><strong>Notatki</strong><span><%= submission.notes || '-' %></span></div>
+  </div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

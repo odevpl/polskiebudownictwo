@@ -1,0 +1,63 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true">PB</div>
+    <div>
+      <p class="adm-kicker">Lista</p>
+      <h1>Zgloszenia</h1>
+      <p class="admin-hero__meta">Lista osob, ktore wypelnily formularz dolaczenia.</p>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <p class="alert"><%= error %></p>
+  <% } %>
+
+  <form class="toolbar" method="get" action="<%= adminUrl('/submissions') %>">
+    <input name="search" type="search" placeholder="Szukaj po nazwie, e-mailu, firmie" value="<%= filters.search || '' %>">
+    <select name="status">
+      <option value="">Wszystkie statusy</option>
+      <option value="new" <%= filters.status === 'new' ? 'selected' : '' %>>Nowe</option>
+      <option value="contacted" <%= filters.status === 'contacted' ? 'selected' : '' %>>Po kontakcie</option>
+      <option value="member" <%= filters.status === 'member' ? 'selected' : '' %>>Czlonek</option>
+    </select>
+    <button class="button" type="submit">Filtruj</button>
+  </form>
+
+  <div class="table-wrap">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Imie i nazwisko</th>
+          <th>Firma</th>
+          <th>E-mail</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!submissions.length) { %>
+          <tr>
+            <td colspan="7" class="muted">Brak zgloszen do wyswietlenia.</td>
+          </tr>
+        <% } %>
+        <% submissions.forEach(submission => { %>
+          <tr>
+            <td><strong><%= submission.full_name %></strong></td>
+            <td><%= submission.company_name || '-' %></td>
+            <td><a href="mailto:<%= submission.email %>"><%= submission.email %></a></td>
+            <td><%= submission.roles.join(', ') || '-' %></td>
+            <td><span class="badge adm-badge--success"><%= submission.status %></span></td>
+            <td><%= submission.created_at ? new Date(submission.created_at).toLocaleString('pl-PL') : '-' %></td>
+            <td><a class="button button--ghost" href="<%= adminUrl('/submissions/' + submission.id) %>">Szczegoly</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="table-count">Razem: <%= pagination.total %></p>
+</section>
+<%- include('../../partials/admin-shell-end') %>
