@@ -1,10 +1,12 @@
 const { createTransporter } = require('../config/mailer');
+const path = require('path');
 
 const manifestUrl = 'https://polskiebudownictwo.org/assets/documents/legal/manifestMSP.pdf';
-const logoUrl = 'https://polskiebudownictwo.org/assets/images/logo.png';
+const logoCid = 'polskie-budownictwo-logo';
+const logoPath = path.join(__dirname, '..', 'page', 'assets', 'images', 'logo.png');
 
 function requireMailConfig() {
-  const required = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM', 'ADMIN_NOTIFY_EMAIL'];
+  const required = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM'];
   const missing = required.filter(name => !process.env[name]);
   if (missing.length) {
     throw new Error(`Missing mail configuration: ${missing.join(', ')}`);
@@ -13,14 +15,14 @@ function requireMailConfig() {
 
 function welcomeText() {
   return [
-    'Dziekujemy, ze dolaczasz do spolecznosci Polskie Budownictwo.',
+    'Dziękujemy, że dołączasz do społeczności Polskie Budownictwo.',
     '',
-    'Rusza inicjatywa, ktora laczy wykonawcow, podwykonawcow, dostawcow, architektow i inzynierow wokol jednego celu: bezpieczniejszego, uczciwszego rynku.',
+    'Rusza inicjatywa, która łączy wykonawców, podwykonawców, dostawców, architektów i inżynierów wokół jednego celu: bezpieczniejszego, uczciwszego rynku.',
     '',
     'Przeczytaj Manifest Polskiego Budownictwa:',
     manifestUrl,
     '',
-    'Dziekujemy, ze budujesz te inicjatywe razem z nami.',
+    'Dziękujemy, że budujesz tę inicjatywę razem z nami.',
   ].join('\n');
 }
 
@@ -31,14 +33,20 @@ function welcomeHtml() {
     <div style="max-width:640px;margin:auto;background:#fff;padding:32px">
       <p style="margin:0 0 28px">
         <a href="https://polskiebudownictwo.org/">
-          <img src="${logoUrl}" width="220" alt="Polskie Budownictwo" style="display:block;width:220px;max-width:100%;height:auto;border:0">
+          <img src="cid:${logoCid}" width="220" alt="Polskie Budownictwo" style="display:block;width:220px;max-width:100%;height:auto;border:0">
         </a>
       </p>
-      <h1>Dziekujemy, ze dolaczasz do Polskiego Budownictwa.</h1>
-      <p>Rusza inicjatywa, ktora laczy wykonawcow, podwykonawcow, dostawcow, architektow i inzynierow wokol jednego celu: bezpieczniejszego, uczciwszego rynku.</p>
-      <p>Manifest Polskiego Budownictwa wyznacza kierunek wspolnego dzialania.</p>
-      <p><a href="${manifestUrl}" style="display:inline-block;padding:15px 20px;background:#ee2329;color:#fff;text-decoration:none;font-weight:bold">Przeczytaj Manifest Polskiego Budownictwa</a></p>
-      <p>Dziekujemy, ze budujesz te inicjatywe razem z nami.</p>
+      <h1>Dziękujemy, że dołączasz do Polskiego Budownictwa.</h1>
+      <p>Rusza inicjatywa, która łączy wykonawców, podwykonawców, dostawców, architektów i inżynierów wokół jednego celu: bezpieczniejszego, uczciwszego rynku.</p>
+      <p>Manifest Polskiego Budownictwa wyznacza kierunek wspólnego działania.</p>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:22px 0;border-collapse:collapse">
+        <tr>
+          <td bgcolor="#ee2329" style="background:#ee2329">
+            <a href="${manifestUrl}" style="display:inline-block;padding:15px 20px;background:#ee2329;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;line-height:20px;text-decoration:none">Przeczytaj Manifest Polskiego Budownictwa</a>
+          </td>
+        </tr>
+      </table>
+      <p>Dziękujemy, że budujesz tę inicjatywę razem z nami.</p>
     </div>
   </body>
 </html>`;
@@ -46,14 +54,14 @@ function welcomeHtml() {
 
 function adminText(submission) {
   return [
-    'Nowe zgloszenie z formularza polskiebudownictwo.org',
+    'Nowe zgłoszenie z formularza polskiebudownictwo.org',
     '',
-    `Imie i nazwisko: ${submission.fullName}`,
+    `Imię i nazwisko: ${submission.fullName}`,
     `Firma: ${submission.companyName}`,
     `E-mail: ${submission.email}`,
     `Telefon: ${submission.phone || 'Nie podano'}`,
     `Role: ${submission.roles.join(', ')}`,
-    `Wielkosc firmy: ${submission.companySize || 'Nie podano'}`,
+    `Wielkość firmy: ${submission.companySize || 'Nie podano'}`,
     `IP: ${submission.ipAddress || 'Nieznane'}`,
   ].join('\n');
 }
@@ -64,9 +72,16 @@ async function sendWelcomeMail(submission) {
   await transporter.sendMail({
     from: process.env.MAIL_FROM,
     to: submission.email,
-    subject: 'Dolaczasz do inicjatywy Polskie Budownictwo. Przeczytaj manifest',
+    subject: 'Dołączasz do inicjatywy Polskie Budownictwo. Przeczytaj manifest',
     text: welcomeText(),
     html: welcomeHtml(),
+    attachments: [
+      {
+        filename: 'logo.png',
+        path: logoPath,
+        cid: logoCid,
+      },
+    ],
   });
 }
 
@@ -76,13 +91,13 @@ async function sendAdminNotification(submission) {
   await transporter.sendMail({
     from: process.env.MAIL_FROM,
     to: process.env.ADMIN_NOTIFY_EMAIL,
-    subject: `Nowe zgloszenie - ${submission.fullName}`,
+    subject: `Nowe zgłoszenie - ${submission.fullName}`,
     text: adminText(submission),
   });
 }
 
 async function sendSubmissionEmails(submission) {
-  await sendAdminNotification(submission);
+  // await sendAdminNotification(submission);
   await sendWelcomeMail(submission);
 }
 

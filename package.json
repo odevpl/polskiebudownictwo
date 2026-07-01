@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "Strona inicjatywy Polskie Budownictwo",
+  "main": "app.js",
   "scripts": {
     "dev": "node --watch server.js",
+    "watch": "node --watch server.js",
     "serve": "node server.js",
-    "start": "node --watch server.js",
+    "start": "node app.js",
+    "start:prod": "node app.js",
     "migrate": "node scripts/migrate.js",
     "create-superadmin": "node scripts/createSuperadmin.js",
-    "reset-admin-password": "node scripts/resetAdminPassword.js"
+    "reset-admin-password": "node scripts/resetAdminPassword.js",
+    "test:smtp": "node scripts/testSmtp.js",
+    "build:deploy": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1",
+    "dist": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1"
   },
   "engines": {
     "node": ">=20"

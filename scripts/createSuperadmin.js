@@ -6,9 +6,9 @@ const pool = require('../config/database');
 
 async function createSuperadmin() {
   const [, , emailArg, passwordArg, ...nameParts] = process.argv;
-  const email = String(emailArg || process.env.SUPERADMIN_EMAIL || '').trim().toLowerCase();
-  const password = String(passwordArg || process.env.SUPERADMIN_PASSWORD || '');
-  const fullName = nameParts.join(' ') || process.env.SUPERADMIN_NAME || 'Superadmin';
+  const email = String(emailArg || '').trim().toLowerCase();
+  const password = String(passwordArg || '');
+  const fullName = nameParts.join(' ') || 'Superadmin';
 
   if (!email || !password) {
     console.error('Uzycie: node scripts/createSuperadmin.js email@example.com haslo "Imie Nazwisko"');

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   notes TEXT,
   status ENUM('new','contacted','member') DEFAULT 'new',
-  INDEX idx_email (email),
+  UNIQUE INDEX uniq_submissions_email (email),
   INDEX idx_created_at (created_at),
   INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

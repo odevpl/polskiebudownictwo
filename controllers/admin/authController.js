@@ -40,7 +40,19 @@ async function login(request, response) {
     };
 
     await Admin.touchLogin(admin.id);
-    response.redirect(adminUrl('/submissions'));
+    request.session.save((saveError) => {
+      if (saveError) {
+        console.error('Session save error:', saveError);
+        response.status(500).render('admin/login', {
+          title: 'Logowanie',
+          error: 'Nie udalo sie zapisac sesji logowania.',
+          values: { email },
+        });
+        return;
+      }
+
+      response.redirect(adminUrl('/submissions'));
+    });
   } catch (error) {
     console.error('Login error:', error);
     response.status(500).render('admin/login', {

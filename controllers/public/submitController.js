@@ -37,7 +37,7 @@ function hasDatabaseConfig() {
 
 async function store(request, response) {
   if (request.body.website) {
-    response.json({ success: true, message: 'Zgloszenie zostalo przyjete.' });
+    response.json({ success: true, message: 'Zgłoszenie zostało przyjęte.' });
     return;
   }
 
@@ -45,7 +45,7 @@ async function store(request, response) {
   if (!errors.isEmpty()) {
     response.status(422).json({
       success: false,
-      message: errors.array()[0]?.msg || 'Uzupelnij wszystkie wymagane pola.',
+      message: errors.array()[0]?.msg || 'Uzupełnij wszystkie wymagane pola.',
       errors: errors.array(),
     });
     return;
@@ -55,26 +55,47 @@ async function store(request, response) {
     const submissionData = submissionFromRequest(request);
 
     if (!hasDatabaseConfig()) {
-      console.log('[test] Zgloszenie API zaakceptowane bez zapisu do bazy i wysylki e-maila.');
+      console.log('[test] Zgłoszenie API zaakceptowane bez zapisu do bazy i wysyłki e-maila.');
       response.json({
         success: true,
-        message: 'Zgloszenie zostalo wyslane w trybie testowym.',
+        message: 'Zgłoszenie zostało wysłane w trybie testowym.',
+      });
+      return;
+    }
+
+    const existingSubmission = await Submission.findByEmail(submissionData.email);
+    if (existingSubmission) {
+      response.status(409).json({
+        success: false,
+        message: 'Ten adres e-mail jest już zapisany.',
       });
       return;
     }
 
     const submission = await Submission.create(submissionData);
-    await sendSubmissionEmails(submission);
+    try {
+      await sendSubmissionEmails(submission);
+    } catch (mailError) {
+      console.error('Submission mail error:', mailError);
+    }
 
     response.json({
       success: true,
-      message: 'Dziekujemy za dolaczenie. Wiadomosc z manifestem zostala wyslana na podany adres e-mail.',
+      message: 'Dziękujemy za dołączenie. Wiadomość z manifestem została wysłana na podany adres e-mail.',
     });
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      response.status(409).json({
+        success: false,
+        message: 'Ten adres e-mail jest już zapisany.',
+      });
+      return;
+    }
+
     console.error('Submit error:', error);
     response.status(500).json({
       success: false,
-      message: 'Nie udalo sie wyslac zgloszenia. Sprobuj ponownie pozniej.',
+      message: 'Nie udało się wysłać zgłoszenia. Spróbuj ponownie później.',
     });
   }
 }

@@ -26,6 +26,7 @@ function createSessionMiddleware() {
   return session({
     name: 'pb.sid',
     secret: process.env.SESSION_SECRET || 'development-session-secret-change-me',
+    proxy: process.env.NODE_ENV === 'production',
     resave: false,
     saveUninitialized: false,
     store,

@@ -87,7 +87,7 @@ form?.addEventListener('submit', async event => {
   try {
     const response = await fetch(form.action, {
       method: 'POST',
-      body: new FormData(form),
+      body: new URLSearchParams(new FormData(form)),
       headers: { Accept: 'application/json' },
     });
     const result = await response.json();

@@ -4,8 +4,8 @@
 
 - Jednostronicowa witryna PolskieBudownictwo.org.
 - Frontend: statyczne HTML, CSS i JavaScript bez frameworka.
-- Backend formularza: PHP oraz bezpośrednia wysyłka przez SMTP.
-- Lokalny serwer Node.js symuluje wysłanie formularza i nie wysyła prawdziwych wiadomości.
+- Backend formularza: Node.js, Express oraz wysyłka przez SMTP.
+- Lokalny serwer Node.js obsługuje formularz i w trybie bez konfiguracji bazy przyjmuje zgłoszenia testowo.
 
 ## Struktura
 
@@ -13,9 +13,8 @@
 - `page/index.html` - treść strony i formularz.
 - `page/global.css` - wszystkie style, w tym widoki mobilne.
 - `page/assets/js/form.js` - obsługa formularza po stronie przeglądarki.
-- `page/send-contact.php` - walidacja, antyspam i wysyłka dwóch wiadomości.
-- `page/smtp-mailer.php` - prosty klient SMTP.
-- `page/smtp-config.php` - poufna konfiguracja SMTP; jest częścią wdrożenia, ale nie jest śledzona przez Git.
+- `controllers/public/submitController.js` - obsługa zgłoszenia formularza.
+- `services/mailService.js` - wysyłka wiadomości e-mail.
 - `server.js` - lokalny serwer deweloperski.
 - `zalozenia.md` - pierwotne założenia strony.
 
@@ -26,9 +25,9 @@
 ## Wdrożenie
 
 1. Skopiuj zawartość katalogu `page/` do katalogu publicznego domeny.
-2. Serwer docelowy musi obsługiwać PHP, połączenia SMTP i zapisywanie plików tymczasowych.
+2. Serwer docelowy musi obsługiwać Node.js, połączenia SMTP i bazę danych.
 
-Nie kopiuj całego repozytorium na serwer. Pilnuj, aby `page/smtp-config.php` znajdował się na serwerze, ale nie trafił do Git.
+Nie zapisuj sekretów SMTP ani danych dostępowych do bazy w plikach śledzonych przez Git.
 
 ## Formularz i manifest
 
@@ -45,6 +44,5 @@ Nie kopiuj całego repozytorium na serwer. Pilnuj, aby `page/smtp-config.php` zn
 - Nie dodawaj frameworków ani procesu kompilacji frontendu bez wyraźnej potrzeby.
 - Nie zmieniaj niepowiązanych sekcji strony.
 - Zachowuj działanie na urządzeniach mobilnych i komputerach.
-- Po zmianach formularza sprawdź spójność pól w `page/index.html`, `page/assets/js/form.js`, `page/send-contact.php` i `server.js`.
-- Przed wdrożeniem sprawdź składnię PHP poleceniami `php -l page/send-contact.php` i `php -l page/smtp-mailer.php`, jeśli PHP jest dostępne.
+- Po zmianach formularza sprawdź spójność pól w `page/index.html`, `page/assets/js/form.js`, `controllers/public/submitController.js`, `middleware/validate.js` i `server.js`.
 - Nie zapisuj haseł ani nowych sekretów w plikach śledzonych przez Git.

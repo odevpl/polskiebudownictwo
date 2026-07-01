@@ -36,6 +36,28 @@ async function create(data) {
   };
 }
 
+async function findByEmail(email, excludeId = null) {
+  const params = [email];
+  const excludeSql = excludeId ? 'AND id <> ?' : '';
+  if (excludeId) params.push(excludeId);
+
+  const [rows] = await pool.execute(
+    `SELECT *
+     FROM submissions
+     WHERE email = ?
+     ${excludeSql}
+     LIMIT 1`,
+    params,
+  );
+
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    ...row,
+    roles: parseRoles(row.roles),
+  };
+}
+
 async function update(id, data) {
   await pool.execute(
     `UPDATE submissions
@@ -97,14 +119,19 @@ async function findAll(filters = {}) {
   const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
   const [rows] = await pool.execute(
-    `SELECT SQL_CALC_FOUND_ROWS *
+    `SELECT *
      FROM submissions
      ${whereSql}
      ORDER BY created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...params, limit, offset],
+     LIMIT ${limit} OFFSET ${offset}`,
+    params,
   );
-  const [countRows] = await pool.query('SELECT FOUND_ROWS() AS total');
+  const [countRows] = await pool.execute(
+    `SELECT COUNT(*) AS total
+     FROM submissions
+     ${whereSql}`,
+    params,
+  );
 
   return {
     rows: rows.map(row => ({
@@ -156,6 +183,7 @@ module.exports = {
   create,
   findAll,
   findForExport,
+  findByEmail,
   findById,
   remove,
   update,

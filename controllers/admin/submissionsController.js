@@ -135,12 +135,39 @@ async function create(request, response) {
   }
 
   try {
+    const existingSubmission = await Submission.findByEmail(data.email);
+    if (existingSubmission) {
+      response.status(409).render('admin/submissions/form', {
+        title: 'Nowe zgloszenie',
+        admin: request.session.admin,
+        mode: 'create',
+        action: request.app.locals.adminUrl('/submissions/new'),
+        submission: bodyToView(data),
+        errors: ['Ten adres e-mail jest juz zapisany.'],
+        ...formOptions(),
+      });
+      return;
+    }
+
     const submission = await Submission.create({
       ...data,
       ipAddress: request.ip,
     });
     response.redirect(request.app.locals.adminUrl(`/submissions/${submission.id}`));
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      response.status(409).render('admin/submissions/form', {
+        title: 'Nowe zgloszenie',
+        admin: request.session.admin,
+        mode: 'create',
+        action: request.app.locals.adminUrl('/submissions/new'),
+        submission: bodyToView(data),
+        errors: ['Ten adres e-mail jest juz zapisany.'],
+        ...formOptions(),
+      });
+      return;
+    }
+
     console.error('Submission create error:', error);
     response.status(500).send('Nie udalo sie dodac zgloszenia.');
   }
@@ -192,6 +219,20 @@ async function update(request, response) {
   }
 
   try {
+    const existingSubmission = await Submission.findByEmail(data.email, id);
+    if (existingSubmission) {
+      response.status(409).render('admin/submissions/form', {
+        title: `Edycja #${id}`,
+        admin: request.session.admin,
+        mode: 'edit',
+        action: request.app.locals.adminUrl(`/submissions/${id}/edit`),
+        submission: { id, ...bodyToView(data) },
+        errors: ['Ten adres e-mail jest juz przypisany do innego zgloszenia.'],
+        ...formOptions(),
+      });
+      return;
+    }
+
     const submission = await Submission.update(id, data);
     if (!submission) {
       response.status(404).send('Zgloszenie nie istnieje.');
@@ -200,6 +241,19 @@ async function update(request, response) {
 
     response.redirect(request.app.locals.adminUrl(`/submissions/${id}`));
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      response.status(409).render('admin/submissions/form', {
+        title: `Edycja #${id}`,
+        admin: request.session.admin,
+        mode: 'edit',
+        action: request.app.locals.adminUrl(`/submissions/${id}/edit`),
+        submission: { id, ...bodyToView(data) },
+        errors: ['Ten adres e-mail jest juz przypisany do innego zgloszenia.'],
+        ...formOptions(),
+      });
+      return;
+    }
+
     console.error('Submission update error:', error);
     response.status(500).send('Nie udalo sie zapisac zgloszenia.');
   }
