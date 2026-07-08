@@ -26,43 +26,90 @@
     <button class="button button--ghost" type="button" data-modal-open="export-csv-modal">Eksportuj CSV</button>
   </form>
 
-  <div class="table-wrap">
-    <table class="adm-table">
-      <thead>
-        <tr>
-          <th>Imie i nazwisko</th>
-          <th>Firma</th>
-          <th>E-mail</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Data</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (!submissions.length) { %>
+  <div class="adm-table-panel">
+    <div class="table-wrap">
+      <table class="adm-table">
+        <thead>
           <tr>
-            <td colspan="7" class="muted">Brak zgloszen do wyswietlenia.</td>
+            <th>Imie</th>
+            <th>Nazwisko</th>
+            <th>Firma</th>
+            <th>Role</th>
+            <th>Grupy</th>
+            <th>Statusy dodatkowe</th>
+            <th></th>
           </tr>
-        <% } %>
-        <% submissions.forEach(submission => { %>
-          <tr>
-            <td><strong><%= submission.full_name %></strong></td>
-            <td><%= submission.company_name || '-' %></td>
-            <td><a href="mailto:<%= submission.email %>"><%= submission.email %></a></td>
-            <td><%= submission.roles.join(', ') || '-' %></td>
-            <td><span class="badge adm-badge--success"><%= submission.status %></span></td>
-            <td><%= submission.created_at ? new Date(submission.created_at).toLocaleString('pl-PL') : '-' %></td>
-            <td>
-              <a class="button button--ghost" href="<%= adminUrl('/submissions/' + submission.id + '/edit') %>">Edytuj</a>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          <% if (!submissions.length) { %>
+            <tr>
+              <td colspan="7" class="muted">Brak zgloszen do wyswietlenia.</td>
+            </tr>
+          <% } %>
+          <% submissions.forEach(submission => { %>
+            <tr>
+              <td data-label="Imie"><strong><%= submission.first_name || '-' %></strong></td>
+              <td data-label="Nazwisko"><%= submission.last_name || '-' %></td>
+              <td data-label="Firma"><%= submission.company_name || '-' %></td>
+              <td data-label="Role"><%= submission.roles.join(', ') || '-' %></td>
+              <td data-label="Grupy"><%= submission.groups.join(', ') || '-' %></td>
+              <td data-label="Statusy dodatkowe"><%= submission.status_tags.join(', ') || '-' %></td>
+              <td data-label="Akcje">
+                <a class="button button--ghost" href="<%= adminUrl('/submissions/' + submission.id + '/edit') %>">Edytuj</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-  <p class="table-count">Razem: <%= pagination.total %></p>
+    <div class="adm-pagination" aria-label="Paginacja zgloszen">
+      <p class="table-count">
+        Razem: <%= pagination.total %>
+        <% if (pagination.total) { %>
+          <span>
+            | Pokazano <%= (pagination.page - 1) * pagination.limit + 1 %>-<%= Math.min(pagination.page * pagination.limit, pagination.total) %>
+          </span>
+        <% } %>
+      </p>
+
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="adm-pagination__nav" aria-label="Strony">
+          <% if (pagination.page > 1) { %>
+            <a class="button button--ghost" href="<%= pageUrl(pagination.page - 1) %>">Poprzednia</a>
+          <% } else { %>
+            <span class="button button--ghost adm-pagination__disabled">Poprzednia</span>
+          <% } %>
+
+          <% const startPage = Math.max(1, pagination.page - 2); %>
+          <% const endPage = Math.min(pagination.totalPages, pagination.page + 2); %>
+          <% if (startPage > 1) { %>
+            <a class="adm-pagination__page" href="<%= pageUrl(1) %>">1</a>
+            <% if (startPage > 2) { %><span class="adm-pagination__ellipsis">...</span><% } %>
+          <% } %>
+
+          <% for (let page = startPage; page <= endPage; page += 1) { %>
+            <% if (page === pagination.page) { %>
+              <span class="adm-pagination__page adm-pagination__page--active" aria-current="page"><%= page %></span>
+            <% } else { %>
+              <a class="adm-pagination__page" href="<%= pageUrl(page) %>"><%= page %></a>
+            <% } %>
+          <% } %>
+
+          <% if (endPage < pagination.totalPages) { %>
+            <% if (endPage < pagination.totalPages - 1) { %><span class="adm-pagination__ellipsis">...</span><% } %>
+            <a class="adm-pagination__page" href="<%= pageUrl(pagination.totalPages) %>"><%= pagination.totalPages %></a>
+          <% } %>
+
+          <% if (pagination.page < pagination.totalPages) { %>
+            <a class="button button--ghost" href="<%= pageUrl(pagination.page + 1) %>">Nastepna</a>
+          <% } else { %>
+            <span class="button button--ghost adm-pagination__disabled">Nastepna</span>
+          <% } %>
+        </nav>
+      <% } %>
+    </div>
+  </div>
 
   <div class="adm-modal" id="export-csv-modal" role="dialog" aria-modal="true" aria-labelledby="export-csv-title" hidden>
     <div class="adm-modal__panel">
@@ -74,6 +121,11 @@
           </div>
           <button class="adm-icon-button" type="button" data-modal-close aria-label="Zamknij">x</button>
         </div>
+
+        <label class="adm-check adm-check--mailerlite">
+          <input name="mailerLiteExport" type="checkbox" value="1">
+          <span>Eksport dla MailerLite</span>
+        </label>
 
         <div class="adm-check-grid adm-check-grid--modal">
           <% exportColumns.forEach(column => { %>

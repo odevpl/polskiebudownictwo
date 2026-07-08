@@ -19,7 +19,8 @@ function normalizeCompanySize(value) {
 
 function submissionFromRequest(request) {
   return {
-    fullName: request.body.name.trim(),
+    firstName: request.body.firstName.trim(),
+    lastName: request.body.lastName.trim(),
     companyName: request.body.company.trim(),
     email: request.body.email.trim(),
     phone: (request.body.phone || '').trim(),

@@ -255,6 +255,21 @@ p {
   color: var(--color-primary);
 }
 
+.site-brand {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.site-breadcrumb {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
 .site-nav {
   display: flex;
   align-items: center;
@@ -439,6 +454,10 @@ p {
   background: var(--color-primary);
   box-shadow: 0 0 0 0.3rem rgb(238 35 41 / 20%);
   content: "";
+}
+
+.hero__note {
+  margin-top: 1.25rem;
 }
 
 .hero__scroll {
@@ -1006,6 +1025,19 @@ p {
   font-size: 0.8rem;
 }
 
+.quote-block {
+  max-width: 56rem;
+  margin: clamp(2rem, 5vw, 3.5rem) auto 0;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--color-primary-soft);
+  color: var(--color-dark);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
 .feature-band {
   padding-block: clamp(2rem, 5vw, 3.5rem);
   background: var(--color-primary);
@@ -1191,6 +1223,32 @@ p {
   gap: 1rem;
 }
 
+.mediation-footer {
+  align-items: flex-start;
+}
+
+.mediation-footer__contact {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mediation-footer__contact p {
+  margin: 0;
+}
+
+.mediation-footer__contact p:first-child {
+  color: var(--color-white);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mediation-footer__contact a {
+  font-weight: 800;
+  text-decoration: none;
+}
+
 @media (max-width: 900px) {
   .site-nav {
     display: none;
@@ -1208,6 +1266,10 @@ p {
     min-height: 2.5rem;
     align-items: center;
     justify-content: center;
+  }
+
+  .site-brand {
+    max-width: calc(100% - 4rem);
   }
 
   .site-header--menu-open .site-nav,

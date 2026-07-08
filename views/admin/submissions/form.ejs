@@ -3,7 +3,7 @@
   <a class="button button--ghost" href="<%= adminUrl('/submissions') %>">Wroc do listy</a>
 
   <div class="admin-hero">
-    <div class="admin-hero__art" aria-hidden="true"><%= mode === 'edit' ? String(submission.full_name || 'PB').slice(0, 2).toUpperCase() : '+' %></div>
+    <div class="admin-hero__art" aria-hidden="true"><%= mode === 'edit' ? String(submission.first_name || 'PB').slice(0, 2).toUpperCase() : '+' %></div>
     <div>
       <p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p>
       <h1><%= mode === 'edit' ? ('#' + submission.id) : 'Dodaj zgloszenie' %></h1>
@@ -22,8 +22,13 @@
   <form class="adm-form" method="post" action="<%= action %>">
     <div class="adm-form-grid">
       <div class="adm-field">
-        <label class="adm-label" for="fullName">Imie i nazwisko</label>
-        <input class="adm-control" id="fullName" name="fullName" type="text" value="<%= submission.full_name || '' %>" required>
+        <label class="adm-label" for="firstName">Imie</label>
+        <input class="adm-control" id="firstName" name="firstName" type="text" value="<%= submission.first_name || '' %>" required>
+      </div>
+
+      <div class="adm-field">
+        <label class="adm-label" for="lastName">Nazwisko</label>
+        <input class="adm-control" id="lastName" name="lastName" type="text" value="<%= submission.last_name || '' %>" required>
       </div>
 
       <div class="adm-field">
@@ -61,12 +66,36 @@
       </div>
 
       <fieldset class="adm-field adm-fieldset adm-form-grid__full">
+        <legend class="adm-label">Statusy dodatkowe</legend>
+        <div class="adm-check-grid">
+          <% statusTags.forEach(tag => { %>
+            <label class="adm-check">
+              <input name="statusTags" type="checkbox" value="<%= tag %>" <%= submission.status_tags && submission.status_tags.includes(tag) ? 'checked' : '' %>>
+              <span><%= tag %></span>
+            </label>
+          <% }) %>
+        </div>
+      </fieldset>
+
+      <fieldset class="adm-field adm-fieldset adm-form-grid__full">
         <legend class="adm-label">Role w branzy</legend>
         <div class="adm-check-grid">
           <% allowedRoles.forEach(role => { %>
             <label class="adm-check">
               <input name="roles" type="checkbox" value="<%= role %>" <%= submission.roles && submission.roles.includes(role) ? 'checked' : '' %>>
               <span><%= role %></span>
+            </label>
+          <% }) %>
+        </div>
+      </fieldset>
+
+      <fieldset class="adm-field adm-fieldset adm-form-grid__full">
+        <legend class="adm-label">Grupy wewnetrzne</legend>
+        <div class="adm-check-grid">
+          <% internalGroups.forEach(group => { %>
+            <label class="adm-check">
+              <input name="groups" type="checkbox" value="<%= group %>" <%= submission.groups && submission.groups.includes(group) ? 'checked' : '' %>>
+              <span><%= group %></span>
             </label>
           <% }) %>
         </div>

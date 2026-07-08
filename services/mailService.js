@@ -56,7 +56,8 @@ function adminText(submission) {
   return [
     'Nowe zgłoszenie z formularza polskiebudownictwo.org',
     '',
-    `Imię i nazwisko: ${submission.fullName}`,
+    `Imię: ${submission.firstName}`,
+    `Nazwisko: ${submission.lastName}`,
     `Firma: ${submission.companyName}`,
     `E-mail: ${submission.email}`,
     `Telefon: ${submission.phone || 'Nie podano'}`,
@@ -88,10 +89,11 @@ async function sendWelcomeMail(submission) {
 async function sendAdminNotification(submission) {
   requireMailConfig();
   const transporter = createTransporter();
+  const fullName = [submission.firstName, submission.lastName].filter(Boolean).join(' ');
   await transporter.sendMail({
     from: process.env.MAIL_FROM,
     to: process.env.ADMIN_NOTIFY_EMAIL,
-    subject: `Nowe zgłoszenie - ${submission.fullName}`,
+    subject: `Nowe zgłoszenie - ${fullName}`,
     text: adminText(submission),
   });
 }

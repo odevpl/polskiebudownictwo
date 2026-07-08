@@ -18,12 +18,80 @@ async function migrate() {
       await connection.query(statement);
     }
     await connection.query('ALTER TABLE sessions MODIFY expires BIGINT UNSIGNED NOT NULL');
+    await ensureSubmissionNameColumns(connection);
+    await ensureSubmissionGroupsColumn(connection);
+    await ensureSubmissionStatusTagsColumn(connection);
     await ensureUniqueSubmissionEmails(connection);
     console.log('Migracje zakonczone.');
   } finally {
     connection.release();
     await pool.end();
   }
+}
+
+async function ensureSubmissionNameColumns(connection) {
+  const [firstNameColumns] = await connection.query(
+    `SHOW COLUMNS
+     FROM submissions
+     LIKE 'first_name'`,
+  );
+
+  const [lastNameColumns] = await connection.query(
+    `SHOW COLUMNS
+     FROM submissions
+     LIKE 'last_name'`,
+  );
+
+  const [fullNameColumns] = await connection.query(
+    `SHOW COLUMNS
+     FROM submissions
+     LIKE 'full_name'`,
+  );
+
+  if (!firstNameColumns.length) {
+    const afterColumn = fullNameColumns.length ? ' AFTER full_name' : ' AFTER id';
+    await connection.query(`ALTER TABLE submissions ADD COLUMN first_name VARCHAR(80) NULL${afterColumn}`);
+  }
+
+  if (!lastNameColumns.length) {
+    await connection.query('ALTER TABLE submissions ADD COLUMN last_name VARCHAR(120) NULL AFTER first_name');
+  }
+
+  if (fullNameColumns.length) {
+    await connection.query(
+      `UPDATE submissions
+       SET first_name = SUBSTRING_INDEX(TRIM(full_name), ' ', 1),
+           last_name = TRIM(SUBSTRING(TRIM(full_name), LENGTH(SUBSTRING_INDEX(TRIM(full_name), ' ', 1)) + 1))
+       WHERE (first_name IS NULL OR first_name = '')
+         AND full_name IS NOT NULL
+         AND TRIM(full_name) <> ''`,
+    );
+    await connection.query('ALTER TABLE submissions DROP COLUMN full_name');
+  }
+}
+
+async function ensureSubmissionGroupsColumn(connection) {
+  const [columns] = await connection.query(
+    `SHOW COLUMNS
+     FROM submissions
+     LIKE 'groups'`,
+  );
+
+  if (columns.length) return;
+
+  await connection.query('ALTER TABLE submissions ADD COLUMN `groups` JSON NULL AFTER roles');
+}
+
+async function ensureSubmissionStatusTagsColumn(connection) {
+  const [columns] = await connection.query(
+    `SHOW COLUMNS
+     FROM submissions
+     LIKE 'status_tags'`,
+  );
+
+  if (columns.length) return;
+
+  await connection.query('ALTER TABLE submissions ADD COLUMN status_tags JSON NULL AFTER status');
 }
 
 async function ensureUniqueSubmissionEmails(connection) {

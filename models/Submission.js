@@ -3,30 +3,36 @@ const pool = require('../config/database');
 async function create(data) {
   const [result] = await pool.execute(
     `INSERT INTO submissions (
-      full_name,
+      first_name,
+      last_name,
       company_name,
       email,
       phone,
       roles,
+      \`groups\`,
       company_size,
       consent_data,
       consent_marketing,
       ip_address,
       notes,
-      status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      status,
+      status_tags
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      data.fullName,
+      data.firstName,
+      data.lastName,
       data.companyName,
       data.email,
       data.phone || null,
       JSON.stringify(data.roles),
+      JSON.stringify(data.groups || []),
       data.companySize || null,
       data.consentData ? 1 : 0,
       data.consentMarketing ? 1 : 0,
       data.ipAddress || null,
       data.notes || null,
       data.status || 'new',
+      JSON.stringify(data.statusTags || []),
     ],
   );
 
@@ -55,34 +61,42 @@ async function findByEmail(email, excludeId = null) {
   return {
     ...row,
     roles: parseRoles(row.roles),
+    groups: parseRoles(row.groups),
+    status_tags: parseRoles(row.status_tags),
   };
 }
 
 async function update(id, data) {
   await pool.execute(
     `UPDATE submissions
-     SET full_name = ?,
+     SET first_name = ?,
+         last_name = ?,
          company_name = ?,
          email = ?,
          phone = ?,
          roles = ?,
+         \`groups\` = ?,
          company_size = ?,
          consent_data = ?,
          consent_marketing = ?,
          notes = ?,
-         status = ?
+         status = ?,
+         status_tags = ?
      WHERE id = ?`,
     [
-      data.fullName,
+      data.firstName,
+      data.lastName,
       data.companyName,
       data.email,
       data.phone || null,
       JSON.stringify(data.roles),
+      JSON.stringify(data.groups || []),
       data.companySize || null,
       data.consentData ? 1 : 0,
       data.consentMarketing ? 1 : 0,
       data.notes || null,
       data.status || 'new',
+      JSON.stringify(data.statusTags || []),
       id,
     ],
   );
@@ -103,9 +117,9 @@ async function findAll(filters = {}) {
   const params = [];
 
   if (filters.search) {
-    where.push('(full_name LIKE ? OR email LIKE ? OR company_name LIKE ?)');
+    where.push('(first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR company_name LIKE ?)');
     const term = `%${filters.search}%`;
-    params.push(term, term, term);
+    params.push(term, term, term, term);
   }
 
   if (filters.status) {
@@ -137,6 +151,8 @@ async function findAll(filters = {}) {
     rows: rows.map(row => ({
       ...row,
       roles: parseRoles(row.roles),
+      groups: parseRoles(row.groups),
+      status_tags: parseRoles(row.status_tags),
     })),
     total: countRows[0]?.total || 0,
     page,
@@ -154,6 +170,8 @@ async function findById(id) {
   return {
     ...row,
     roles: parseRoles(row.roles),
+    groups: parseRoles(row.groups),
+    status_tags: parseRoles(row.status_tags),
   };
 }
 
@@ -167,6 +185,8 @@ async function findForExport() {
   return rows.map(row => ({
     ...row,
     roles: parseRoles(row.roles),
+    groups: parseRoles(row.groups),
+    status_tags: parseRoles(row.status_tags),
   }));
 }
 

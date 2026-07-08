@@ -3,21 +3,41 @@ const { allowedRoles } = require('../../middleware/validate');
 
 const companySizes = ['1-2', '3-10', '11-50', '51-250', '250+'];
 const statuses = ['new', 'contacted', 'member'];
+const statusTags = ['Akademia'];
+const internalGroups = [
+  'Ambasador Polskiego Budownictwa',
+  'Mediator Polskiego Budownictwa',
+  'Partner',
+  'Mecenas',
+];
 const exportColumns = [
   { key: 'id', label: 'ID', value: row => row.id },
-  { key: 'full_name', label: 'Imie i nazwisko', value: row => row.full_name },
+  { key: 'first_name', label: 'Imie', value: row => row.first_name },
+  { key: 'last_name', label: 'Nazwisko', value: row => row.last_name },
   { key: 'company_name', label: 'Nazwa firmy', value: row => row.company_name },
   { key: 'email', label: 'E-mail', value: row => row.email },
   { key: 'phone', label: 'Telefon', value: row => row.phone },
   { key: 'roles', label: 'Role w branzy', value: row => row.roles.join(', ') },
+  { key: 'groups', label: 'Grupy', value: row => row.groups.join(', ') },
   { key: 'company_size', label: 'Wielkosc firmy', value: row => row.company_size },
   { key: 'status', label: 'Status', value: row => row.status },
+  { key: 'status_tags', label: 'Statusy dodatkowe', value: row => row.status_tags.join(', ') },
   { key: 'notes', label: 'Notatki', value: row => row.notes },
   { key: 'consent_data', label: 'Zgoda dane', value: row => row.consent_data ? 'Tak' : 'Nie' },
   { key: 'consent_marketing', label: 'Zgoda marketing', value: row => row.consent_marketing ? 'Tak' : 'Nie' },
   { key: 'ip_address', label: 'IP', value: row => row.ip_address },
   { key: 'created_at', label: 'Data utworzenia', value: row => formatDate(row.created_at) },
   { key: 'updated_at', label: 'Data aktualizacji', value: row => formatDate(row.updated_at) },
+];
+const mailerLiteExportColumns = [
+  { label: 'Imię', value: row => row.first_name },
+  { label: 'Nazwisko', value: row => row.last_name },
+  { label: 'Nazwa firmy', value: row => row.company_name },
+  { label: 'Email', value: row => row.email },
+  { label: 'Telefon', value: row => row.phone },
+  { label: 'Grupa', value: row => mergeGroups(row).join(', ') },
+  { label: 'Status', value: row => row.status },
+  { label: 'Inne', value: row => row.notes },
 ];
 
 function normalizeArray(value) {
@@ -27,13 +47,18 @@ function normalizeArray(value) {
 
 function submissionFromBody(body) {
   const roles = normalizeArray(body.roles).filter(role => allowedRoles.includes(role));
+  const groups = normalizeArray(body.groups).filter(group => internalGroups.includes(group));
+  const selectedStatusTags = normalizeArray(body.statusTags).filter(tag => statusTags.includes(tag));
 
   return {
-    fullName: String(body.fullName || '').trim(),
+    firstName: String(body.firstName || '').trim(),
+    lastName: String(body.lastName || '').trim(),
     companyName: String(body.companyName || '').trim(),
     email: String(body.email || '').trim().toLowerCase(),
     phone: String(body.phone || '').trim(),
     roles,
+    groups,
+    statusTags: selectedStatusTags,
     companySize: companySizes.includes(body.companySize) ? body.companySize : null,
     consentData: Boolean(body.consentData),
     consentMarketing: Boolean(body.consentMarketing),
@@ -44,7 +69,8 @@ function submissionFromBody(body) {
 
 function validateSubmission(data) {
   const errors = [];
-  if (!data.fullName) errors.push('Podaj imie i nazwisko.');
+  if (!data.firstName) errors.push('Podaj imie.');
+  if (!data.lastName) errors.push('Podaj nazwisko.');
   if (!data.companyName) errors.push('Podaj nazwe firmy.');
   if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.push('Podaj poprawny adres e-mail.');
   if (!data.roles.length) errors.push('Wybierz co najmniej jedna role.');
@@ -58,7 +84,9 @@ function formOptions() {
   return {
     allowedRoles,
     companySizes,
+    internalGroups,
     statuses,
+    statusTags,
   };
 }
 
@@ -71,12 +99,14 @@ async function index(request, response) {
 
   try {
     const result = await Submission.findAll(filters);
+    const totalPages = Math.max(Math.ceil(result.total / result.limit), 1);
     response.render('admin/submissions/index', {
       title: 'Zgloszenia',
       admin: request.session.admin,
       submissions: result.rows,
       filters,
-      pagination: result,
+      pagination: { ...result, totalPages },
+      pageUrl: page => submissionsPageUrl(request, page),
       exportColumns,
       error: null,
     });
@@ -87,11 +117,20 @@ async function index(request, response) {
       admin: request.session.admin,
       submissions: [],
       filters,
-      pagination: { total: 0, page: 1, limit: 25 },
+      pagination: { total: 0, page: 1, limit: 25, totalPages: 1 },
+      pageUrl: page => submissionsPageUrl(request, page),
       exportColumns,
       error: 'Nie udalo sie pobrac zgloszen. Sprawdz konfiguracje bazy danych.',
     });
   }
+}
+
+function submissionsPageUrl(request, page) {
+  const params = new URLSearchParams();
+  if (request.query.search) params.set('search', request.query.search);
+  if (request.query.status) params.set('status', request.query.status);
+  params.set('page', String(page));
+  return `${request.app.locals.adminUrl('/submissions')}?${params.toString()}`;
 }
 
 function newForm(request, response) {
@@ -101,11 +140,14 @@ function newForm(request, response) {
     mode: 'create',
     action: request.app.locals.adminUrl('/submissions/new'),
     submission: {
-      full_name: '',
+      first_name: '',
+      last_name: '',
       company_name: '',
       email: '',
       phone: '',
       roles: [],
+      groups: [],
+      status_tags: [],
       company_size: '',
       consent_data: 1,
       consent_marketing: 1,
@@ -270,11 +312,14 @@ async function destroy(request, response) {
 }
 
 async function exportCsv(request, response) {
+  const mailerLiteExport = Boolean(request.body.mailerLiteExport);
   const selectedKeys = normalizeArray(request.body.columns);
-  const selectedColumns = exportColumns.filter(column => selectedKeys.includes(column.key));
+  const selectedColumns = mailerLiteExport
+    ? mailerLiteExportColumns
+    : exportColumns.filter(column => selectedKeys.includes(column.key));
 
   if (!selectedColumns.length) {
-    response.status(422).send('Wybierz co najmniej jedna kolumne.');
+    response.status(422).send('Wybierz co najmniej jedna kolumne albo eksport dla MailerLite.');
     return;
   }
 
@@ -282,9 +327,12 @@ async function exportCsv(request, response) {
     const submissions = await Submission.findForExport();
     const csv = buildCsv(submissions, selectedColumns);
     const stamp = new Date().toISOString().slice(0, 10);
+    const filename = mailerLiteExport
+      ? `zgloszenia-mailerlite-${stamp}.csv`
+      : `zgloszenia-${stamp}.csv`;
 
     response.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    response.setHeader('Content-Disposition', `attachment; filename=\"zgloszenia-${stamp}.csv\"`);
+    response.setHeader('Content-Disposition', `attachment; filename=\"${filename}\"`);
     response.send(`\uFEFF${csv}`);
   } catch (error) {
     console.error('Submission export error:', error);
@@ -294,11 +342,14 @@ async function exportCsv(request, response) {
 
 function bodyToView(data) {
   return {
-    full_name: data.fullName,
+    first_name: data.firstName,
+    last_name: data.lastName,
     company_name: data.companyName,
     email: data.email,
     phone: data.phone,
     roles: data.roles,
+    groups: data.groups,
+    status_tags: data.statusTags,
     company_size: data.companySize,
     consent_data: data.consentData ? 1 : 0,
     consent_marketing: data.consentMarketing ? 1 : 0,
@@ -319,6 +370,10 @@ function buildCsv(rows, columns) {
 function csvCell(value) {
   const text = String(value ?? '');
   return `"${text.replace(/"/g, '""')}"`;
+}
+
+function mergeGroups(row) {
+  return [...new Set([...(row.roles || []), ...(row.groups || [])])];
 }
 
 function formatDate(value) {

@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS submissions (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  full_name VARCHAR(150) NOT NULL,
+  first_name VARCHAR(80),
+  last_name VARCHAR(120),
   company_name VARCHAR(200),
   email VARCHAR(254) NOT NULL,
   phone VARCHAR(20),
   roles JSON NOT NULL,
+  `groups` JSON,
   company_size ENUM('1-2','3-10','11-50','51-250','250+'),
   consent_data TINYINT(1) NOT NULL DEFAULT 0,
   consent_marketing TINYINT(1) NOT NULL DEFAULT 0,
@@ -13,6 +15,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   notes TEXT,
   status ENUM('new','contacted','member') DEFAULT 'new',
+  status_tags JSON,
   UNIQUE INDEX uniq_submissions_email (email),
   INDEX idx_created_at (created_at),
   INDEX idx_status (status)

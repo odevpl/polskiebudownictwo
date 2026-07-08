@@ -8,7 +8,7 @@
       content="Polskie Budownictwo wspiera polskich wykonawców, podwykonawców, dostawców i specjalistów branży budowlanej."
     />
     <title>Polskie Budownictwo</title>
-    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="global.css?v=5" />
   </head>
   <body>
     <header class="site-header">
@@ -21,7 +21,13 @@
           <img src="assets/images/logo.png" alt="Polskie Budownictwo" />
         </a>
 
-        <nav class="site-nav" aria-label="Główna nawigacja">
+        <button class="site-menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Otwórz menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="site-nav" id="site-nav" aria-label="Główna nawigacja">
           <a href="#misja">Misja</a>
           <a href="#dzialania">Obszary działania</a>
           <a href="#spolecznosc">Społeczność</a>
@@ -491,12 +497,22 @@
           <form class="form signup__form" id="signup-form" action="/api/submit" method="post">
             <div class="form-grid">
               <div class="field">
-                <label for="name">Imię i nazwisko</label>
+                <label for="firstName">Imię</label>
                 <input
-                  id="name"
-                  name="name"
+                  id="firstName"
+                  name="firstName"
                   type="text"
-                  autocomplete="name"
+                  autocomplete="given-name"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="lastName">Nazwisko</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  autocomplete="family-name"
                   required
                 />
               </div>
@@ -615,10 +631,9 @@
             <article class="contact-card">
               <p>Oddział Gdańsk</p>
               <address class="contact-card__address">
-                ul. Szafarnia 11<br>
-                80-755 Gdańsk
+                al. Grunwaldzka 56 lok. 202<br>
+                80-241 Gdańsk
               </address>
-              <span class="contact-card__note">Tylko umówione spotkania</span>
             </article>
           </div>
         </div>
@@ -673,6 +688,10 @@
           <label class="role-option"><input name="role[]" type="checkbox" value="Producent materiałów" form="signup-form" /><span>Producent materiałów</span></label>
           <label class="role-option"><input name="role[]" type="checkbox" value="Inżynier, projektant lub architekt" form="signup-form" /><span>Inżynier, projektant lub architekt</span></label>
           <label class="role-option"><input name="role[]" type="checkbox" value="Usługodawca dla budownictwa" form="signup-form" /><span>Usługodawca dla budownictwa</span></label>
+          <label class="role-option"><input name="role[]" type="checkbox" value="Rzeczoznawca" form="signup-form" /><span>Rzeczoznawca</span></label>
+          <label class="role-option"><input name="role[]" type="checkbox" value="Prawnik" form="signup-form" /><span>Prawnik</span></label>
+          <label class="role-option"><input name="role[]" type="checkbox" value="Mediator" form="signup-form" /><span>Mediator</span></label>
+          <label class="role-option"><input name="role[]" type="checkbox" value="Organizacja Branżowa" form="signup-form" /><span>Organizacja Branżowa</span></label>
           <label class="role-option"><input name="role[]" type="checkbox" value="Inna" form="signup-form" /><span>Inna</span></label>
         </div>
         <div class="role-popup__actions">
@@ -682,6 +701,7 @@
       </div>
     </div>
 
+    <script src="assets/js/menu.js?v=2" defer></script>
     <script src="assets/js/form.js?v=3" defer></script>
   </body>
 </html>

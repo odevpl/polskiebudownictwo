@@ -8,6 +8,10 @@ const allowedRoles = [
   'Producent materiałów',
   'Inżynier, projektant lub architekt',
   'Usługodawca dla budownictwa',
+  'Rzeczoznawca',
+  'Prawnik',
+  'Mediator',
+  'Organizacja Branżowa',
   'Inna',
 ];
 
@@ -22,13 +26,20 @@ const submitValidation = [
       return Number.isFinite(startedAt) && Date.now() / 1000 - startedAt >= 3;
     })
     .withMessage('Formularz zostal wyslany zbyt szybko. Sprobuj ponownie.'),
-  body('name')
+  body('firstName')
     .trim()
     .notEmpty()
-    .withMessage('Podaj imie i nazwisko.')
+    .withMessage('Podaj imie.')
     .bail()
-    .isLength({ max: 150 })
-    .withMessage('Imie i nazwisko jest zbyt dlugie.'),
+    .isLength({ max: 80 })
+    .withMessage('Imie jest zbyt dlugie.'),
+  body('lastName')
+    .trim()
+    .notEmpty()
+    .withMessage('Podaj nazwisko.')
+    .bail()
+    .isLength({ max: 120 })
+    .withMessage('Nazwisko jest zbyt dlugie.'),
   body('company')
     .trim()
     .notEmpty()

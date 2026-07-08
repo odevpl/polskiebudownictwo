@@ -10,9 +10,11 @@
 ## Struktura
 
 - `page/` - publiczne pliki strony. Zmiany widoczne na stronie wykonuj tutaj.
+- `subdomain/mediacje/` - publiczne pliki subdomeny `mediacje.polskiebudownictwo.org`.
 - `page/index.html` - treść strony i formularz.
 - `page/global.css` - wszystkie style, w tym widoki mobilne.
 - `page/assets/js/form.js` - obsługa formularza po stronie przeglądarki.
+- `app-mediacje.js` - osobny entrypoint Passenger/Node dla subdomeny mediacji.
 - `controllers/public/submitController.js` - obsługa zgłoszenia formularza.
 - `services/mailService.js` - wysyłka wiadomości e-mail.
 - `server.js` - lokalny serwer deweloperski.
@@ -21,11 +23,20 @@
 ## Polecenia
 
 - `npm run dev` - uruchamia stronę lokalnie pod `http://127.0.0.1:3000/`.
+- `npm run build:main` - buduje paczkę wdrożeniową głównej domeny do `dists/polskiebudownictwo.org/`.
+- `npm run build:mediacje` - buduje paczkę wdrożeniową subdomeny do `dists/mediacje.polskiebudownictwo.org/`.
+- `npm run build:deploy` - buduje obie paczki wdrożeniowe.
 
 ## Wdrożenie
 
-1. Skopiuj zawartość katalogu `page/` do katalogu publicznego domeny.
-2. Serwer docelowy musi obsługiwać Node.js, połączenia SMTP i bazę danych.
+1. Dla głównej domeny używaj paczki `dists/polskiebudownictwo.org/`.
+2. Dla subdomeny mediacji używaj paczki `dists/mediacje.polskiebudownictwo.org/`.
+3. Serwer docelowy musi obsługiwać Node.js, połączenia SMTP i bazę danych.
+
+Subdomena `mediacje.polskiebudownictwo.org` działa jako osobna aplikacja Passenger/Node,
+ale może korzystać z API głównej domeny `polskiebudownictwo.org`. Formularze mediacji
+powinny docelowo wysyłać dane do endpointów API na głównej domenie; przy takim użyciu
+trzeba dodać CORS dla `https://mediacje.polskiebudownictwo.org`.
 
 Nie zapisuj sekretów SMTP ani danych dostępowych do bazy w plikach śledzonych przez Git.
 

@@ -5,3 +5,4 @@ php-error.log
 deploy/
 page/smtp-config.php
 dist/
+dists/
