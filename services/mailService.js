@@ -67,6 +67,115 @@ function adminText(submission) {
   ].join('\n');
 }
 
+function firstContactEmail(submission) {
+  for (const party of submission.parties || []) {
+    if (party.attorney?.email) return party.attorney.email;
+    if (party.email) return party.email;
+  }
+  return null;
+}
+
+function mediationCaseAdminText(submission) {
+  const lines = [
+    submission.needsAdvice
+      ? 'Nowe zgłoszenie mediacyjne - potrzebna porada w sprawie uzyskania zgody'
+      : 'Nowe zgłoszenie mediacyjne',
+    '',
+    `Data: ${submission.submittedAt || 'Nieznana'}`,
+    `IP: ${submission.ipAddress || 'Nieznane'}`,
+    `Zgoda na mediację od wszystkich stron: ${submission.mediationConsent}`,
+    `Zgoda pozostałych stron: ${submission.otherPartiesConsent}`,
+    `Etap sporu: ${submission.disputeStage}`,
+    `Wartość przedmiotu sporu: ${submission.disputeValue ? `${submission.disputeValue} PLN` : 'Nie podano'}`,
+    '',
+    'Opis sporu:',
+    submission.description,
+    '',
+    'Strony:',
+  ];
+
+  (submission.parties || []).forEach((party, index) => {
+    lines.push('');
+    lines.push(`${index + 1}. ${party.name}`);
+    lines.push(`Reprezentant: ${party.representative || 'Nie podano'}`);
+    lines.push(`E-mail: ${party.email || 'Nie podano'}`);
+    lines.push(`Telefon: ${party.phone || 'Nie podano'}`);
+    lines.push(`WWW: ${party.website || 'Nie podano'}`);
+    lines.push(`NIP: ${party.nip || 'Nie podano'}`);
+    if (party.hasAttorney) {
+      lines.push('Pełnomocnik: tak');
+      lines.push(`Imię i nazwisko: ${party.attorney?.name || 'Nie podano'}`);
+      lines.push(`Kancelaria: ${party.attorney?.lawFirm || 'Nie podano'}`);
+      lines.push(`E-mail pełnomocnika: ${party.attorney?.email || 'Nie podano'}`);
+      lines.push(`Telefon pełnomocnika: ${party.attorney?.phone || 'Nie podano'}`);
+      lines.push(`Działający w imieniu: ${party.attorney?.actingFor || 'Nie podano'}`);
+      lines.push(`Pełnomocnictwo obejmuje mediację: ${party.attorney?.hasPowerOfAttorney ? 'tak' : 'nie'}`);
+    }
+  });
+
+  return lines.join('\n');
+}
+
+function mediationCaseConfirmationText() {
+  return [
+    'Dziękujemy za przesłanie zgłoszenia do Centrum Mediacji przy Fundacji „Polskie Budownictwo”.',
+    '',
+    'Otrzymaliśmy formularz i przeanalizujemy przekazane informacje. Jeśli będą potrzebne dodatkowe dane, skontaktujemy się w kolejnym kroku.',
+    '',
+    'Centrum Mediacji',
+    'Fundacja „Polskie Budownictwo”',
+  ].join('\n');
+}
+
+function mediatorApplicationAdminText(submission) {
+  return [
+    'Nowe zgłoszenie mediatora',
+    '',
+    `Data: ${submission.submittedAt || 'Nieznana'}`,
+    `IP: ${submission.ipAddress || 'Nieznane'}`,
+    `Imię, nazwisko: ${submission.fullName}`,
+    `E-mail: ${submission.email}`,
+    `Telefon: ${submission.phone}`,
+    `Doświadczenie: ${submission.experienceYears}`,
+    `Uprawnienia do mediacji sądowych/gospodarczych: ${submission.hasCertification}`,
+    `Numer uprawnień: ${submission.certificationNumber || 'Nie podano'}`,
+    `Placówka wydająca certyfikat: ${submission.certificationIssuer || 'Nie podano'}`,
+    `Branże doświadczenia: ${(submission.industries || []).join(', ') || 'Nie podano'}`,
+    `Inna branża: ${submission.industryOther || 'Nie podano'}`,
+  ].join('\n');
+}
+
+function mediatorApplicationConfirmationText() {
+  return [
+    'Dziękujemy za przesłanie zgłoszenia do Centrum Mediacji przy Fundacji „Polskie Budownictwo”.',
+    '',
+    'Otrzymaliśmy Twoje zgłoszenie. Skontaktujemy się z Tobą w kolejnym kroku.',
+    '',
+    'Centrum Mediacji',
+    'Fundacja „Polskie Budownictwo”',
+  ].join('\n');
+}
+
+async function sendMediatorApplicationEmails(submission) {
+  requireMailConfig();
+  const transporter = createTransporter();
+  const recipient = process.env.MEDIATION_NOTIFY_EMAIL || 'mediacje@polskiebudownictwo.org';
+
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to: recipient,
+    subject: `[ZGŁOSZENIE MEDIATORA] ${submission.fullName}`,
+    text: mediatorApplicationAdminText(submission),
+  });
+
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to: submission.email,
+    subject: 'Potwierdzenie zgłoszenia do Centrum Mediacji',
+    text: mediatorApplicationConfirmationText(),
+  });
+}
+
 async function sendWelcomeMail(submission) {
   requireMailConfig();
   const transporter = createTransporter();
@@ -103,8 +212,34 @@ async function sendSubmissionEmails(submission) {
   await sendWelcomeMail(submission);
 }
 
+async function sendMediationCaseEmails(submission) {
+  requireMailConfig();
+  const transporter = createTransporter();
+  const recipient = process.env.MEDIATION_NOTIFY_EMAIL || 'mediacje@polskiebudownictwo.org';
+  const subjectPrefix = submission.needsAdvice ? '[POTRZEBNA PORADA]' : '[ZGŁOSZENIE MEDIACJI]';
+
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to: recipient,
+    subject: `${subjectPrefix} ${submission.parties?.[0]?.name || 'Nowa sprawa'}`,
+    text: mediationCaseAdminText(submission),
+  });
+
+  const contactEmail = firstContactEmail(submission);
+  if (contactEmail) {
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: contactEmail,
+      subject: 'Potwierdzenie zgłoszenia sprawy do mediacji',
+      text: mediationCaseConfirmationText(),
+    });
+  }
+}
+
 module.exports = {
   sendAdminNotification,
+  sendMediationCaseEmails,
+  sendMediatorApplicationEmails,
   sendSubmissionEmails,
   sendWelcomeMail,
 };

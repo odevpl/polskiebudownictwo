@@ -32,6 +32,26 @@ app.get('/health', (request, response) => {
   response.status(200).json({ status: 'ok' });
 });
 
+app.use('/api/mediacje', (request, response, next) => {
+  const allowedOrigins = new Set([
+    'https://mediacje.polskiebudownictwo.org',
+    'http://127.0.0.1:3001',
+    'http://localhost:3001',
+  ]);
+  const origin = request.get('origin');
+  if (origin && allowedOrigins.has(origin)) {
+    response.setHeader('Access-Control-Allow-Origin', origin);
+    response.setHeader('Vary', 'Origin');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  }
+  if (request.method === 'OPTIONS') {
+    response.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 app.use(express.static(appPublicRoot));
 app.use(express.static(publicRoot, {
   extensions: ['html'],

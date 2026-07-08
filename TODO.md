@@ -1,4 +1,4 @@
-# TODO – subdomena mediacje.polskiebudownictwo.org
+﻿# TODO – subdomena mediacje.polskiebudownictwo.org
 
 Kontekst dla Codex: budujemy podstronę tematyczną (subdomenę) głównej organizacji
 "Polskie Budownictwo" (http://polskiebudownictwo.org/), poświęconą wyłącznie mediacjom
@@ -12,7 +12,7 @@ HTML względem strony głównej bez potrzeby — kopiuj wzorce 1:1, zmieniaj tyl
 
 ---
 
-## 0. Wzorzec strukturalny do skopiowania ze strony głównej
+## [x] 0. Wzorzec strukturalny do skopiowania ze strony głównej
 
 Ze strony głównej (polskiebudownictwo.org) przenieś dosłownie:
 
@@ -31,14 +31,14 @@ Ze strony głównej (polskiebudownictwo.org) przenieś dosłownie:
 
 ---
 
-## 1. Strona główna subdomeny (index)
+## [ ] 1. Strona główna subdomeny (index)
 
-### 1.1 Header
+### [x] 1.1 Header
 - Logo Polskie Budownictwo (link do polskiebudownictwo.org)
 - Nawigacja: Mediacje gospodarcze / Mediacje inwestycyjne / FAQ / Zgłoś sprawę / Zostań mediatorem
 - Etykieta/breadcrumb: `Polskie Budownictwo / Centrum Mediacji`
 
-### 1.2 Hero
+### [x] 1.2 Hero
 - Eyebrow: `Centrum Mediacji przy Fundacji „Polskie Budownictwo”`
 - H1: `Mediacje Gospodarcze. Skuteczne rozwiązywanie sporów biznesowych i budowlanych.`
 - Lead: `Szybciej. Taniej. Z zachowaniem relacji biznesowych. Konflikt nie zawsze musi kończyć się wieloletnim procesem sądowym — profesjonalnie poprowadzona mediacja pozwala odzyskać należności, wypracować korzystne porozumienie i kontynuować współpracę bez ponoszenia wysokich kosztów postępowania sądowego.`
@@ -46,7 +46,7 @@ Ze strony głównej (polskiebudownictwo.org) przenieś dosłownie:
 - CTA secondary: `Zostań mediatorem` (link do formularza Mediatorów, `/zostan-mediatorem`)
 - Podtekst pod CTA: `Prowadzimy mediacje gospodarcze oraz wspieramy przedsiębiorców w rozwiązywaniu sporów na każdym etapie konfliktu.`
 
-### 1.3 Sekcja "Dlaczego mediacja"
+### [x] 1.3 Sekcja "Dlaczego mediacja"
 - Eyebrow: `Dlaczego warto wybrać mediację`
 - H2: `Spór nie musi kończyć się latami w sądzie.`
 - Karty:
@@ -58,7 +58,7 @@ Ze strony głównej (polskiebudownictwo.org) przenieś dosłownie:
   - 06 **Ugoda uwzględniająca interesy obu stron** — Możliwość zawarcia porozumienia korzystnego dla wszystkich uczestników sporu.
 - Cytat pod kartami (wyróżniony blok): `Dobrze przeprowadzona mediacja nie polega na tym, aby znaleźć kompromis za wszelką cenę. Jej celem jest wypracowanie rozwiązania, które pozwoli przedsiębiorcom zakończyć konflikt i wrócić do prowadzenia biznesu.`
 
-### 1.4 Sekcja "Rodzaje mediacji gospodarczych"
+### [x] 1.4 Sekcja "Rodzaje mediacji gospodarczych"
 - Eyebrow: `Zakres usług`
 - H2: `Dopasowany tryb do etapu sporu.`
 
@@ -121,7 +121,7 @@ Podkategorie (5 mini-kart):
 - **Mediacje Managerskie** — konflikty pomiędzy kadrą zarządzającą, dyrektorami i kierownikami.
 - **Mediacje Pracownicze** — rozwiązywanie sporów pomiędzy pracownikami, zespołami oraz pracodawcą.
 
-### 1.5 Sekcja "Mediacje inwestycyjne"
+### [x] 1.5 Sekcja "Mediacje inwestycyjne"
 - Eyebrow: `Dla uczestników procesu budowlanego`
 - H2: `Rozwiązujemy konflikt, zanim zatrzyma inwestycję.`
 - Lead: `To jedna z najbardziej specjalistycznych usług skierowanych do uczestników procesu inwestycyjnego lub procesu budowlanego. Naszym celem jest rozwiązanie konfliktu jeszcze w trakcie realizacji inwestycji, zanim doprowadzi on do zatrzymania robót lub wielomilionowego sporu.`
@@ -139,7 +139,7 @@ Podkategorie (5 mini-kart):
   - rozliczeń inwestycji
   - współpracy pomiędzy inwestorem, generalnym wykonawcą i podwykonawcami
 
-### 1.6 Sekcja "E-mediacje"
+### [x] 1.6 Sekcja "E-mediacje"
 - Eyebrow: `Bez konieczności spotkań stacjonarnych`
 - H2: `Mediacja prowadzona w pełni online.`
 - Lead: `Nowoczesna forma prowadzenia mediacji bez konieczności spotkań stacjonarnych. Proces może być prowadzony całkowicie online z wykorzystaniem bezpiecznych narzędzi komunikacji jak Zoom lub Google Meet.`
@@ -150,7 +150,7 @@ Podkategorie (5 mini-kart):
   - inwestycji realizowanych w wielu lokalizacjach
   - sporów wymagających szybkiej reakcji
 
-### 1.7 Sekcja "Misja i Standardy Rozwoju Zawodowego"
+### [x] 1.7 Sekcja "Misja i Standardy Rozwoju Zawodowego"
 - Eyebrow: `Nasza misja`
 - H2: `Budujemy kulturę dialogu i odpowiedzialnego rozwiązywania konfliktów.`
 - Lead: `Pomagamy przedsiębiorcom zakończyć spór efektywnie i z możliwością kontynuowania dalszej współpracy biznesowej.`
@@ -166,12 +166,14 @@ Podkategorie (5 mini-kart):
   Zamykający akapit: `Centrum Mediacji jest miejscem, w którym mediatorzy stale podnoszą swoje kwalifikacje. U nas przedsiębiorcy powierzają swoje sprawy osobom pracującym według jednolitych, wysokich standardów, a nie przypadkowym mediatorom wpisanym jedynie na listę.`
   Link do dokumentu Standardów: **placeholder** — patrz sekcja 4 (link czeka na ustalenie z Kasią, gdzie ma się pojawić).
 
-### 1.8 Sekcja FAQ — pełna treść (33 pytania)
+### [x] 1.8 Baza wiedzy — pełna treść FAQ (33 pytania)
 
 Eyebrow: `Najczęstsze pytania`
 H2: `Mediacje gospodarcze — pytania i odpowiedzi.`
 
-Wdrożyć jako akordeon, pogrupowany w 10 podsekcji z nagłówkami (H3) jak niżej.
+Wdrożone jako osobna podstrona `/baza-wiedzy`, w układzie typowej bazy wiedzy:
+lewa nawigacja kategorii, środkowa treść i prawy spis treści/tagi na desktopie oraz układ
+jednokolumnowy na mobile. Na stronie głównej subdomeny zostaje lekki teaser z CTA.
 Poniżej pełna treść pytań i odpowiedzi do wklejenia 1:1.
 
 #### Grupa 1: Podstawy mediacji gospodarczej
@@ -299,8 +301,6 @@ Intencją ustawodawcy jest szybka weryfikacja i odsiew spraw, gdzie błyskawiczn
 
 **24. Czy jeśli odmówię mediacji na które sąd mnie skierował to mogę otrzymać karę?**
 Aby przeciwdziałać traktowaniu sprzeciwu jako domyślnej procedury uników, od 1 marca 2026 r. zaczynają obowiązywać rygorystyczne przepisy art. 103 k.p.c. uprawniające sąd do obciążenia kosztami procesu tej strony, która bez uzasadnionej przyczyny odmówiła udziału w mediacji.
-
-⚠️ Uwaga redakcyjna: zweryfikować przed publikacją, czy ten przepis już obowiązuje w dniu deploya (wchodzi w życie 1 marca 2026).
 
 **25. Na czym polega Model gotowości do obowiązkowych mediacji?**
 5 filarów gotowości do obowiązkowych mediacji w budownictwie. Aby zniwelować ryzyko gry na czas i braku kompetencji, jako praktyk proponujemy implementację restrykcyjnego modelu mediacji budowlanych. Zamiast "terapii", spór biznesowy wymaga procedury inżynieryjnej.
@@ -447,10 +447,7 @@ drugiej Stronie pisemnego wezwania do usunięcia naruszeń lub polubownego
 załatwienia sporu."
 ```
 
-⚠️ Uwaga do sekcji 24/25: przed publikacją zweryfikować, czy przepis art. 103 k.p.c.
-(wchodzący w życie 1 marca 2026) już obowiązuje w dniu deploya.
-
-### 1.9 Stopka
+### [x] 1.9 Stopka
 - Identyczna jak na głównej stronie:
 - E-mail: `mediacje@polskiebudownictwo.org`
 - Adres 1: `ul. Nowogrodzka 50/54 lok. 515, 00-695 Warszawa`
@@ -463,14 +460,14 @@ załatwienia sporu."
 
 ---
 
-## 2. Formularz dla Stron sporu i Pełnomocników
+## [x] 2. Formularz dla Stron sporu i Pełnomocników
 
 Ścieżka: `/zgloszenie` (lub podstrona pod hero-CTA "Zgłoś sprawę do mediacji").
 Styl pól identyczny jak istniejący formularz "Dołącz bezpłatnie" na głównej stronie.
 
 Nagłówek strony formularza: `Formularz wniosku o mediację — dla Stron sporu i Pełnomocników`
 
-### 2.1 Pytanie bramkujące
+### [x] 2.1 Pytanie bramkujące
 ```
 Czy zgłoszenie dotyczy umów gospodarczych lub inwestycji
 (nasze centrum nie zajmuje się innymi typami mediacji)?
@@ -481,7 +478,7 @@ Czy zgłoszenie dotyczy umów gospodarczych lub inwestycji
   `Tym razem nie będziemy w stanie Ci pomóc. Zapraszamy Cię, kiedy Twoje trudności
   komunikacyjne będą dotyczyły kwestii gospodarczych lub inwestycyjnych.`
 
-### 2.2 Zgoda na mediację
+### [x] 2.2 Zgoda na mediację
 ```
 Czy masz już zgodę na mediację od wszystkich stron sporu?
 [ TAK ]  [ NIE ]
@@ -491,7 +488,7 @@ Czy masz już zgodę na mediację od wszystkich stron sporu?
   zeskanowana lub potwierdzona poprzez podpis elektroniczny zaufany lub kwalifikowany.`
 - Link: `Link do strony z podpisami` (URL do uzupełnienia — placeholder na razie)
 
-### 2.3 Dane strony zgłaszającej (blok dynamiczny)
+### [x] 2.3 Dane strony zgłaszającej (blok dynamiczny)
 - Domyślnie pokazuje pola dla min. 2 stron, z przyciskiem `+ Dodaj kolejną stronę`
   (mediacje mogą być wielostronne — bez górnego limitu)
 - Per strona:
@@ -510,7 +507,7 @@ Czy masz już zgodę na mediację od wszystkich stron sporu?
       - `Działający w imieniu…` (pole tekstowe)
       - Checkbox: `Czy posiadasz aktualne pełnomocnictwo obejmujące proces mediacji?`
 
-### 2.4 Zgoda drugiej strony/pozostałych stron
+### [x] 2.4 Zgoda drugiej strony/pozostałych stron
 ```
 Czy druga strona/pozostałe strony wyraziły zgodę na proces mediacji?
 [ TAK ]  [ NIE / POTRZEBUJĘ PORADY NA TEMAT MEDIACJI I SPOSOBU UZYSKANIA ZGODY ]
@@ -520,7 +517,7 @@ Czy druga strona/pozostałe strony wyraziły zgodę na proces mediacji?
 - POTRZEBUJĘ PORADY → oznacz zgłoszenie flagą `potrzebuje_porady`
   (inny szablon maila powiadomienia, patrz 2.8)
 
-### 2.5 Etap sporu (jednokrotny wybór)
+### [x] 2.5 Etap sporu (jednokrotny wybór)
 ```
 Etap sporu:
 ( ) Nie ma jednoznacznego sporu, ale są trudności wymagające wsparcia w ramach
@@ -531,18 +528,20 @@ Etap sporu:
 ( ) Jest skierowanie stron przez Sąd na mediację
 ```
 
-### 2.6 Opis sporu i wartość
+### [x] 2.6 Opis sporu i wartość
 - `Krótki opis sporu` — textarea, limit **2000 znaków**, licznik znaków widoczny na żywo,
   placeholder: `np. bez danych osobowych i danych identyfikujących kontrakt`
 - `Wartość przedmiotu sporu` — pole liczbowe + `PLN` (wartość kontraktu/umowy/szacowana
   wartość pozwu)
 
-### 2.7 Zgody prawne (checkboxy blokujące submit)
-- `Akceptuję Regulamin Centrum Mediacji` [rozwijany tekst + link do PDF/podstrony — treść regulaminu jest jeszcze do dostarczenia, patrz sekcja 4]
-- `Akceptuję Politykę RODO Fundacji „Polskie Budownictwo"` [rozwijany tekst + link]
+### [x] 2.7 Zgody prawne
 
-### 2.8 Submit
-- Walidacja: wszystkie pola wymagane muszą być wypełnione, oba checkboxy zaznaczone
+Na tym etapie formularz zgłoszenia sprawy wdrażamy bez checkboxów zgód prawnych, ponieważ
+Regulamin Centrum Mediacji i dokumenty RODO nie są jeszcze gotowe do podlinkowania.
+Nie dodawać wymaganych zgód ani blokady submitu na tej podstawie w tej iteracji.
+
+### [x] 2.8 Submit
+- Walidacja: wszystkie pola wymagane muszą być wypełnione
 - Wysyłka e-mail na `mediacje@polskiebudownictwo.org` z pełną treścią zgłoszenia
 - Auto-odpowiedź do zgłaszającego z potwierdzeniem przyjęcia
 - Jeśli flaga `potrzebuje_porady` — osobny szablon maila (inny nagłówek/priorytet)
@@ -551,25 +550,25 @@ Etap sporu:
 
 ---
 
-## 3. Formularz dla Mediatorów
+## [x] 3. Formularz dla Mediatorów
 
 Ścieżka: `/zostan-mediatorem` (lub podstrona pod CTA "Zostań mediatorem").
 
 Nagłówek strony formularza: `Jesteś Mediatorem i chcesz do Nas dołączyć?`
 
-### 3.1 Pytanie wejściowe
+### [x] 3.1 Pytanie wejściowe
 ```
 Jesteś Mediatorem i chcesz do Nas dołączyć?
 [ TAK ]
 ```
 - TAK → rozwija cały formularz poniżej
 
-### 3.2 Dane podstawowe
+### [x] 3.2 Dane podstawowe
 - `Imię, nazwisko` — wymagane
 - `E-mail` — wymagane
 - `Telefon` — wymagane
 
-### 3.3 Doświadczenie
+### [x] 3.3 Doświadczenie
 - `Ilość lat doświadczenia jako mediator`:
   ( ) zaczynam  ( ) 0-3 lata  ( ) powyżej 3 lat
 - `Czy masz uprawnienia do mediacji sądowych/gospodarczych?`
@@ -578,7 +577,7 @@ Jesteś Mediatorem i chcesz do Nas dołączyć?
     - `Numer uprawnień`
     - `Nazwa placówki, która wydała certyfikat`
 
-### 3.4 Branże doświadczenia (checkboxy, wielokrotny wybór)
+### [x] 3.4 Branże doświadczenia (checkboxy, wielokrotny wybór)
 - Budownictwo jako inżynier/architekt/projektant
 - Rzeczoznawca/Konsultant dla Budownictwa
 - Inne dla budownictwa
@@ -591,7 +590,7 @@ Jesteś Mediatorem i chcesz do Nas dołączyć?
 - Prawo zamówień publicznych/Administracja/Stanowiska Urzędnicze
 - Inne (jeśli zaznaczone → pokaż pole tekstowe do uzupełnienia)
 
-### 3.5 Zgody (⚠️ ustalenie robocze z 08.07.2026 — WSTAWIĆ TYLKO TO PONIŻEJ)
+### [x] 3.5 Zgody (⚠️ ustalenie robocze z 08.07.2026 — WSTAWIĆ TYLKO TO PONIŻEJ)
 - `Akceptuję Politykę RODO Fundacji „Polskie Budownictwo"` [rozwijany tekst + link] —
   **jedyny obowiązkowy checkbox w tej wersji formularza**
 
@@ -602,7 +601,7 @@ ustalenie do potwierdzenia, nie wdrażać bez dalszego sygnału):
 - Kodeks Etyki Mediatora
 - Polityka wykorzystywania AI
 
-### 3.6 Submit
+### [x] 3.6 Submit
 - Walidacja: wszystkie pola sekcji 3.2–3.4 wymagane, checkbox RODO (3.5) wymagany
 - Wysyłka e-mail powiadomienia do zespołu rekrutującego mediatorów
   (adres do potwierdzenia — na razie użyj `mediacje@polskiebudownictwo.org`)
@@ -611,7 +610,7 @@ ustalenie do potwierdzenia, nie wdrażać bez dalszego sygnału):
 
 ---
 
-## 4. Treści/dokumenty wciąż brakujące (blockery — nie tworzyć treści samodzielnie, czekać na dostarczenie)
+## [ ] 4. Treści/dokumenty wciąż brakujące (blockery — nie tworzyć treści samodzielnie, czekać na dostarczenie)
 
 - Regulamin Centrum Mediacji — brak treści źródłowej, potrzebny do linku w 2.7
 - Kodeks Etyki Mediatora — brak treści źródłowej
@@ -627,7 +626,7 @@ stronę „Wkrótce" lub ukryty odnośnik, żeby nie blokować wdrożenia reszty
 
 ---
 
-## 5. Zakres tej iteracji — czego NIE robimy teraz
+## [ ] 5. Zakres tej iteracji — czego NIE robimy teraz
 
 - Brak panelu admina / zaplecza do przeglądania zgłoszeń — ustalone: **formularz → e-mail**,
   nic więcej na tym etapie
@@ -636,9 +635,11 @@ stronę „Wkrótce" lub ukryty odnośnik, żeby nie blokować wdrożenia reszty
 
 ---
 
-## 6. Rzeczy do obgadania później
+## [ ] 6. Rzeczy do obgadania później
 
 - Dokładne endpointy API na głównej domenie dla formularzy mediacji.
 - CORS na `polskiebudownictwo.org` dla `https://mediacje.polskiebudownictwo.org`.
 - Finalne linki do Polityki RODO, Regulaminu Centrum Mediacji, strony z podpisami elektronicznymi i wzoru zgody na mediację.
-- Weryfikacja art. 103 k.p.c. przed publikacją.
+
+
+

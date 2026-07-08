@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Formularz wniosku o mediację dla stron sporu i pełnomocników Centrum Mediacji przy Fundacji Polskie Budownictwo."
+    />
+    <title>Zgłoś sprawę do mediacji | Centrum Mediacji</title>
+    <link rel="stylesheet" href="global.css?v=1" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <div class="site-brand">
+          <a class="site-logo" href="https://polskiebudownictwo.org/" aria-label="Polskie Budownictwo – strona główna">
+            <img src="assets/images/logo.png" alt="Polskie Budownictwo" />
+          </a>
+          <p class="site-breadcrumb">Polskie Budownictwo / Centrum Mediacji</p>
+        </div>
+
+        <button class="site-menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Otwórz menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="site-nav" id="site-nav" aria-label="Główna nawigacja">
+          <a href="/#mediacje-gospodarcze">Mediacje gospodarcze</a>
+          <a href="/#mediacje-inwestycyjne">Mediacje inwestycyjne</a>
+          <a href="/baza-wiedzy">Baza wiedzy</a>
+          <a href="/zgloszenie" aria-current="page">Zgłoś sprawę</a>
+          <a class="button button--nav" href="/zostan-mediatorem">Zostań mediatorem</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="section form-page" aria-labelledby="case-form-title">
+        <div class="container form-page__grid">
+          <div class="form-page__intro">
+            <p class="eyebrow">Zgłoś sprawę</p>
+            <h1 id="case-form-title">Formularz wniosku o mediację — dla Stron sporu i Pełnomocników</h1>
+            <p class="lead">Wypełnij formularz, jeśli sprawa dotyczy umów gospodarczych lub inwestycji. Nie dodajemy tu plików ani zgód prawnych — szczegóły potwierdzimy w dalszym kontakcie.</p>
+          </div>
+
+          <form class="form mediation-form" id="mediation-case-form" novalidate>
+            <div class="form-step">
+              <p class="form-step__title">Czy zgłoszenie dotyczy umów gospodarczych lub inwestycji?</p>
+              <p class="form-help">Nasze centrum nie zajmuje się innymi typami mediacji.</p>
+              <div class="choice-row">
+                <label class="choice-pill"><input type="radio" name="isBusinessCase" value="tak" required /> TAK</label>
+                <label class="choice-pill"><input type="radio" name="isBusinessCase" value="nie" /> NIE</label>
+              </div>
+              <p class="form-message" id="business-gate-message" hidden>Tym razem nie będziemy w stanie Ci pomóc. Zapraszamy Cię, kiedy Twoje trudności komunikacyjne będą dotyczyły kwestii gospodarczych lub inwestycyjnych.</p>
+            </div>
+
+            <div id="case-form-body" hidden>
+              <div class="form-step">
+                <p class="form-step__title">Czy masz już zgodę na mediację od wszystkich stron sporu?</p>
+                <div class="choice-row">
+                  <label class="choice-pill"><input type="radio" name="mediationConsent" value="tak" required /> TAK</label>
+                  <label class="choice-pill"><input type="radio" name="mediationConsent" value="nie" /> NIE</label>
+                </div>
+                <p class="form-help">Zgoda może być potwierdzona czytelnym podpisem odręcznym i zeskanowana lub podpisem elektronicznym zaufanym albo kwalifikowanym.</p>
+                <p class="form-help"><a href="/wkrotce">Pobierz wzór zgody</a> · <a href="/wkrotce">Link do strony z podpisami</a></p>
+              </div>
+
+              <div class="form-step">
+                <div class="form-step__header">
+                  <div>
+                    <p class="form-step__title">Dane stron sporu</p>
+                    <p class="form-help">Domyślnie pokazujemy dwie strony. Możesz dodać kolejne.</p>
+                  </div>
+                  <button class="button button--outline button--compact" type="button" id="add-party">+ Dodaj kolejną stronę</button>
+                </div>
+                <div class="parties-list" id="parties-list"></div>
+              </div>
+
+              <div class="form-step">
+                <p class="form-step__title">Czy druga strona/pozostałe strony wyraziły zgodę na proces mediacji?</p>
+                <div class="choice-row">
+                  <label class="choice-pill"><input type="radio" name="otherPartiesConsent" value="tak" required /> TAK</label>
+                  <label class="choice-pill"><input type="radio" name="otherPartiesConsent" value="potrzebuje_porady" /> NIE / POTRZEBUJĘ PORADY</label>
+                </div>
+                <p class="form-message" id="consent-info" hidden>Zgody mogą zostać przekazane później mailowo lub potwierdzone w dalszym kontakcie z Centrum.</p>
+              </div>
+
+              <div class="form-step">
+                <p class="form-step__title">Etap sporu</p>
+                <div class="radio-list">
+                  <label><input type="radio" name="disputeStage" value="Nie ma jednoznacznego sporu, ale są trudności wymagające wsparcia w ramach współpracy gospodarczej" required /> Nie ma jednoznacznego sporu, ale są trudności wymagające wsparcia w ramach współpracy gospodarczej</label>
+                  <label><input type="radio" name="disputeStage" value="Spór właśnie powstał i jest chęć przystąpienia do mediacji" /> Spór właśnie powstał i jest chęć przystąpienia do mediacji</label>
+                  <label><input type="radio" name="disputeStage" value="Spór jest na etapie wezwań przedsądowych" /> Spór jest na etapie wezwań przedsądowych</label>
+                  <label><input type="radio" name="disputeStage" value="Został złożony pozew bez skierowania przez Sąd na mediację" /> Został złożony pozew bez skierowania przez Sąd na mediację</label>
+                  <label><input type="radio" name="disputeStage" value="Jest skierowanie stron przez Sąd na mediację" /> Jest skierowanie stron przez Sąd na mediację</label>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <div class="form-grid">
+                  <div class="field field--full">
+                    <label for="description">Krótki opis sporu</label>
+                    <textarea id="description" name="description" maxlength="2000" placeholder="np. bez danych osobowych i danych identyfikujących kontrakt" required></textarea>
+                    <p class="field-counter"><span id="description-count">0</span>/2000 znaków</p>
+                  </div>
+                  <div class="field">
+                    <label for="dispute-value">Wartość przedmiotu sporu</label>
+                    <div class="input-addon">
+                      <input id="dispute-value" name="disputeValue" type="number" min="0" step="1" inputmode="numeric" />
+                      <span>PLN</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-honeypot" aria-hidden="true">
+                <label for="website">Strona internetowa</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+              <input id="case-form-started" name="formStarted" type="hidden" />
+
+              <button class="button signup__submit" type="submit">Wyślij zgłoszenie</button>
+              <p class="form-status" id="case-form-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container mediation-footer">
+        <div class="mediation-footer__brand">
+          <a class="site-logo site-logo--footer" href="https://polskiebudownictwo.org/" aria-label="Polskie Budownictwo">
+            <img src="assets/images/logo.png" alt="Polskie Budownictwo" />
+          </a>
+          <p>Centrum Mediacji przy Fundacji „Polskie Budownictwo”.</p>
+        </div>
+        <div class="mediation-footer__column">
+          <p class="mediation-footer__title">Kontakt ogólny</p>
+          <a href="mailto:mediacje@polskiebudownictwo.org">mediacje@polskiebudownictwo.org</a>
+          <address>ul. Nowogrodzka 50/54 lok. 515<br>00-695 Warszawa</address>
+          <address>al. Grunwaldzka 56 lok. 202<br>80-241 Gdańsk</address>
+        </div>
+        <div class="mediation-footer__column">
+          <p class="mediation-footer__title">Organizacja mediacji</p>
+          <p>Mediacje stacjonarne prowadzimy w salach przystosowanych dla 6-8 osób (tylko umówione spotkania za dodatkową opłatą za każdą rozpoczętą godzinę).</p>
+          <p>Posiedzenia mediacyjne organizujemy od poniedziałku do czwartku, 10:00-15:00.</p>
+        </div>
+        <div class="mediation-footer__column">
+          <p class="mediation-footer__title">Zgłoszenia i formy pracy</p>
+          <p>Zgłoszenia przyjmujemy poprzez formularz na stronie dla stron i pełnomocników oraz za pośrednictwem sądów.</p>
+          <p>Prowadzimy mediacje stacjonarne, online, hybrydowe i wielostronne.</p>
+          <nav class="site-footer__links" aria-label="Dokumenty prawne">
+            <a href="/wkrotce">Polityka prywatności</a>
+            <a href="/wkrotce">Polityka cookies</a>
+          </nav>
+        </div>
+        <p class="mediation-footer__copyright">© 2026 Polskie Budownictwo. Wszelkie prawa zastrzeżone.</p>
+      </div>
+    </footer>
+
+    <template id="party-template">
+      <article class="party-card">
+        <div class="party-card__header">
+          <h3>Strona <span data-party-number></span></h3>
+          <button class="button button--outline button--compact" type="button" data-remove-party>Usuń</button>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Nazwa strony</label>
+            <input data-field="name" type="text" required />
+          </div>
+          <div class="field">
+            <label>Imię i nazwisko reprezentanta (zgodnie z KRS/CEIDG)</label>
+            <input data-field="representative" type="text" />
+          </div>
+          <div class="field">
+            <label>E-mail</label>
+            <input data-field="email" type="email" />
+          </div>
+          <div class="field">
+            <label>Telefon</label>
+            <input data-field="phone" type="tel" />
+          </div>
+          <div class="field">
+            <label>Adres www</label>
+            <input data-field="website" type="url" />
+          </div>
+          <div class="field">
+            <label>NIP</label>
+            <input data-field="nip" type="text" />
+          </div>
+          <label class="checkbox field--full">
+            <input data-field="hasAttorney" type="checkbox" />
+            <span>Za tę stronę zgłasza się pełnomocnik</span>
+          </label>
+        </div>
+        <div class="attorney-fields" hidden>
+          <div class="form-grid">
+            <div class="field">
+              <label>Imię i nazwisko pełnomocnika</label>
+              <input data-attorney-field="name" type="text" />
+            </div>
+            <div class="field">
+              <label>Nazwa kancelarii</label>
+              <input data-attorney-field="lawFirm" type="text" />
+            </div>
+            <div class="field">
+              <label>E-mail pełnomocnika</label>
+              <input data-attorney-field="email" type="email" />
+            </div>
+            <div class="field">
+              <label>Telefon pełnomocnika</label>
+              <input data-attorney-field="phone" type="tel" />
+            </div>
+            <div class="field field--full">
+              <label>Działający w imieniu…</label>
+              <input data-attorney-field="actingFor" type="text" />
+            </div>
+            <label class="checkbox field--full">
+              <input data-attorney-field="hasPowerOfAttorney" type="checkbox" />
+              <span>Czy posiadasz aktualne pełnomocnictwo obejmujące proces mediacji?</span>
+            </label>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="assets/js/menu.js?v=1" defer></script>
+    <script src="assets/js/mediation-case-form.js?v=1" defer></script>
+  </body>
+</html>
