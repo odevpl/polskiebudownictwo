@@ -16,10 +16,10 @@
     "create-superadmin": "node scripts/createSuperadmin.js",
     "reset-admin-password": "node scripts/resetAdminPassword.js",
     "test:smtp": "node scripts/testSmtp.js",
-    "build:main": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1 -Target main",
-    "build:mediacje": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1 -Target mediacje",
-    "build:deploy": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1",
-    "dist": "powershell -ExecutionPolicy Bypass -File scripts/buildDeployPackage.ps1"
+    "build:main": "node scripts/buildDeployPackage.js main",
+    "build:mediacje": "node scripts/buildDeployPackage.js mediacje",
+    "build:deploy": "node scripts/buildDeployPackage.js",
+    "dist": "node scripts/buildDeployPackage.js"
   },
   "engines": {
     "node": ">=20"
