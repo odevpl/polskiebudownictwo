@@ -103,7 +103,10 @@ async function index(request, response) {
     response.render('admin/submissions/index', {
       title: 'Zgloszenia',
       admin: request.session.admin,
-      submissions: result.rows,
+      submissions: result.rows.map(row => ({
+        ...row,
+        submitted_date: formatDateOnly(row.created_at),
+      })),
       filters,
       pagination: { ...result, totalPages },
       pageUrl: page => submissionsPageUrl(request, page),
@@ -379,6 +382,11 @@ function mergeGroups(row) {
 function formatDate(value) {
   if (!value) return '';
   return new Date(value).toLocaleString('pl-PL');
+}
+
+function formatDateOnly(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleDateString('pl-PL');
 }
 
 module.exports = {

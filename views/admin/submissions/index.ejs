@@ -34,6 +34,7 @@
             <th>Imie</th>
             <th>Nazwisko</th>
             <th>Firma</th>
+            <th>Data zapisania</th>
             <th>Role</th>
             <th>Grupy</th>
             <th>Statusy dodatkowe</th>
@@ -43,7 +44,7 @@
         <tbody>
           <% if (!submissions.length) { %>
             <tr>
-              <td colspan="7" class="muted">Brak zgloszen do wyswietlenia.</td>
+              <td colspan="8" class="muted">Brak zgloszen do wyswietlenia.</td>
             </tr>
           <% } %>
           <% submissions.forEach(submission => { %>
@@ -51,6 +52,7 @@
               <td data-label="Imie"><strong><%= submission.first_name || '-' %></strong></td>
               <td data-label="Nazwisko"><%= submission.last_name || '-' %></td>
               <td data-label="Firma"><%= submission.company_name || '-' %></td>
+              <td data-label="Data zapisania"><%= submission.submitted_date || '-' %></td>
               <td data-label="Role"><%= submission.roles.join(', ') || '-' %></td>
               <td data-label="Grupy"><%= submission.groups.join(', ') || '-' %></td>
               <td data-label="Statusy dodatkowe"><%= submission.status_tags.join(', ') || '-' %></td>
