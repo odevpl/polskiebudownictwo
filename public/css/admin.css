@@ -782,10 +782,11 @@ textarea.adm-control.adm-textarea {
 .time-picker-popover {
   position: absolute;
   z-index: 30;
-  top: 100%;
+  top: auto;
   left: 0;
+  bottom: 100%;
   width: 252px;
-  margin-top: 8px;
+  margin-bottom: 8px;
   overflow: hidden;
   border: 1px solid var(--adm-border);
   border-radius: var(--adm-radius-sm);
