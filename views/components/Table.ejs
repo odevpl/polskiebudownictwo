@@ -1,0 +1,31 @@
+<div class="table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr>
+        <% columns.forEach(column => { %>
+          <th><%= column.label || '' %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!rows.length) { %>
+        <tr>
+          <td colspan="<%= columns.length %>" class="muted"><%= emptyMessage || 'Brak danych do wyswietlenia.' %></td>
+        </tr>
+      <% } %>
+      <% rows.forEach(row => { %>
+        <tr>
+          <% columns.forEach(column => { %>
+            <td data-label="<%= column.label || '' %>">
+              <% if (column.html) { %>
+                <%- column.value(row) %>
+              <% } else { %>
+                <%= column.value(row) ?? '-' %>
+              <% } %>
+            </td>
+          <% }) %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

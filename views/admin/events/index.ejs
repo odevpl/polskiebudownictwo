@@ -1,0 +1,24 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true">EV</div>
+    <div>
+      <p class="adm-kicker">Lista</p>
+      <h1>Wydarzenia</h1>
+      <p class="admin-hero__meta">Terminy wydarzen publikowanych na stronie.</p>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <p class="alert"><%= error %></p>
+  <% } %>
+
+  <div class="adm-page-actions">
+    <a class="button" href="<%= adminUrl('/events/new') %>">Dodaj wydarzenie</a>
+  </div>
+
+  <div class="adm-table-panel">
+    <%- include('../../components/Table', { columns, rows: events, emptyMessage: 'Brak wydarzen do wyswietlenia.' }) %>
+  </div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

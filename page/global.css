@@ -105,7 +105,7 @@ h4 {
 
 h1 {
   margin-bottom: 1.5rem;
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-size: clamp(2.5rem, 6vw, 4rem);
   letter-spacing: -0.05em;
 }
 
@@ -909,6 +909,35 @@ p {
   font-size: 0.8rem;
   font-weight: 800;
   text-decoration: none;
+  text-transform: uppercase;
+}
+
+.events-list {
+  display: grid;
+  gap: 1rem;
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.event-card {
+  border-left: 4px solid var(--color-primary);
+}
+
+.event-card h2 {
+  margin-bottom: 0.6rem;
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.event-card__description {
+  margin-bottom: 0;
+}
+
+.event-card__meta {
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 

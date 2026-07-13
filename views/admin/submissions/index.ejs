@@ -27,43 +27,7 @@
   </form>
 
   <div class="adm-table-panel">
-    <div class="table-wrap">
-      <table class="adm-table">
-        <thead>
-          <tr>
-            <th>Imie</th>
-            <th>Nazwisko</th>
-            <th>Firma</th>
-            <th>Data zapisania</th>
-            <th>Role</th>
-            <th>Grupy</th>
-            <th>Statusy dodatkowe</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (!submissions.length) { %>
-            <tr>
-              <td colspan="8" class="muted">Brak zgloszen do wyswietlenia.</td>
-            </tr>
-          <% } %>
-          <% submissions.forEach(submission => { %>
-            <tr>
-              <td data-label="Imie"><strong><%= submission.first_name || '-' %></strong></td>
-              <td data-label="Nazwisko"><%= submission.last_name || '-' %></td>
-              <td data-label="Firma"><%= submission.company_name || '-' %></td>
-              <td data-label="Data zapisania"><%= submission.submitted_date || '-' %></td>
-              <td data-label="Role"><%= submission.roles.join(', ') || '-' %></td>
-              <td data-label="Grupy"><%= submission.groups.join(', ') || '-' %></td>
-              <td data-label="Statusy dodatkowe"><%= submission.status_tags.join(', ') || '-' %></td>
-              <td data-label="Akcje">
-                <a class="button button--ghost" href="<%= adminUrl('/submissions/' + submission.id + '/edit') %>">Edytuj</a>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+    <%- include('../../components/Table', { columns: locals.tableColumns || [], rows: submissions, emptyMessage: 'Brak zgloszen do wyswietlenia.' }) %>
 
     <div class="adm-pagination" aria-label="Paginacja zgloszen">
       <p class="table-count">

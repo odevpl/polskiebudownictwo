@@ -1,0 +1,21 @@
+<div class="time-picker-field" data-time-picker>
+  <label class="adm-label" for="<%= id %>-button"><%= label %></label>
+  <input class="time-picker-value" id="<%= id %>" name="<%= name %>" type="hidden" value="<%= value || '' %>" required>
+  <button class="time-picker-input" id="<%= id %>-button" type="button" data-time-picker-toggle aria-haspopup="dialog" aria-expanded="false">
+    <span data-time-picker-display><%= value || '--:--' %></span>
+  </button>
+  <div class="time-picker-popover" data-time-picker-popover hidden>
+    <div class="time-picker-top">Wybierz godzinę</div>
+    <div class="time-counter-view" data-time-picker-counter>
+      <button type="button" class="hour-up" data-time-step="hour" data-step="1" aria-label="Zwiększ godzinę">↑</button>
+      <button type="button" class="minute-up" data-time-step="minute" data-step="5" aria-label="Zwiększ minuty">↑</button>
+      <button type="button" class="time-value hour-value" data-time-view="hours">00</button>
+      <span class="time-separator">:</span>
+      <button type="button" class="time-value minute-value" data-time-view="minutes">00</button>
+      <button type="button" class="hour-down" data-time-step="hour" data-step="-1" aria-label="Zmniejsz godzinę">↓</button>
+      <button type="button" class="minute-down" data-time-step="minute" data-step="-5" aria-label="Zmniejsz minuty">↓</button>
+    </div>
+    <div class="time-grid time-grid-hours" data-time-grid="hours" hidden></div>
+    <div class="time-grid time-grid-minutes" data-time-grid="minutes" hidden></div>
+  </div>
+</div>

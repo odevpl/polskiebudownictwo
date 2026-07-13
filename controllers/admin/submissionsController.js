@@ -111,6 +111,7 @@ async function index(request, response) {
       pagination: { ...result, totalPages },
       pageUrl: page => submissionsPageUrl(request, page),
       exportColumns,
+      tableColumns: submissionTableColumns(request),
       error: null,
     });
   } catch (error) {
@@ -123,6 +124,7 @@ async function index(request, response) {
       pagination: { total: 0, page: 1, limit: 25, totalPages: 1 },
       pageUrl: page => submissionsPageUrl(request, page),
       exportColumns,
+      tableColumns: submissionTableColumns(request),
       error: 'Nie udalo sie pobrac zgloszen. Sprawdz konfiguracje bazy danych.',
     });
   }
@@ -387,6 +389,23 @@ function formatDate(value) {
 function formatDateOnly(value) {
   if (!value) return '';
   return new Date(value).toLocaleDateString('pl-PL');
+}
+
+function submissionTableColumns(request) {
+  return [
+    { label: 'Imie', value: row => row.first_name || '-' },
+    { label: 'Nazwisko', value: row => row.last_name || '-' },
+    { label: 'Firma', value: row => row.company_name || '-' },
+    { label: 'Data zapisania', value: row => row.submitted_date || '-' },
+    { label: 'Role', value: row => row.roles.join(', ') || '-' },
+    { label: 'Grupy', value: row => row.groups.join(', ') || '-' },
+    { label: 'Statusy dodatkowe', value: row => row.status_tags.join(', ') || '-' },
+    {
+      label: 'Akcje',
+      html: true,
+      value: row => `<a class="button button--ghost" href="${request.app.locals.adminUrl(`/submissions/${row.id}/edit`)}">Edytuj</a>`,
+    },
+  ];
 }
 
 module.exports = {

@@ -4,6 +4,7 @@ const express = require('express');
 const helmet = require('helmet');
 const path = require('node:path');
 const publicRoutes = require('./routes/public');
+const eventsController = require('./controllers/public/eventsController');
 const adminRoutes = require('./routes/admin');
 const { adminPath, adminUrl } = require('./config/adminPath');
 const { createSessionMiddleware } = require('./config/session');
@@ -31,6 +32,8 @@ app.locals.adminUrl = adminUrl;
 app.get('/health', (request, response) => {
   response.status(200).json({ status: 'ok' });
 });
+
+app.get('/wydarzenia', eventsController.index);
 
 app.use('/api/mediacje', (request, response, next) => {
   const allowedOrigins = new Set([

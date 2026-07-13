@@ -1,0 +1,56 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<% const eventDateValue = event.event_date instanceof Date
+  ? [event.event_date.getFullYear(), String(event.event_date.getMonth() + 1).padStart(2, '0'), String(event.event_date.getDate()).padStart(2, '0')].join('-')
+  : String(event.event_date || event.eventDate || '').slice(0, 10); %>
+<% const eventTimeValue = event.event_time instanceof Date
+  ? event.event_time.toISOString().slice(11, 16)
+  : String(event.event_time || event.eventTime || '').slice(0, 5); %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/events') %>">Wroc do wydarzen</a>
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true">EV</div>
+    <div>
+      <p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p>
+      <h1><%= mode === 'edit' ? ('Wydarzenie #' + event.id) : 'Dodaj wydarzenie' %></h1>
+      <p class="admin-hero__meta">Uzupelnij informacje publikowane przy wydarzeniu.</p>
+    </div>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="adm-alert">
+      <% errors.forEach(error => { %><div><%= error %></div><% }) %>
+    </div>
+  <% } %>
+
+  <form class="adm-form" method="post" action="<%= action %>">
+    <div class="adm-form-grid">
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="title">Tytul</label>
+        <input class="adm-control" id="title" name="title" type="text" maxlength="255" value="<%= event.title || '' %>" required>
+      </div>
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="description">Opis</label>
+        <textarea class="adm-control adm-textarea" id="description" name="description" required><%= event.description || '' %></textarea>
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="eventDate">Data</label>
+        <input class="adm-control" id="eventDate" name="eventDate" type="date" value="<%= eventDateValue %>" data-date-picker required>
+      </div>
+      <div class="adm-field">
+        <%- include('../../components/TimePicker', { id: 'eventTime', name: 'eventTime', label: 'Godzina', value: eventTimeValue }) %>
+      </div>
+      <div class="adm-form-actions adm-form-grid__full">
+        <button class="button" type="submit"><%= mode === 'edit' ? 'Zapisz zmiany' : 'Dodaj wydarzenie' %></button>
+        <a class="button button--ghost" href="<%= adminUrl('/events') %>">Anuluj</a>
+        <% if (mode === 'edit') { %>
+          <button class="button button--ghost" type="submit" form="delete-event-form">Usun</button>
+        <% } %>
+      </div>
+    </div>
+  </form>
+
+  <% if (mode === 'edit') { %>
+    <form id="delete-event-form" method="post" action="<%= adminUrl('/events/' + event.id + '/delete') %>" onsubmit="return confirm('Na pewno usunac to wydarzenie? Tej operacji nie mozna cofnac.');"></form>
+  <% } %>
+</section>
+<%- include('../../partials/admin-shell-end') %>

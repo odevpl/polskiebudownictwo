@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/admin/authController');
 const submissionsController = require('../controllers/admin/submissionsController');
+const eventsController = require('../controllers/admin/eventsController');
 const { adminUrl } = require('../config/adminPath');
 const { requireAuth } = require('../middleware/auth');
 const { loginLimiter } = require('../middleware/rateLimiter');
@@ -19,5 +20,11 @@ router.get('/submissions/:id/edit', requireAuth, submissionsController.editForm)
 router.post('/submissions/:id/edit', requireAuth, submissionsController.update);
 router.post('/submissions/:id/delete', requireAuth, submissionsController.destroy);
 router.get('/submissions/:id', requireAuth, submissionsController.redirectToEdit);
+router.get('/events', requireAuth, eventsController.index);
+router.get('/events/new', requireAuth, eventsController.newForm);
+router.post('/events/new', requireAuth, eventsController.create);
+router.get('/events/:id/edit', requireAuth, eventsController.editForm);
+router.post('/events/:id/edit', requireAuth, eventsController.update);
+router.post('/events/:id/delete', requireAuth, eventsController.destroy);
 
 module.exports = router;

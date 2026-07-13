@@ -754,6 +754,116 @@ textarea.adm-control.adm-textarea {
   padding-top: 8px;
 }
 
+/* Reusable time picker */
+.time-picker-field {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.time-picker-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--adm-radius-pill);
+  background: #fff;
+  color: #121212;
+  cursor: pointer;
+  font-weight: 700;
+  text-align: left;
+}
+
+.time-picker-input:focus-visible {
+  outline: 2px solid var(--adm-accent);
+  outline-offset: 3px;
+}
+
+.time-picker-popover {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  left: 0;
+  width: 252px;
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-sm);
+  background: #202020;
+  box-shadow: var(--adm-shadow);
+}
+
+.time-picker-popover [hidden] {
+  display: none !important;
+}
+
+.time-picker-top {
+  display: grid;
+  min-height: 36px;
+  place-items: center;
+  border-bottom: 1px solid var(--adm-border);
+  color: var(--adm-accent-hover);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.time-counter-view {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  align-items: center;
+  text-align: center;
+}
+
+.time-counter-view button {
+  min-height: 54px;
+  border: 0;
+  background: #292929;
+  color: var(--adm-accent-hover);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.time-counter-view .time-value {
+  border-radius: var(--adm-radius-xs);
+  background: #303030;
+  color: var(--adm-text);
+  font-size: 16px;
+}
+
+.hour-up,
+.hour-value,
+.hour-down { grid-column: 1; }
+.minute-up,
+.minute-value,
+.minute-down { grid-column: 3; }
+.time-separator { grid-column: 2; grid-row: 2; color: var(--adm-text-muted); }
+
+.time-grid {
+  display: grid;
+  background: #202020;
+}
+
+.time-grid-hours,
+.time-grid-minutes { grid-template-columns: repeat(4, 1fr); }
+
+.time-grid button {
+  min-height: 52px;
+  border: 0;
+  border-bottom: 1px solid var(--adm-border);
+  background: #292929;
+  color: var(--adm-text-muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.time-grid button:hover,
+.time-grid button.active {
+  background: rgb(29 185 84 / 14%);
+  color: var(--adm-accent-hover);
+}
+
 /* Modal */
 .adm-modal {
   position: fixed;
