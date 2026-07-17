@@ -22,11 +22,30 @@ async function migrate() {
     await ensureSubmissionGroupsColumn(connection);
     await ensureSubmissionStatusTagsColumn(connection);
     await ensureUniqueSubmissionEmails(connection);
+    await ensureEventsUpcomingColumn(connection);
+    await ensureEventScheduleNullable(connection);
     console.log('Migracje zakonczone.');
   } finally {
     connection.release();
     await pool.end();
   }
+}
+
+async function ensureEventsUpcomingColumn(connection) {
+  const [columns] = await connection.query(
+    `SHOW COLUMNS
+     FROM events
+     LIKE 'upcoming'`,
+  );
+
+  if (!columns.length) {
+    await connection.query('ALTER TABLE events ADD COLUMN upcoming TINYINT(1) NOT NULL DEFAULT 0 AFTER description');
+  }
+}
+
+async function ensureEventScheduleNullable(connection) {
+  await connection.query('ALTER TABLE events MODIFY event_date DATE NULL');
+  await connection.query('ALTER TABLE events MODIFY event_time TIME NULL');
 }
 
 async function ensureSubmissionNameColumns(connection) {

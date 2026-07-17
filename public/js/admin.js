@@ -125,3 +125,19 @@ document.querySelectorAll('[data-date-picker]').forEach(input => {
     if (typeof input.showPicker === 'function') input.showPicker();
   });
 });
+
+document.querySelectorAll('[data-upcoming-toggle]').forEach(toggle => {
+  const fields = document.querySelectorAll('[data-event-schedule-field]');
+
+  function updateScheduleFields() {
+    fields.forEach(field => {
+      field.hidden = toggle.checked;
+      field.querySelectorAll('input').forEach(input => {
+        input.required = !toggle.checked;
+      });
+    });
+  }
+
+  toggle.addEventListener('change', updateScheduleFields);
+  updateScheduleFields();
+});

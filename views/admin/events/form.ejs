@@ -5,6 +5,7 @@
 <% const eventTimeValue = event.event_time instanceof Date
   ? event.event_time.toISOString().slice(11, 16)
   : String(event.event_time || event.eventTime || '').slice(0, 5); %>
+<% const isUpcoming = Boolean(event.upcoming); %>
 <section class="admin-page">
   <a class="button button--ghost" href="<%= adminUrl('/events') %>">Wroc do wydarzen</a>
   <div class="admin-hero">
@@ -32,12 +33,18 @@
         <label class="adm-label" for="description">Opis</label>
         <textarea class="adm-control adm-textarea" id="description" name="description" required><%= event.description || '' %></textarea>
       </div>
+      <label class="adm-check adm-form-grid__full">
+        <input id="upcoming" name="upcoming" type="checkbox" value="1" <%= isUpcoming ? 'checked' : '' %> data-upcoming-toggle>
+        <span>Wkrótce</span>
+      </label>
       <div class="adm-field">
         <label class="adm-label" for="eventDate">Data</label>
-        <input class="adm-control" id="eventDate" name="eventDate" type="date" value="<%= eventDateValue %>" data-date-picker required>
+        <input class="adm-control" id="eventDate" name="eventDate" type="date" value="<%= eventDateValue %>" data-date-picker data-event-schedule-field required>
       </div>
       <div class="adm-field">
-        <%- include('../../components/TimePicker', { id: 'eventTime', name: 'eventTime', label: 'Godzina', value: eventTimeValue }) %>
+        <div data-event-schedule-field>
+          <%- include('../../components/TimePicker', { id: 'eventTime', name: 'eventTime', label: 'Godzina', value: eventTimeValue }) %>
+        </div>
       </div>
       <div class="adm-form-actions adm-form-grid__full">
         <button class="button" type="submit"><%= mode === 'edit' ? 'Zapisz zmiany' : 'Dodaj wydarzenie' %></button>

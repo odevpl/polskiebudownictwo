@@ -87,6 +87,7 @@ function eventFromBody(body) {
   return {
     title: String(body.title || '').trim(),
     description: String(body.description || '').trim(),
+    upcoming: Boolean(body.upcoming),
     eventDate: String(body.eventDate || '').trim(),
     eventTime: String(body.eventTime || '').trim(),
   };
@@ -97,6 +98,7 @@ function validateEvent(data) {
   if (!data.title) errors.push('Podaj tytul wydarzenia.');
   if (data.title.length > 255) errors.push('Tytul wydarzenia moze miec maksymalnie 255 znakow.');
   if (!data.description) errors.push('Podaj opis wydarzenia.');
+  if (data.upcoming) return errors;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data.eventDate)) errors.push('Podaj poprawna date wydarzenia.');
   if (!/^\d{2}:\d{2}$/.test(data.eventTime)) {
     errors.push('Podaj poprawna godzine wydarzenia.');

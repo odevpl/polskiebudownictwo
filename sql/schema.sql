@@ -25,8 +25,9 @@ CREATE TABLE IF NOT EXISTS events (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
-  event_date DATE NOT NULL,
-  event_time TIME NOT NULL,
+  upcoming TINYINT(1) NOT NULL DEFAULT 0,
+  event_date DATE NULL,
+  event_time TIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_events_date_time (event_date, event_time)

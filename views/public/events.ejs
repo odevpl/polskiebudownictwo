@@ -46,10 +46,14 @@
             <div class="events-list">
               <% events.forEach(event => { %>
                 <article class="card event-card">
-                  <p class="event-card__meta">
-                    <%= formatDate(event.event_date) %>, <%= formatTime(event.event_time) %>
-                    <% if (typeof isPast === 'function' && isPast(event.event_date)) { %> · Spotkanie odbyło się<% } %>
-                  </p>
+                  <% if (event.upcoming) { %>
+                    <p class="event-card__meta">Wkrótce</p>
+                  <% } else { %>
+                    <p class="event-card__meta">
+                      <%= formatDate(event.event_date) %>, <%= formatTime(event.event_time) %>
+                      <% if (typeof isPast === 'function' && isPast(event.event_date)) { %> · Spotkanie odbyło się<% } %>
+                    </p>
+                  <% } %>
                   <h2><%= event.title %></h2>
                   <p class="event-card__description"><%= event.description %></p>
                 </article>
