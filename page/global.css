@@ -940,6 +940,10 @@ p {
 }
 
 .event-card__toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.8rem;
   margin-top: 0.8rem;
   padding: 0;
   border: 0;
@@ -948,6 +952,13 @@ p {
   cursor: pointer;
   font: inherit;
   font-weight: 800;
+}
+
+.event-card__toggle::before {
+  flex: 1;
+  height: 2px;
+  background: var(--color-primary);
+  content: "";
 }
 
 .event-card__toggle:hover {
