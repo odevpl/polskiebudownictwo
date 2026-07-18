@@ -954,6 +954,10 @@ p {
   font-weight: 800;
 }
 
+.event-card__toggle[hidden] {
+  display: none;
+}
+
 .event-card__toggle::before {
   flex: 1;
   height: 2px;
