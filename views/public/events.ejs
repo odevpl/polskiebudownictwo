@@ -55,7 +55,8 @@
                     </p>
                   <% } %>
                   <h2><%= event.title %></h2>
-                  <p class="event-card__description"><%= event.description %></p>
+                  <p class="event-card__description" data-event-description><%= event.description %></p>
+                  <button class="event-card__toggle" type="button" data-event-description-toggle aria-expanded="false" hidden>Pokaż więcej</button>
                 </article>
               <% }) %>
             </div>
@@ -77,5 +78,6 @@
       </div>
     </footer>
     <script src="/assets/js/menu.js" defer></script>
+    <script src="/assets/js/events.js" defer></script>
   </body>
 </html>

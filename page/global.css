@@ -930,7 +930,28 @@ p {
 
 .event-card__description {
   margin-bottom: 0;
+  max-height: calc(1.6em * 10);
+  overflow: hidden;
   white-space: pre-line;
+}
+
+.event-card__description.is-expanded {
+  max-height: none;
+}
+
+.event-card__toggle {
+  margin-top: 0.8rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.event-card__toggle:hover {
+  color: var(--color-primary-dark);
 }
 
 .event-card__meta {
