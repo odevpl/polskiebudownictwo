@@ -930,6 +930,7 @@ p {
 
 .event-card__description {
   margin-bottom: 0;
+  white-space: pre-line;
 }
 
 .event-card__meta {
