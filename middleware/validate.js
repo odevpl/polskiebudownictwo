@@ -187,9 +187,20 @@ const mediatorApplicationValidation = [
     .withMessage('Akceptacja Polityki RODO jest wymagana.'),
 ];
 
+const userEmailValidation = body('email').trim().isEmail().withMessage('Podaj poprawny adres e-mail.').bail().normalizeEmail().isLength({ max: 254 });
+const userPasswordValidation = body('password').isLength({ min: 12, max: 128 }).withMessage('Hasło musi mieć od 12 do 128 znaków.');
+const registrationValidation = [userEmailValidation, userPasswordValidation];
+const loginValidation = [userEmailValidation, body('password').notEmpty().withMessage('Podaj hasło.')];
+const resetValidation = [userEmailValidation];
+const passwordChangeValidation = [body('token').trim().notEmpty().withMessage('Link jest nieprawidłowy.'), userPasswordValidation];
+
 module.exports = {
   allowedRoles,
   mediationCaseValidation,
   mediatorApplicationValidation,
   submitValidation,
+  registrationValidation,
+  loginValidation,
+  passwordChangeValidation,
+  resetValidation,
 };

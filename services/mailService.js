@@ -13,6 +13,26 @@ function requireMailConfig() {
   }
 }
 
+async function sendAccountEmail(to, subject, heading, message, link, linkLabel) {
+  requireMailConfig();
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to,
+    subject,
+    text: `${message}\n\n${link}`,
+    html: `<p>${message}</p><p><a href="${link}">${linkLabel}</a></p><p>Jeśli nie inicjowano tej operacji, zignoruj tę wiadomość.</p>`,
+  });
+}
+
+function sendAccountVerificationEmail(to, link) {
+  return sendAccountEmail(to, 'Potwierdź adres e-mail', 'Potwierdź adres e-mail', 'Dziękujemy za rejestrację. Potwierdź swój adres e-mail.', link, 'Potwierdź adres e-mail');
+}
+
+function sendPasswordResetEmail(to, link) {
+  return sendAccountEmail(to, 'Reset hasła', 'Reset hasła', 'Otrzymaliśmy prośbę o zmianę hasła. Link jest ważny przez godzinę.', link, 'Ustaw nowe hasło');
+}
+
 function welcomeText() {
   return [
     'Dziękujemy, że dołączasz do społeczności Polskie Budownictwo.',
@@ -242,4 +262,6 @@ module.exports = {
   sendMediatorApplicationEmails,
   sendSubmissionEmails,
   sendWelcomeMail,
+  sendAccountVerificationEmail,
+  sendPasswordResetEmail,
 };

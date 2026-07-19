@@ -4,6 +4,9 @@ const MySQLStoreFactory = require('express-mysql-session');
 const MySQLStore = MySQLStoreFactory(session);
 
 function createSessionMiddleware() {
+  if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET must be configured in production.');
+  }
   const hasDatabaseConfig = process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER;
   const store = hasDatabaseConfig
     ? new MySQLStore({
