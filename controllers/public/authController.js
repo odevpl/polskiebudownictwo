@@ -102,4 +102,12 @@ function logout(request, response) {
   request.session.destroy(() => { response.clearCookie('pb.sid'); response.json({ success: true }); });
 }
 
-module.exports = { login, logout, register, requestPasswordReset, resetPassword, verifyEmail };
+function sessionInfo(request, response) {
+  response.setHeader('Cache-Control', 'no-store');
+  response.json({
+    authenticated: Boolean(request.session?.user),
+    user: request.session?.user ? { email: request.session.user.email } : null,
+  });
+}
+
+module.exports = { login, logout, register, requestPasswordReset, resetPassword, sessionInfo, verifyEmail };

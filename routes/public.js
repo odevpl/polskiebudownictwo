@@ -14,6 +14,7 @@ router.post('/api/submit', submitLimiter, submitValidation, submitController.sto
 router.post('/api/auth/register', loginLimiter, registrationValidation, authController.register);
 router.post('/api/auth/login', loginLimiter, loginValidation, authController.login);
 router.post('/api/auth/logout', authController.logout);
+router.get('/api/auth/session', authController.sessionInfo);
 router.post('/api/auth/verify-email', loginLimiter, authController.verifyEmail);
 router.post('/api/auth/password-reset', loginLimiter, resetValidation, authController.requestPasswordReset);
 router.post('/api/auth/password-reset/confirm', loginLimiter, passwordChangeValidation, authController.resetPassword);
