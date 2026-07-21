@@ -24,6 +24,7 @@
     <button class="button" type="submit">Filtruj</button>
     <a class="button button--ghost" href="<%= adminUrl('/submissions/new') %>">Dodaj</a>
     <button class="button button--ghost" type="button" data-modal-open="export-csv-modal">Eksportuj CSV</button>
+    <button class="button button--ghost" type="submit" formaction="<%= adminUrl('/submissions/export/mailerlite') %>" formmethod="post">Pobierz dla MailerLite</button>
   </form>
 
   <div class="adm-table-panel">
@@ -87,11 +88,6 @@
           </div>
           <button class="adm-icon-button" type="button" data-modal-close aria-label="Zamknij">x</button>
         </div>
-
-        <label class="adm-check adm-check--mailerlite">
-          <input name="mailerLiteExport" type="checkbox" value="1">
-          <span>Eksport dla MailerLite</span>
-        </label>
 
         <div class="adm-check-grid adm-check-grid--modal">
           <% exportColumns.forEach(column => { %>

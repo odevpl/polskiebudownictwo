@@ -30,14 +30,16 @@ const exportColumns = [
   { key: 'updated_at', label: 'Data aktualizacji', value: row => formatDate(row.updated_at) },
 ];
 const mailerLiteExportColumns = [
-  { label: 'Imię', value: row => row.first_name },
-  { label: 'Nazwisko', value: row => row.last_name },
-  { label: 'Nazwa firmy', value: row => row.company_name },
   { label: 'Email', value: row => row.email },
-  { label: 'Telefon', value: row => row.phone },
-  { label: 'Grupa', value: row => mergeGroups(row).join(', ') },
-  { label: 'Status', value: row => row.status },
-  { label: 'Inne', value: row => row.notes },
+  { label: 'Name', value: row => row.first_name },
+  { label: 'Last name', value: row => row.last_name },
+  { label: 'Company', value: row => row.company_name },
+  { label: 'Country', value: () => '' },
+  { label: 'City', value: () => '' },
+  { label: 'Phone', value: row => row.phone },
+  { label: 'State', value: () => '' },
+  { label: 'Zip', value: () => '' },
+  { label: 'Group', value: row => row.roles.join(', ') },
 ];
 
 function normalizeArray(value) {
@@ -317,14 +319,11 @@ async function destroy(request, response) {
 }
 
 async function exportCsv(request, response) {
-  const mailerLiteExport = Boolean(request.body.mailerLiteExport);
   const selectedKeys = normalizeArray(request.body.columns);
-  const selectedColumns = mailerLiteExport
-    ? mailerLiteExportColumns
-    : exportColumns.filter(column => selectedKeys.includes(column.key));
+  const selectedColumns = exportColumns.filter(column => selectedKeys.includes(column.key));
 
   if (!selectedColumns.length) {
-    response.status(422).send('Wybierz co najmniej jedna kolumne albo eksport dla MailerLite.');
+    response.status(422).send('Wybierz co najmniej jedna kolumne.');
     return;
   }
 
@@ -332,9 +331,7 @@ async function exportCsv(request, response) {
     const submissions = await Submission.findForExport();
     const csv = buildCsv(submissions, selectedColumns);
     const stamp = new Date().toISOString().slice(0, 10);
-    const filename = mailerLiteExport
-      ? `zgloszenia-mailerlite-${stamp}.csv`
-      : `zgloszenia-${stamp}.csv`;
+    const filename = `zgloszenia-${stamp}.csv`;
 
     response.setHeader('Content-Type', 'text/csv; charset=utf-8');
     response.setHeader('Content-Disposition', `attachment; filename=\"${filename}\"`);
@@ -342,6 +339,20 @@ async function exportCsv(request, response) {
   } catch (error) {
     console.error('Submission export error:', error);
     response.status(500).send('Nie udalo sie wygenerowac pliku CSV.');
+  }
+}
+
+async function exportMailerLiteCsv(request, response) {
+  try {
+    const submissions = await Submission.findForMailerLiteExport();
+    const csv = buildCsv(submissions, mailerLiteExportColumns, ',');
+    const stamp = new Date().toISOString().slice(0, 10);
+    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    response.setHeader('Content-Disposition', `attachment; filename="zgloszenia-mailerlite-${stamp}.csv"`);
+    response.send(`\uFEFF${csv}`);
+  } catch (error) {
+    console.error('MailerLite export error:', error);
+    response.status(500).send('Nie udalo sie wygenerowac pliku CSV dla MailerLite.');
   }
 }
 
@@ -363,10 +374,10 @@ function bodyToView(data) {
   };
 }
 
-function buildCsv(rows, columns) {
-  const header = columns.map(column => csvCell(column.label)).join(';');
+function buildCsv(rows, columns, separator = ';') {
+  const header = columns.map(column => csvCell(column.label)).join(separator);
   const body = rows.map(row => (
-    columns.map(column => csvCell(column.value(row) ?? '')).join(';')
+    columns.map(column => csvCell(column.value(row) ?? '')).join(separator)
   ));
 
   return [header, ...body].join('\r\n');
@@ -377,9 +388,6 @@ function csvCell(value) {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
-function mergeGroups(row) {
-  return [...new Set([...(row.roles || []), ...(row.groups || [])])];
-}
 
 function formatDate(value) {
   if (!value) return '';
@@ -413,6 +421,7 @@ module.exports = {
   destroy,
   editForm,
   exportCsv,
+  exportMailerLiteCsv,
   index,
   newForm,
   redirectToEdit,

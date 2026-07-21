@@ -190,6 +190,20 @@ async function findForExport() {
   }));
 }
 
+async function findForMailerLiteExport() {
+  const [rows] = await pool.query(
+    `SELECT *
+     FROM submissions
+     WHERE consent_marketing = 1
+     ORDER BY created_at DESC`,
+  );
+
+  return rows.map(row => ({
+    ...row,
+    roles: parseRoles(row.roles),
+  }));
+}
+
 function parseRoles(value) {
   if (Array.isArray(value)) return value;
   try {
@@ -203,6 +217,7 @@ module.exports = {
   create,
   findAll,
   findForExport,
+  findForMailerLiteExport,
   findByEmail,
   findById,
   remove,
