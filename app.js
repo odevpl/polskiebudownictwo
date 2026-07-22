@@ -20,6 +20,7 @@ app.set('trust proxy', 1);
 
 app.use(helmet({
   contentSecurityPolicy: false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }));
 app.use(express.urlencoded({ extended: false, limit: '30kb' }));
 app.use(express.json({ limit: '30kb' }));
