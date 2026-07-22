@@ -42,4 +42,22 @@ async function create(data) {
   return findById(result.insertId);
 }
 
-module.exports = { create, findAll, findById, findBySlug };
+async function update(id, data) {
+  const current = await findById(id);
+  if (!current) return null;
+  await pool.execute(
+    `UPDATE courses
+     SET slug = ?, title = ?, description = ?, category = ?, level = ?,
+         lesson_count = ?, is_free = ?, is_active = ?, sort_order = ?
+     WHERE id = ?`,
+    [data.slug, data.title, data.description, data.category || null, data.level || null, data.lessonCount ?? current.lesson_count, data.isFree ? 1 : 0, data.isActive ? 1 : 0, data.sortOrder || 0, id],
+  );
+  return findById(id);
+}
+
+async function remove(id) {
+  const [result] = await pool.execute('DELETE FROM courses WHERE id = ?', [id]);
+  return result.affectedRows > 0;
+}
+
+module.exports = { create, findAll, findById, findBySlug, remove, update };

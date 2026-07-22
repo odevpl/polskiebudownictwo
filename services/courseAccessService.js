@@ -36,4 +36,24 @@ async function findAvailableCourses(userId) {
   return rows;
 }
 
-module.exports = { findAvailableCourses, hasActiveAccess };
+async function hasLessonAccess(userId, lessonId) {
+  const [rows] = await pool.execute(
+    `SELECT 1
+     FROM course_lessons l
+     INNER JOIN courses c ON c.id = l.course_id
+     LEFT JOIN user_course_access a
+       ON a.course_id = c.id
+      AND a.user_id = ?
+      AND a.status = 'active'
+      AND (a.expires_at IS NULL OR a.expires_at > CURRENT_TIMESTAMP)
+     WHERE l.id = ?
+       AND l.is_published = 1
+       AND c.is_active = 1
+       AND (c.is_free = 1 OR a.id IS NOT NULL)
+     LIMIT 1`,
+    [userId, lessonId],
+  );
+  return rows.length > 0;
+}
+
+module.exports = { findAvailableCourses, hasActiveAccess, hasLessonAccess };

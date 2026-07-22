@@ -1,0 +1,14 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/academy/courses') %>">Wróć do kursów</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">L</div><div><p class="adm-kicker">Lekcje</p><h1><%= course.title %></h1><p class="admin-hero__meta">Zarządzaj kolejnością i publikacją lekcji.</p></div></div>
+  <div class="adm-page-actions"><a class="button" href="<%= adminUrl('/academy/courses/' + course.id + '/lessons/new') %>">Dodaj lekcję</a></div>
+  <div class="adm-table-panel"><%- include('../../../components/Table', { columns: [
+    { label: 'Tytuł', value: lesson => lesson.title },
+    { label: 'Slug', value: lesson => lesson.slug },
+    { label: 'Typ', value: lesson => lesson.content_type },
+    { label: 'Status', value: lesson => lesson.is_published ? 'Opublikowana' : 'Ukryta' },
+    { label: 'Akcje', html: true, value: lesson => `<a class="button button--ghost" href="${adminUrl('/academy/lessons/' + lesson.id + '/edit')}">Edytuj</a>` },
+  ], rows: lessons, emptyMessage: 'Brak lekcji.' }) %></div>
+</section>
+<%- include('../../../partials/admin-shell-end') %>

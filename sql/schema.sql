@@ -168,6 +168,23 @@ CREATE TABLE IF NOT EXISTS user_lesson_progress (
   INDEX idx_lesson_progress_lesson (lesson_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS academy_access_audit (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  access_id BIGINT UNSIGNED NULL,
+  user_id INT UNSIGNED NOT NULL,
+  course_id INT UNSIGNED NOT NULL,
+  admin_id INT UNSIGNED NULL,
+  action ENUM('grant', 'revoke') NOT NULL,
+  reason VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (access_id) REFERENCES user_course_access(id) ON DELETE SET NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE SET NULL,
+  INDEX idx_academy_access_audit_access (access_id, created_at),
+  INDEX idx_academy_access_audit_user (user_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sessions (
   session_id VARCHAR(128) NOT NULL PRIMARY KEY,
   expires BIGINT UNSIGNED NOT NULL,

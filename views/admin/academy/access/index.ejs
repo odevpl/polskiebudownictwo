@@ -1,0 +1,24 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">D</div><div><p class="adm-kicker">Akademia</p><h1>Dostępy</h1><p class="admin-hero__meta">Nadaj lub odbierz użytkownikowi dostęp do kursu.</p></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form adm-card" method="post" action="<%= adminUrl('/academy/access') %>"><div class="adm-form-grid"><div class="adm-field"><label class="adm-label" for="email">E-mail użytkownika</label><input class="adm-control" id="email" name="email" type="email" required></div><div class="adm-field"><label class="adm-label" for="courseId">Kurs</label><select class="adm-control" id="courseId" name="courseId" required><% courses.forEach(course => { %><option value="<%= course.id %>"><%= course.title %></option><% }) %></select></div><div class="adm-field"><label class="adm-label" for="accessType">Źródło dostępu</label><select class="adm-control" id="accessType" name="accessType"><% ['grant', 'purchase', 'free', 'code'].forEach(type => { %><option value="<%= type %>"><%= type %></option><% }) %></select></div><div class="adm-field"><label class="adm-label" for="expiresAt">Wygasa</label><input class="adm-control" id="expiresAt" name="expiresAt" type="datetime-local"></div><div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Nadaj dostęp</button></div></div></form>
+  <div class="adm-table-panel"><%- include('../../../components/Table', { columns: [
+    { label: 'Użytkownik', value: access => access.email },
+    { label: 'Kurs', value: access => access.course_title },
+    { label: 'Typ', value: access => access.access_type },
+    { label: 'Status', value: access => access.status },
+    { label: 'Wygasa', value: access => access.expires_at || '-' },
+    { label: 'Akcje', html: true, value: access => access.status === 'active' ? `<form method="post" action="${adminUrl('/academy/access/' + access.user_id + '/' + access.course_id + '/revoke')}" onsubmit="return confirm('Odebrać dostęp?');"><input name="reason" placeholder="Powód" aria-label="Powód odebrania" maxlength="255"><button class="button button--ghost" type="submit">Odbierz</button></form>` : '-' },
+  ], rows: access, emptyMessage: 'Brak nadanych dostępów.' }) %></div>
+  <h2 class="adm-section-title">Historia zmian</h2>
+  <div class="adm-table-panel"><%- include('../../../components/Table', { columns: [
+    { label: 'Data', value: item => item.created_at },
+    { label: 'Użytkownik', value: item => item.email },
+    { label: 'Kurs', value: item => item.course_title },
+    { label: 'Akcja', value: item => item.action },
+    { label: 'Administrator', value: item => item.admin_name || '-' },
+    { label: 'Powód', value: item => item.reason || '-' },
+  ], rows: audit, emptyMessage: 'Brak historii zmian.' }) %></div>
+</section>
+<%- include('../../../partials/admin-shell-end') %>

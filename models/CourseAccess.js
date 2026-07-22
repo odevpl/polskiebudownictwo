@@ -1,5 +1,29 @@
 const pool = require('../config/database');
 
+async function findAll() {
+  const [rows] = await pool.query(
+    `SELECT a.*, u.email, c.title AS course_title, c.slug AS course_slug
+     FROM user_course_access a
+     INNER JOIN users u ON u.id = a.user_id
+     INNER JOIN courses c ON c.id = a.course_id
+     ORDER BY a.created_at DESC, a.id DESC`,
+  );
+  return rows;
+}
+
+async function findAudit() {
+  const [rows] = await pool.query(
+    `SELECT h.*, u.email, c.title AS course_title, a.full_name AS admin_name
+     FROM academy_access_audit h
+     INNER JOIN users u ON u.id = h.user_id
+     INNER JOIN courses c ON c.id = h.course_id
+     LEFT JOIN admins a ON a.id = h.admin_id
+     ORDER BY h.created_at DESC, h.id DESC
+     LIMIT 200`,
+  );
+  return rows;
+}
+
 async function findByUserId(userId) {
   const [rows] = await pool.execute(
     `SELECT a.*, c.slug AS course_slug, c.title AS course_title
@@ -59,17 +83,31 @@ async function grant(userId, courseId, data = {}) {
       data.sourceReference || null,
     ],
   );
-  return findByUserAndCourse(userId, courseId);
+  const access = await findByUserAndCourse(userId, courseId);
+  await pool.execute(
+    `INSERT INTO academy_access_audit (access_id, user_id, course_id, admin_id, action, reason)
+     VALUES (?, ?, ?, ?, 'grant', ?)`,
+    [access.id, userId, courseId, data.grantedByAdminId || null, data.reason || null],
+  );
+  return access;
 }
 
-async function revoke(userId, courseId, reason = null) {
+async function revoke(userId, courseId, reason = null, adminId = null) {
+  const access = await findByUserAndCourse(userId, courseId);
   const [result] = await pool.execute(
     `UPDATE user_course_access
      SET status = 'revoked', revoked_at = CURRENT_TIMESTAMP, revoked_reason = ?
      WHERE user_id = ? AND course_id = ?`,
     [reason, userId, courseId],
   );
+  if (result.affectedRows > 0 && access) {
+    await pool.execute(
+      `INSERT INTO academy_access_audit (access_id, user_id, course_id, admin_id, action, reason)
+       VALUES (?, ?, ?, ?, 'revoke', ?)`,
+      [access.id, userId, courseId, adminId, reason],
+    );
+  }
   return result.affectedRows > 0;
 }
 
-module.exports = { findByUserId, findByUserAndCourse, grant, hasActiveAccess, revoke };
+module.exports = { findAll, findAudit, findByUserId, findByUserAndCourse, grant, hasActiveAccess, revoke };

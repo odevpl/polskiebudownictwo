@@ -1,0 +1,19 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/academy/courses') %>">Wróć do kursów</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p><h1><%= mode === 'edit' ? ('Kurs #' + course.id) : 'Dodaj kurs' %></h1></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form" method="post" action="<%= action %>"><div class="adm-form-grid">
+    <div class="adm-field"><label class="adm-label" for="slug">Slug</label><input class="adm-control" id="slug" name="slug" value="<%= course.slug || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="title">Tytuł</label><input class="adm-control" id="title" name="title" maxlength="255" value="<%= course.title || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="category">Kategoria</label><input class="adm-control" id="category" name="category" value="<%= course.category || '' %>"></div>
+    <div class="adm-field"><label class="adm-label" for="level">Poziom</label><input class="adm-control" id="level" name="level" value="<%= course.level || '' %>"></div>
+    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><textarea class="adm-control adm-textarea" id="description" name="description" required><%= course.description || '' %></textarea></div>
+    <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= course.sort_order ?? course.sortOrder ?? 0 %>"></div>
+    <label class="adm-check"><input name="isFree" type="checkbox" value="1" <%= course.is_free || course.isFree ? 'checked' : '' %>><span>Kurs darmowy</span></label>
+    <label class="adm-check"><input name="isActive" type="checkbox" value="1" <%= course.is_active || course.isActive ? 'checked' : '' %>><span>Aktywny i widoczny</span></label>
+    <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Zapisz kurs</button><a class="button button--ghost" href="<%= adminUrl('/academy/courses') %>">Anuluj</a><% if (mode === 'edit') { %><a class="button button--ghost" href="<%= adminUrl('/academy/courses/' + course.id + '/lessons') %>">Zarządzaj lekcjami</a><% } %></div>
+  </div></form>
+  <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/courses/' + course.id + '/delete') %>" onsubmit="return confirm('Usunąć kurs i jego lekcje?');"><button class="button button--ghost" type="submit">Usuń kurs</button></form><% } %>
+</section>
+<%- include('../../../partials/admin-shell-end') %>

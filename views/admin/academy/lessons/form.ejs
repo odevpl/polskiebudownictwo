@@ -1,0 +1,18 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/academy/courses/' + course.id + '/lessons') %>">Wróć do lekcji</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">L</div><div><p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p><h1><%= mode === 'edit' ? ('Lekcja #' + lesson.id) : 'Dodaj lekcję' %></h1><p class="admin-hero__meta"><%= course.title %></p></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form" method="post" action="<%= action %>"><div class="adm-form-grid">
+    <div class="adm-field"><label class="adm-label" for="slug">Slug</label><input class="adm-control" id="slug" name="slug" value="<%= lesson.slug || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="title">Tytuł</label><input class="adm-control" id="title" name="title" value="<%= lesson.title || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="contentType">Typ treści</label><select class="adm-control" id="contentType" name="contentType"><% ['text', 'video', 'material'].forEach(type => { %><option value="<%= type %>" <%= lesson.content_type === type || lesson.contentType === type ? 'selected' : '' %>><%= type %></option><% }) %></select></div>
+    <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= lesson.sort_order ?? lesson.sortOrder ?? 0 %>"></div>
+    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><textarea class="adm-control adm-textarea" id="description" name="description"><%= lesson.description || '' %></textarea></div>
+    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="content">Treść</label><textarea class="adm-control adm-textarea" id="content" name="content"><%= lesson.content || '' %></textarea></div>
+    <label class="adm-check"><input name="isPublished" type="checkbox" value="1" <%= lesson.is_published || lesson.isPublished ? 'checked' : '' %>><span>Opublikowana</span></label>
+    <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Zapisz lekcję</button><a class="button button--ghost" href="<%= adminUrl('/academy/courses/' + course.id + '/lessons') %>">Anuluj</a></div>
+  </div></form>
+  <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/lessons/' + lesson.id + '/delete') %>" onsubmit="return confirm('Usunąć lekcję?');"><button class="button button--ghost" type="submit">Usuń lekcję</button></form><% } %>
+</section>
+<%- include('../../../partials/admin-shell-end') %>

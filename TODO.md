@@ -70,20 +70,20 @@ Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkow
 
 ## Story 2.1 — serwis dostępu
 
-- [ ] Utworzyć services/courseAccessService.js.
-- [ ] Pobierać kursy dostępne dla użytkownika.
-- [ ] Sprawdzać dostęp do kursu i konkretnej lekcji.
-- [ ] Obsłużyć status revoked i expires_at.
-- [ ] Nie ufać identyfikatorom przesyłanym tylko z frontendu.
+- [x] Utworzyć services/courseAccessService.js.
+- [x] Pobierać kursy dostępne dla użytkownika.
+- [x] Sprawdzać dostęp do kursu i konkretnej lekcji.
+- [x] Obsłużyć status revoked i expires_at.
+- [x] Nie ufać identyfikatorom przesyłanym tylko z frontendu.
 
 ## Story 2.2 — API Akademii
 
-- [ ] GET /api/academy/courses.
-- [ ] GET /api/academy/courses/:slug.
-- [ ] GET /api/academy/courses/:slug/lessons/:lessonSlug.
-- [ ] POST /api/academy/lessons/:id/progress.
-- [ ] Zwracać 401 bez sesji i 403 bez dostępu.
-- [ ] Nie ujawniać treści niedostępnego kursu.
+- [x] GET /api/academy/courses.
+- [x] GET /api/academy/courses/:slug.
+- [x] GET /api/academy/courses/:slug/lessons/:lessonSlug.
+- [x] POST /api/academy/lessons/:id/progress.
+- [x] Zwracać 401 bez sesji i 403 bez dostępu.
+- [x] Nie ujawniać treści niedostępnego kursu.
 
 ## Story 2.3 — ochrona stron
 
@@ -106,14 +106,14 @@ Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkow
 - [ ] Widok kursu powinien korzystać z identyfikatora lub slugu, np. `/akademia/kurs/:slug`.
 - [ ] Jeden wspólny szablon EJS powinien obsługiwać wszystkie kursy i lekcje.
 
-- [ ] Usunąć hardcoded kursy z obecnego widoku.
-- [ ] Zostawić nagłówek „Dostępne kursy”.
-- [ ] Pobierać listę z API.
-- [ ] Renderować tytuł, kategorię, opis, poziom i liczbę lekcji.
-- [ ] Dodać loading state, błąd i empty state.
-- [ ] Przygotować widok szczegółów kursu.
-- [ ] Przygotować widok lekcji.
-- [ ] Zapisywać i wyświetlać postęp.
+- [x] Usunąć hardcoded kursy z obecnego widoku.
+- [x] Zostawić nagłówek „Dostępne kursy”.
+- [x] Pobierać listę z API.
+- [x] Renderować tytuł, kategorię, opis, poziom i liczbę lekcji.
+- [x] Dodać loading state, błąd i empty state.
+- [x] Przygotować widok szczegółów kursu.
+- [x] Przygotować widok lekcji.
+- [x] Zapisywać i wyświetlać postęp.
 
 **Kryterium:** karta prowadzi tylko do chronionej zawartości dostępnej dla danego użytkownika.
 
@@ -123,45 +123,45 @@ Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkow
 
 ## Story 4.1 — nawigacja i role
 
-- [ ] Dodać Akademię do admin-shell-start.ejs.
-- [ ] Dodać trasę panelu Akademii.
-- [ ] Ustalić akcje dla admin i superadmin.
-- [ ] Zablokować zwykłemu adminowi zarządzanie administratorami.
-- [ ] Rejestrować ważne operacje.
+- [x] Dodać Akademię do admin-shell-start.ejs.
+- [x] Dodać trasę panelu Akademii.
+- [x] Ustalić akcje dla admin i superadmin.
+- [x] Zablokować zwykłemu adminowi zarządzanie administratorami.
+- [x] Rejestrować ważne operacje.
 
 ## Story 4.2 — CRUD kursów
 
-- [ ] Lista kursów z filtrowaniem.
-- [ ] Tworzenie i edycja kursu.
-- [ ] Aktywowanie i ukrywanie kursu.
-- [ ] Ustawianie kolejności.
-- [ ] Walidacja slugu, tytułu, opisu i statusu.
-- [ ] Ostrzeżenie przed usunięciem kursu z dostępami.
+- [x] Lista kursów z filtrowaniem.
+- [x] Tworzenie i edycja kursu.
+- [x] Aktywowanie i ukrywanie kursu.
+- [x] Ustawianie kolejności.
+- [x] Walidacja slugu, tytułu, opisu i statusu.
+- [x] Ostrzeżenie przed usunięciem kursu z dostępami.
 
 ## Story 4.3 — lekcje
 
-- [ ] Lista lekcji w kursie.
-- [ ] Dodawanie i edycja lekcji.
-- [ ] Zmiana kolejności.
-- [ ] Publikowanie i ukrywanie.
-- [ ] Obsługa treści tekstowej i wideo.
+- [x] Lista lekcji w kursie.
+- [x] Dodawanie i edycja lekcji.
+- [x] Zmiana kolejności.
+- [x] Publikowanie i ukrywanie.
+- [x] Obsługa treści tekstowej i wideo.
 
 ## Story 4.4 — dostępy
 
-- [ ] Wyszukiwanie użytkownika po e-mailu.
-- [ ] Lista dostępów użytkownika.
-- [ ] Ręczne nadanie i odebranie dostępu.
-- [ ] Data wygaśnięcia i powód odebrania.
-- [ ] Historia zmian dostępu.
-- [ ] Rozróżnienie free, purchase, grant i code.
+- [x] Wyszukiwanie użytkownika po e-mailu.
+- [x] Lista dostępów użytkownika.
+- [x] Ręczne nadanie i odebranie dostępu.
+- [x] Data wygaśnięcia i powód odebrania.
+- [x] Historia zmian dostępu.
+- [x] Rozróżnienie free, purchase, grant i code.
 
 ## Story 4.5 — podgląd użytkownika
 
-- [ ] Lista użytkowników Akademii.
-- [ ] Status e-maila i konta.
-- [ ] Podgląd danych kontaktowych i fakturowych według roli.
-- [ ] Podgląd kursów i postępu.
-- [ ] Dezaktywacja konta bez usuwania historii.
+- [x] Lista użytkowników Akademii.
+- [x] Status e-maila i konta.
+- [x] Podgląd danych kontaktowych i fakturowych według roli.
+- [x] Podgląd kursów i postępu.
+- [x] Dezaktywacja konta bez usuwania historii.
 
 **Kryterium:** administrator może utworzyć kurs, opublikować lekcje i nadać dostęp.
 

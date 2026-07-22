@@ -9,6 +9,7 @@ const adminRoutes = require('./routes/admin');
 const { adminPath, adminUrl } = require('./config/adminPath');
 const { createSessionMiddleware } = require('./config/session');
 const { requireUser } = require('./middleware/userAuth');
+const academyPageController = require('./controllers/public/academyPageController');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -36,6 +37,8 @@ app.get('/health', (request, response) => {
 });
 
 app.get('/wydarzenia', eventsController.index);
+app.get('/akademia/kurs/:slug', requireUser, academyPageController.course);
+app.get('/akademia/kurs/:slug/lekcja/:lessonSlug', requireUser, academyPageController.lesson);
 const academyPages = {
   '/akademia': 'akademia.html',
   '/akademia/': 'akademia.html',

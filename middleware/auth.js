@@ -18,7 +18,14 @@ function requireGuest(request, response, next) {
   next();
 }
 
-module.exports = {
-  requireAuth,
-  requireGuest,
-};
+function requireRole(...roles) {
+  return (request, response, next) => {
+    if (request.session?.admin && roles.includes(request.session.admin.role)) {
+      next();
+      return;
+    }
+    response.status(403).send('Brak uprawnień.');
+  };
+}
+
+module.exports = { requireAuth, requireGuest, requireRole };

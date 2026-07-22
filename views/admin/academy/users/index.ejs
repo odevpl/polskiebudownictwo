@@ -1,0 +1,16 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">U</div><div><p class="adm-kicker">Akademia</p><h1>Użytkownicy</h1><p class="admin-hero__meta">Podgląd kont, danych kontaktowych i aktywności kursowej.</p></div></div>
+  <form class="toolbar" method="get" action="<%= adminUrl('/academy/users') %>"><input name="search" type="search" placeholder="E-mail, imię, nazwisko lub NIP" value="<%= search %>"><button class="button" type="submit">Szukaj</button></form>
+  <div class="adm-table-panel"><%- include('../../../components/Table', { columns: [
+    { label: 'E-mail', value: user => user.email },
+    { label: 'Osoba', value: user => [user.first_name, user.last_name].filter(Boolean).join(' ') || '-' },
+    { label: 'Telefon', value: user => user.phone || '-' },
+    { label: 'NIP', value: user => user.nip || '-' },
+    { label: 'Dostępy', value: user => `${user.active_access_count || 0} aktywne / ${user.access_count || 0} łącznie` },
+    { label: 'Ukończone lekcje', value: user => user.completed_lesson_count || 0 },
+    { label: 'E-mail', value: user => user.email_verified_at ? 'Potwierdzony' : 'Niepotwierdzony' },
+    { label: 'Akcje', html: true, value: user => user.is_active && admin.role === 'superadmin' ? `<form method="post" action="${adminUrl('/academy/users/' + user.id + '/deactivate')}" onsubmit="return confirm('Dezaktywować konto?');"><button class="button button--ghost" type="submit">Dezaktywuj</button></form>` : (user.is_active ? 'Aktywne' : 'Nieaktywne') },
+  ], rows: users, emptyMessage: 'Brak użytkowników.' }) %></div>
+</section>
+<%- include('../../../partials/admin-shell-end') %>

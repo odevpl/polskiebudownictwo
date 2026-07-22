@@ -6,4 +6,13 @@ function requireUser(request, response, next) {
   response.redirect('/logowanie.html');
 }
 
-module.exports = { requireUser };
+function requireUserApi(request, response, next) {
+  if (request.session?.user) {
+    next();
+    return;
+  }
+
+  response.status(401).json({ success: false, message: 'Wymagane jest zalogowanie.' });
+}
+
+module.exports = { requireUser, requireUserApi };

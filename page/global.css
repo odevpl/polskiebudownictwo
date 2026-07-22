@@ -910,6 +910,11 @@ p {
   .academy-courses__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .academy-lesson-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1511,6 +1516,68 @@ p {
 .academy-courses__back {
   margin-top: 2.5rem;
   text-align: center;
+}
+
+.academy-courses__state {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 2rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.academy-detail__content {
+  max-width: 58rem;
+}
+
+.academy-detail__content h2 {
+  margin-top: 3rem;
+}
+
+.academy-lessons {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.academy-lesson-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.academy-lesson-row h3 {
+  margin: 0.35rem 0;
+}
+
+.academy-lesson-row p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.academy-progress {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #15803d;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.academy-lesson-content {
+  max-width: 48rem;
+  margin-top: 2rem;
+}
+
+.academy-lesson-content__body {
+  min-height: 12rem;
+  margin: 1.5rem 0;
+  white-space: pre-wrap;
+  line-height: 1.8;
 }
 
 .report-download {
