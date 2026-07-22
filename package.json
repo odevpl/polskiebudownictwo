@@ -14,6 +14,7 @@
     "dev:mediacje": "node --watch --watch-path=subdomain/mediacje --watch-path=app-mediacje.js scripts/runMediacje.js",
     "mediacje:dist": "npm run build:mediacje && node dists/mediacje.polskiebudownictwo.org/app.js",
     "migrate": "node scripts/migrate.js",
+    "seed:academy": "node scripts/seedAcademy.js",
     "create-superadmin": "node scripts/createSuperadmin.js",
     "reset-admin-password": "node scripts/resetAdminPassword.js",
     "test:smtp": "node scripts/testSmtp.js",

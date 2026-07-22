@@ -194,6 +194,30 @@ const loginValidation = [userEmailValidation, body('password').notEmpty().withMe
 const resetValidation = [userEmailValidation];
 const passwordChangeValidation = [body('token').trim().notEmpty().withMessage('Link jest nieprawidłowy.'), userPasswordValidation];
 
+const accountProfileValidation = [
+  body('firstName').optional({ values: 'falsy' }).trim().isLength({ max: 80 }).withMessage('Imię może mieć maksymalnie 80 znaków.'),
+  body('lastName').optional({ values: 'falsy' }).trim().isLength({ max: 120 }).withMessage('Nazwisko może mieć maksymalnie 120 znaków.'),
+  body('phone').optional({ values: 'falsy' }).trim().isLength({ max: 30 }).withMessage('Numer telefonu może mieć maksymalnie 30 znaków.'),
+];
+
+const accountBillingValidation = [
+  body('billingType').isIn(['company', 'individual']).withMessage('Wybierz typ danych do faktury.'),
+  body('companyName').optional({ values: 'falsy' }).trim().isLength({ max: 200 }).withMessage('Nazwa może mieć maksymalnie 200 znaków.'),
+  body('nip').optional({ values: 'falsy' }).trim().custom(value => /^\d{10}$/.test(value.replace(/[-\s]/g, ''))).withMessage('NIP musi zawierać 10 cyfr.'),
+  body('billingEmail').optional({ values: 'falsy' }).trim().isEmail().withMessage('Podaj poprawny e-mail do faktury.').isLength({ max: 254 }),
+  body('street').optional({ values: 'falsy' }).trim().isLength({ max: 160 }).withMessage('Ulica może mieć maksymalnie 160 znaków.'),
+  body('buildingNumber').optional({ values: 'falsy' }).trim().isLength({ max: 20 }).withMessage('Numer budynku jest zbyt długi.'),
+  body('apartmentNumber').optional({ values: 'falsy' }).trim().isLength({ max: 20 }).withMessage('Numer lokalu jest zbyt długi.'),
+  body('postalCode').optional({ values: 'falsy' }).trim().isLength({ max: 10 }).withMessage('Kod pocztowy jest zbyt długi.'),
+  body('city').optional({ values: 'falsy' }).trim().isLength({ max: 100 }).withMessage('Miejscowość może mieć maksymalnie 100 znaków.'),
+  body('country').optional({ values: 'falsy' }).trim().isLength({ max: 100 }).withMessage('Kraj jest zbyt długi.'),
+];
+
+const authenticatedPasswordChangeValidation = [
+  body('currentPassword').notEmpty().withMessage('Podaj aktualne hasło.'),
+  body('newPassword').isLength({ min: 12, max: 128 }).withMessage('Nowe hasło musi mieć od 12 do 128 znaków.'),
+];
+
 module.exports = {
   allowedRoles,
   mediationCaseValidation,
@@ -203,4 +227,7 @@ module.exports = {
   loginValidation,
   passwordChangeValidation,
   resetValidation,
+  accountProfileValidation,
+  accountBillingValidation,
+  authenticatedPasswordChangeValidation,
 };

@@ -1,6 +1,8 @@
 const siteHeader = document.querySelector('.site-header');
 const menuToggle = document.querySelector('.site-menu-toggle');
 const siteNav = document.getElementById('site-nav');
+const localHosts = new Set(['localhost', '127.0.0.1', '::1']);
+const isLocalHost = localHosts.has(window.location.hostname);
 const menuVariants = {
   public: { mobileAccount: 'button' },
   academy: { mobileAccount: 'links' },
@@ -31,6 +33,10 @@ document.addEventListener('keydown', event => {
 async function updateAccountMenu() {
   const accountMenu = document.querySelector('[data-auth-menu]');
   if (!accountMenu) return;
+  if (!isLocalHost) {
+    accountMenu.hidden = true;
+    return;
+  }
 
   try {
     const response = await fetch('/api/auth/session', { headers: { Accept: 'application/json' }, cache: 'no-store' });
@@ -38,7 +44,7 @@ async function updateAccountMenu() {
     if (!response.ok || !session.authenticated || !session.user?.email) return;
 
     const initial = session.user.email.slice(0, 1).toLocaleUpperCase('pl-PL');
-    accountMenu.innerHTML = `<div class="user-menu"><button class="user-menu__trigger" type="button" aria-expanded="false" aria-label="Menu użytkownika">${initial}</button><div class="user-menu__popover"><p class="user-menu__email">${session.user.email}</p><a href="/akademia/ustawienia/">Ustawienia</a><a href="/akademia/strefa-szkolen/">Strefa szkoleń</a><button class="user-menu__logout" type="button">Wyloguj</button></div></div>`;
+    accountMenu.innerHTML = `<div class="user-menu"><button class="user-menu__trigger" type="button" aria-expanded="false" aria-label="Menu użytkownika">${initial}</button><div class="user-menu__popover"><p class="user-menu__email">${session.user.email}</p><a href="/akademia/ustawienia/">Ustawienia</a><a href="/akademia/">Strefa Akademii</a><button class="user-menu__logout" type="button">Wyloguj</button></div></div>`;
     const userMenu = accountMenu.querySelector('.user-menu');
     const userMenuTrigger = userMenu.querySelector('.user-menu__trigger');
     userMenuTrigger.addEventListener('click', () => {

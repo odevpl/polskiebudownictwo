@@ -24,10 +24,25 @@ async function migrate() {
     await ensureUniqueSubmissionEmails(connection);
     await ensureEventsUpcomingColumn(connection);
     await ensureEventScheduleNullable(connection);
+    await ensureAcademyLessonCountColumn(connection);
     console.log('Migracje zakonczone.');
   } finally {
     connection.release();
     await pool.end();
+  }
+}
+
+async function ensureAcademyLessonCountColumn(connection) {
+  const [columns] = await connection.query(
+    `SHOW COLUMNS
+     FROM courses
+     LIKE 'lesson_count'`,
+  );
+
+  if (!columns.length) {
+    await connection.query(
+      'ALTER TABLE courses ADD COLUMN lesson_count SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER level',
+    );
   }
 }
 

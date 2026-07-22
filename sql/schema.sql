@@ -70,6 +70,104 @@ CREATE TABLE IF NOT EXISTS user_tokens (
   INDEX idx_user_tokens_lookup (user_id, type, expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS user_profiles (
+  user_id INT UNSIGNED PRIMARY KEY,
+  first_name VARCHAR(80),
+  last_name VARCHAR(120),
+  phone VARCHAR(30),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_billing_details (
+  user_id INT UNSIGNED PRIMARY KEY,
+  billing_type ENUM('company', 'individual') NOT NULL DEFAULT 'company',
+  company_name VARCHAR(200),
+  nip CHAR(10),
+  billing_email VARCHAR(254),
+  street VARCHAR(160),
+  building_number VARCHAR(20),
+  apartment_number VARCHAR(20),
+  postal_code VARCHAR(10),
+  city VARCHAR(100),
+  country VARCHAR(100) NOT NULL DEFAULT 'Polska',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_billing_nip (nip)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS courses (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  slug VARCHAR(160) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  category VARCHAR(120),
+  level VARCHAR(40),
+  lesson_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  is_free TINYINT(1) NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 0,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE INDEX uniq_courses_slug (slug),
+  INDEX idx_courses_listing (is_active, sort_order, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS course_lessons (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  course_id INT UNSIGNED NOT NULL,
+  slug VARCHAR(160) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  content_type ENUM('text', 'video', 'material') NOT NULL DEFAULT 'text',
+  content MEDIUMTEXT,
+  sort_order INT NOT NULL DEFAULT 0,
+  is_published TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE INDEX uniq_course_lessons_slug (course_id, slug),
+  INDEX idx_course_lessons_listing (course_id, is_published, sort_order, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_course_access (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  course_id INT UNSIGNED NOT NULL,
+  access_type ENUM('free', 'purchase', 'grant', 'code') NOT NULL,
+  status ENUM('active', 'revoked', 'expired') NOT NULL DEFAULT 'active',
+  granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP NULL,
+  revoked_at TIMESTAMP NULL,
+  revoked_reason VARCHAR(255),
+  granted_by_admin_id INT UNSIGNED NULL,
+  source_reference VARCHAR(160),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  FOREIGN KEY (granted_by_admin_id) REFERENCES admins(id) ON DELETE SET NULL,
+  UNIQUE INDEX uniq_user_course_access (user_id, course_id),
+  INDEX idx_course_access_user_status (user_id, status, expires_at),
+  INDEX idx_course_access_course (course_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_lesson_progress (
+  user_id INT UNSIGNED NOT NULL,
+  lesson_id INT UNSIGNED NOT NULL,
+  started_at TIMESTAMP NULL,
+  completed_at TIMESTAMP NULL,
+  last_viewed_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, lesson_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (lesson_id) REFERENCES course_lessons(id) ON DELETE CASCADE,
+  INDEX idx_lesson_progress_lesson (lesson_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sessions (
   session_id VARCHAR(128) NOT NULL PRIMARY KEY,
   expires BIGINT UNSIGNED NOT NULL,

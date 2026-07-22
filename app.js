@@ -38,14 +38,20 @@ app.get('/health', (request, response) => {
 app.get('/wydarzenia', eventsController.index);
 const academyPages = {
   '/akademia': 'akademia.html',
+  '/akademia/': 'akademia.html',
   '/akademia.html': 'akademia.html',
   '/akademia/ustawienia': path.join('akademia', 'ustawienia', 'index.html'),
   '/akademia/ustawienia/': path.join('akademia', 'ustawienia', 'index.html'),
   '/akademia/ustawienia/index.html': path.join('akademia', 'ustawienia', 'index.html'),
-  '/akademia/strefa-szkolen': path.join('akademia', 'strefa-szkolen', 'index.html'),
-  '/akademia/strefa-szkolen/': path.join('akademia', 'strefa-szkolen', 'index.html'),
-  '/akademia/strefa-szkolen/index.html': path.join('akademia', 'strefa-szkolen', 'index.html'),
 };
+
+app.get([
+  '/akademia/strefa-szkolen',
+  '/akademia/strefa-szkolen/',
+  '/akademia/strefa-szkolen/index.html',
+], requireUser, (request, response) => {
+  response.redirect('/akademia/');
+});
 
 app.get(Object.keys(academyPages), requireUser, (request, response) => {
   response.sendFile(path.join(publicRoot, academyPages[request.path]));

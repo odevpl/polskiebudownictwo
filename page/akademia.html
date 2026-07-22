@@ -26,13 +26,61 @@
         </nav>
       </div>
     </header>
-    <main class="section">
-      <div class="container report-content">
-        <p class="eyebrow">Strefa użytkownika</p>
-        <h1>Akademia</h1>
-        <p>Witaj w Akademii Polskiego Budownictwa. Materiały edukacyjne będą dostępne w tej sekcji.</p>
-        <p><a href="/">Wróć na stronę główną</a></p>
-      </div>
+    <main>
+      <section class="section section--dark academy-courses__hero" aria-labelledby="academy-courses-title">
+        <div class="container">
+          <p class="eyebrow">Akademia Polskiego Budownictwa</p>
+          <h1 id="academy-courses-title">Wiedza, która wzmacnia bezpieczeństwo na budowie.</h1>
+          <p class="lead">Wybierz kurs i rozwijaj kompetencje potrzebne do bezpiecznego prowadzenia inwestycji, współpracy z partnerami i ochrony własnego biznesu.</p>
+        </div>
+      </section>
+
+      <section class="section academy-courses" aria-labelledby="available-courses-title">
+        <div class="container">
+          <header class="academy-courses__header">
+            <p class="eyebrow">Dostępne kursy</p>
+            <h2 id="available-courses-title">Rozwijaj się krok po kroku</h2>
+            <p>Praktyczne materiały przygotowane z myślą o przedsiębiorcach, wykonawcach i podwykonawcach branży budowlanej.</p>
+          </header>
+
+          <div class="academy-courses__grid">
+            <article class="course-card" id="kurs-bezpieczne-kontrakty">
+              <p class="course-card__tag">Prawo i kontrakty</p>
+              <h3>Bezpieczne kontrakty budowlane</h3>
+              <p class="course-card__description">Poznaj najważniejsze zapisy umów, zidentyfikuj ryzyka i przygotuj się do skutecznych negocjacji.</p>
+              <ul class="course-card__meta" aria-label="Informacje o kursie">
+                <li>Poziom podstawowy</li>
+                <li>6 lekcji</li>
+              </ul>
+              <a class="course-card__link" href="#kurs-bezpieczne-kontrakty">Zobacz kurs <span aria-hidden="true">→</span></a>
+            </article>
+
+            <article class="course-card" id="kurs-ryzyko">
+              <p class="course-card__tag">Zarządzanie</p>
+              <h3>Ryzyko na budowie od A do Z</h3>
+              <p class="course-card__description">Naucz się rozpoznawać zagrożenia, porządkować odpowiedzialność i reagować zanim problem wpłynie na wynik inwestycji.</p>
+              <ul class="course-card__meta" aria-label="Informacje o kursie">
+                <li>Poziom średniozaawansowany</li>
+                <li>8 lekcji</li>
+              </ul>
+              <a class="course-card__link" href="#kurs-ryzyko">Zobacz kurs <span aria-hidden="true">→</span></a>
+            </article>
+
+            <article class="course-card" id="kurs-odbior">
+              <p class="course-card__tag">Praktyka budowy</p>
+              <h3>Dokumentacja i odbiór robót</h3>
+              <p class="course-card__description">Uporządkuj dokumentację, przygotuj odbiór prac i ogranicz ryzyko sporów na końcowym etapie inwestycji.</p>
+              <ul class="course-card__meta" aria-label="Informacje o kursie">
+                <li>Poziom podstawowy</li>
+                <li>5 lekcji</li>
+              </ul>
+              <a class="course-card__link" href="#kurs-odbior">Zobacz kurs <span aria-hidden="true">→</span></a>
+            </article>
+          </div>
+
+          <p class="academy-courses__back"><a href="/akademia/ustawienia/">Ustawienia konta</a></p>
+        </div>
+      </section>
     </main>
     <script src="/assets/js/menu.js" defer></script>
   </body>
