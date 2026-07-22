@@ -13,6 +13,6 @@
       <section class="section section--dark academy-courses__hero"><div class="container"><p class="eyebrow"><%= course.category || 'Akademia' %></p><h1><%= course.title %></h1><p class="lead"><%= course.description %></p></div></section>
       <section class="section"><div class="container academy-detail__content"><a class="button button--ghost" href="/akademia/">← Wróć do kursów</a><h2>Program kursu</h2><% if (!lessons.length) { %><p>Ten kurs nie ma jeszcze opublikowanych lekcji.</p><% } %><ol class="academy-lessons"><% lessons.forEach(lesson => { %><li class="academy-lesson-row"><div><span class="course-card__tag"><%= lesson.content_type %></span><h3><%= lesson.title %></h3><p><%= lesson.description || '' %></p></div><div><% if (lesson.progress && lesson.progress.completed_at) { %><span class="academy-progress">Ukończona</span><% } %><a class="course-card__link" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/lekcja/<%= encodeURIComponent(lesson.slug) %>">Otwórz <span aria-hidden="true">→</span></a></div></li><% }) %></ol></div></section>
     </main>
-    <script src="/assets/js/menu.js" defer></script>
+    <script src="/assets/js/menu.js?v=3" defer></script>
   </body>
 </html>

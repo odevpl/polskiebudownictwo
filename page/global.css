@@ -273,6 +273,10 @@ p {
   align-items: center;
 }
 
+.site-nav__account[hidden] {
+  display: none !important;
+}
+
 .user-menu {
   position: relative;
 }
