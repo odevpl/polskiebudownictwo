@@ -218,6 +218,11 @@ const authenticatedPasswordChangeValidation = [
   body('newPassword').isLength({ min: 12, max: 128 }).withMessage('Nowe hasło musi mieć od 12 do 128 znaków.'),
 ];
 
+const deleteAccountValidation = [
+  body('password').notEmpty().withMessage('Podaj hasło, aby potwierdzić usunięcie konta.'),
+  body('confirmation').equals('USUŃ KONTO').withMessage('Wpisz dokładnie „USUŃ KONTO”.'),
+];
+
 module.exports = {
   allowedRoles,
   mediationCaseValidation,
@@ -230,4 +235,5 @@ module.exports = {
   accountProfileValidation,
   accountBillingValidation,
   authenticatedPasswordChangeValidation,
+  deleteAccountValidation,
 };

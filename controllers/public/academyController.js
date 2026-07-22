@@ -26,6 +26,17 @@ async function listCourses(request, response) {
   }
 }
 
+async function listCatalog(request, response) {
+  try {
+    const courses = await courseAccessService.findCatalogCourses(currentUserId(request));
+    response.setHeader('Cache-Control', 'private, no-store');
+    return response.json({ success: true, courses });
+  } catch (error) {
+    console.error('Academy catalog error:', error);
+    return response.status(500).json({ success: false, message: 'Nie udało się pobrać katalogu szkoleń.' });
+  }
+}
+
 async function showCourse(request, response) {
   try {
     const course = await Course.findBySlug(request.params.slug);
@@ -103,4 +114,4 @@ async function updateLessonProgress(request, response) {
   }
 }
 
-module.exports = { listCourses, showCourse, showLesson, updateLessonProgress };
+module.exports = { listCatalog, listCourses, showCourse, showLesson, updateLessonProgress };

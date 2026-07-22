@@ -43,4 +43,21 @@ async function lesson(request, response) {
   }
 }
 
-module.exports = { course, lesson };
+async function checkout(request, response) {
+  try {
+    const record = await Course.findBySlug(request.params.slug);
+    if (!record || !record.is_active) return response.status(404).send('Szkolenie nie istnieje.');
+    if (record.is_free || Number(record.price_amount) <= 0) return response.redirect(`/akademia/kurs/${encodeURIComponent(record.slug)}`);
+    if (await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.redirect(`/akademia/kurs/${encodeURIComponent(record.slug)}`);
+    return response.render('public/academy/checkout', { title: `Kup szkolenie — ${record.title}`, course: record });
+  } catch (error) {
+    console.error('Academy checkout page error:', error);
+    return response.status(500).send('Nie udało się przygotować zakupu.');
+  }
+}
+
+function paymentResult(request, response) {
+  return response.render('public/academy/payment-result', { title: 'Status płatności', orderNumber: String(request.query.order || '') });
+}
+
+module.exports = { checkout, course, lesson, paymentResult };

@@ -19,6 +19,7 @@
           <a href="<%= adminUrl('/submissions') %>" <%= title === 'Zgloszenia' || title.startsWith('Edycja') || title === 'Nowe zgloszenie' ? 'aria-current="page"' : '' %>>Zgloszenia</a>
           <a href="<%= adminUrl('/events') %>" <%= title === 'Wydarzenia' ? 'aria-current="page"' : '' %>>Wydarzenia</a>
           <a href="<%= adminUrl('/academy/courses') %>" <%= title === 'Akademia' || title.startsWith('Edycja kursu') || title === 'Nowy kurs' ? 'aria-current="page"' : '' %>>Akademia</a>
+          <a href="<%= adminUrl('/academy/orders') %>" <%= title === 'Zamówienia Akademii' || title.startsWith('Zamówienie #') ? 'aria-current="page"' : '' %>>Zamówienia</a>
           <a href="<%= adminUrl('/academy/access') %>" <%= title === 'Dostępy Akademii' ? 'aria-current="page"' : '' %>>Dostępy</a>
           <a href="<%= adminUrl('/academy/users') %>" <%= title === 'Użytkownicy Akademii' ? 'aria-current="page"' : '' %>>Użytkownicy</a>
         </nav>

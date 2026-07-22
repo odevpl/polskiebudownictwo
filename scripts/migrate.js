@@ -25,6 +25,9 @@ async function migrate() {
     await ensureEventsUpcomingColumn(connection);
     await ensureEventScheduleNullable(connection);
     await ensureAcademyLessonCountColumn(connection);
+    await ensureAcademyPriceColumns(connection);
+    await ensureUserAnonymizedAtColumn(connection);
+    await ensureOrderRefundColumns(connection);
     console.log('Migracje zakonczone.');
   } finally {
     connection.release();
@@ -44,6 +47,31 @@ async function ensureAcademyLessonCountColumn(connection) {
       'ALTER TABLE courses ADD COLUMN lesson_count SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER level',
     );
   }
+}
+
+async function ensureAcademyPriceColumns(connection) {
+  const [priceColumns] = await connection.query('SHOW COLUMNS FROM courses LIKE \'price_amount\'');
+  if (!priceColumns.length) {
+    await connection.query('ALTER TABLE courses ADD COLUMN price_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00 AFTER level');
+  }
+  const [currencyColumns] = await connection.query('SHOW COLUMNS FROM courses LIKE \'currency\'');
+  if (!currencyColumns.length) {
+    await connection.query('ALTER TABLE courses ADD COLUMN currency CHAR(3) NOT NULL DEFAULT \'PLN\' AFTER price_amount');
+  }
+}
+
+async function ensureUserAnonymizedAtColumn(connection) {
+  const [columns] = await connection.query('SHOW COLUMNS FROM users LIKE \'anonymized_at\'');
+  if (!columns.length) {
+    await connection.query('ALTER TABLE users ADD COLUMN anonymized_at TIMESTAMP NULL AFTER last_login_at');
+  }
+}
+
+async function ensureOrderRefundColumns(connection) {
+  const [requested] = await connection.query('SHOW COLUMNS FROM orders LIKE \'refund_requested_at\'');
+  if (!requested.length) await connection.query('ALTER TABLE orders ADD COLUMN refund_requested_at TIMESTAMP NULL AFTER refunded_at');
+  const [requestId] = await connection.query('SHOW COLUMNS FROM orders LIKE \'refund_request_id\'');
+  if (!requestId.length) await connection.query('ALTER TABLE orders ADD COLUMN refund_request_id VARCHAR(45) AFTER refund_requested_at');
 }
 
 async function ensureEventsUpcomingColumn(connection) {

@@ -2,6 +2,8 @@ const Course = require('../../models/Course');
 const CourseAccess = require('../../models/CourseAccess');
 const CourseLesson = require('../../models/CourseLesson');
 const User = require('../../models/User');
+const Order = require('../../models/Order');
+const przelewy24Provider = require('../../services/przelewy24Provider');
 
 async function coursesIndex(request, response) {
   try {
@@ -212,6 +214,35 @@ async function deactivateUser(request, response) {
   }
 }
 
+async function ordersIndex(request, response) {
+  try {
+    const filters = { status: String(request.query.status || ''), search: String(request.query.search || '') };
+    const orders = await Order.findAdminAll(filters);
+    return response.render('admin/academy/orders/index', { title: 'Zamówienia Akademii', admin: request.session.admin, orders, ...filters });
+  } catch (error) { console.error('Admin academy orders error:', error); return response.status(500).send('Nie udało się pobrać zamówień.'); }
+}
+
+async function orderDetail(request, response) {
+  try {
+    const order = await Order.findById(request.params.id);
+    if (!order) return response.status(404).send('Zamówienie nie istnieje.');
+    const events = await Order.findPaymentEvents(order.order_number);
+    return response.render('admin/academy/orders/detail', { title: `Zamówienie #${order.order_number}`, admin: request.session.admin, order, events });
+  } catch (error) { console.error('Admin academy order detail error:', error); return response.status(500).send('Nie udało się pobrać zamówienia.'); }
+}
+
+async function requestOrderRefund(request, response) {
+  try {
+    const order = await Order.findById(request.params.id);
+    if (!order || order.status !== 'paid' || order.payment_provider !== 'przelewy24' || !order.provider_payment_id || order.refund_requested_at) {
+      return response.status(409).send('Zwrot nie może zostać rozpoczęty dla tego zamówienia.');
+    }
+    const refund = await przelewy24Provider.requestRefund(order, request);
+    await Order.markRefundRequested(order.id, refund.requestId);
+    return response.redirect(request.app.locals.adminUrl(`/academy/orders/${order.id}`));
+  } catch (error) { console.error('Admin academy refund request error:', error); return response.status(502).send('Nie udało się rozpocząć zwrotu w Przelewy24.'); }
+}
+
 function renderCourseForm(response, request, course, mode, errors, status = 200) {
   return response.status(status).render('admin/academy/courses/form', { title: mode === 'edit' ? `Edycja kursu #${course.id}` : 'Nowy kurs', admin: request.session.admin, course, mode, errors, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/courses/${course.id}/edit` : '/academy/courses/new') });
 }
@@ -226,7 +257,7 @@ async function renderAccessWithErrors(request, response, errors, status) {
 }
 
 function courseFromBody(body) {
-  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: String(body.description || '').trim(), category: String(body.category || '').trim(), level: String(body.level || '').trim(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
+  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: String(body.description || '').trim(), category: String(body.category || '').trim(), level: String(body.level || '').trim(), priceAmount: body.priceAmount === undefined ? null : Number(body.priceAmount || 0), currency: String(body.currency || 'PLN').trim().toUpperCase(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
 }
 
 function lessonFromBody(body, courseId) {
@@ -238,6 +269,8 @@ function validateCourse(data) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) errors.push('Slug może zawierać małe litery, cyfry i myślniki.');
   if (!data.title || data.title.length > 255) errors.push('Podaj tytuł kursu (maksymalnie 255 znaków).');
   if (!data.description) errors.push('Podaj opis kursu.');
+  if (data.priceAmount !== null && (!Number.isFinite(data.priceAmount) || data.priceAmount < 0)) errors.push('Cena musi być liczbą nieujemną.');
+  if (!/^[A-Z]{3}$/.test(data.currency)) errors.push('Waluta musi mieć 3 wielkie litery.');
   if (!Number.isSafeInteger(data.sortOrder) || data.sortOrder < 0) errors.push('Kolejność musi być liczbą nieujemną.');
   return errors;
 }
@@ -254,4 +287,4 @@ function validateLesson(data) {
 function emptyCourse() { return { slug: '', title: '', description: '', category: '', level: '', lesson_count: 0, is_free: 0, is_active: 0, sort_order: 0 }; }
 function emptyLesson(courseId) { return { course_id: courseId, slug: '', title: '', description: '', content_type: 'text', content: '', sort_order: 0, is_published: 0 }; }
 
-module.exports = { accessIndex, coursesIndex, createCourse, createLesson, deactivateUser, deleteCourse, deleteLesson, editCourse, editLesson, grantAccess, lessonsIndex, newCourse, newLesson, revokeAccess, updateCourse, updateLesson, usersIndex };
+module.exports = { accessIndex, coursesIndex, createCourse, createLesson, deactivateUser, deleteCourse, deleteLesson, editCourse, editLesson, grantAccess, lessonsIndex, newCourse, newLesson, orderDetail, ordersIndex, requestOrderRefund, revokeAccess, updateCourse, updateLesson, usersIndex };

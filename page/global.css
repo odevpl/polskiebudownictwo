@@ -1522,7 +1522,7 @@ p {
   grid-column: 1 / -1;
   margin: 0;
   padding: 2rem;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
   text-align: center;
 }
 
@@ -1557,7 +1557,7 @@ p {
 
 .academy-lesson-row p {
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
 }
 
 .academy-progress {
@@ -1578,6 +1578,74 @@ p {
   margin: 1.5rem 0;
   white-space: pre-wrap;
   line-height: 1.8;
+}
+
+.academy-catalog {
+  margin-top: 5rem;
+  padding-top: 4rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.academy-catalog__header {
+  margin-bottom: 2rem;
+}
+
+.academy-checkout {
+  max-width: 40rem;
+  margin: 2rem auto 0;
+}
+
+.academy-checkout__summary {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--color-surface);
+}
+
+.academy-checkout__summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.academy-checkout__summary dt {
+  color: var(--color-muted);
+}
+
+.academy-checkout__summary dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.academy-settings__privacy {
+  margin-top: 2rem;
+}
+
+.academy-order-history { margin-top: 2rem; }
+.academy-order-history__row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .35rem 1rem; padding: 1rem 0; border-bottom: 1px solid var(--color-border); }
+.academy-order-history__row h3, .academy-order-history__row p { margin: 0; }
+.academy-order-history__row p { grid-column: 1; color: var(--color-muted); font-size: .9rem; }
+.academy-order-history__row strong { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.academy-order-history__row span { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+@media (max-width: 700px) { .academy-order-history__row { grid-template-columns: 1fr auto; } .academy-order-history__row strong, .academy-order-history__row span { grid-column: auto; grid-row: auto; } }
+
+.academy-settings__privacy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.button--danger {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.button--danger:hover {
+  background: #991b1b;
+  color: #fff;
 }
 
 .report-download {

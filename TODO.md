@@ -169,14 +169,39 @@ Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkow
 
 # Milestone 5 — zakupy i płatności
 
-- [ ] Tabele orders i order_items.
-- [ ] Zapis ceny i nazwy kursu z momentu zakupu.
-- [ ] Powiązanie zamówienia z użytkownikiem i fakturą.
-- [ ] Statusy pending, paid, cancelled i refunded.
-- [ ] Wybór operatora płatności.
-- [ ] Podpisany webhook i idempotencja.
-- [ ] Nadanie dostępu dopiero po potwierdzeniu płatności.
-- [ ] Obsługa zwrotów i odebrania dostępu.
+## Story 5.1 — katalog i zakup szkolenia
+
+- [x] Pokazać cenę i status darmowy/płatny na karcie szkolenia.
+- [x] Dodać przycisk „Kup szkolenie” dla kursu płatnego.
+- [x] Dodać przycisk „Rozpocznij szkolenie” dla kursu darmowego lub już posiadanego.
+- [x] Zbudować stronę podsumowania zakupu z nazwą, ceną i danymi użytkownika.
+- [x] Zablokować zakup kursu, do którego użytkownik ma już aktywny dostęp.
+- [x] Zapisać zamówienie przed przekierowaniem do Przelewy24.
+- [x] Po potwierdzeniu płatności dodać kurs do „Dostępnych kursów”.
+- [x] Obsłużyć powrót z Przelewy24 dla sukcesu, anulowania i błędu.
+
+## Story 5.2 — zamówienia użytkownika
+
+- [x] Dodać historię zamówień w ustawieniach Akademii.
+- [x] Pokazać status płatności i numer zamówienia.
+- [x] Pokazać informację o oczekiwaniu na potwierdzenie webhooka.
+- [x] Nie ujawniać danych płatniczych przechowywanych po stronie Przelewy24.
+
+## Story 5.3 — obsługa administracyjna sprzedaży
+
+- [x] Dodać listę zamówień w panelu administracyjnym.
+- [x] Filtrować zamówienia po statusie, użytkowniku i kursie.
+- [x] Pokazać szczegóły zamówienia i historię webhooków.
+- [x] Dodać bezpieczne rozpoczęcie zwrotu przez Przelewy24.
+
+- [x] Tabele orders i order_items.
+- [x] Zapis ceny i nazwy kursu z momentu zakupu.
+- [x] Powiązanie zamówienia z użytkownikiem i fakturą.
+- [x] Statusy pending, paid, cancelled i refunded.
+- [x] Wybór operatora płatności: Przelewy24.
+- [x] Podpisany webhook i idempotencja.
+- [x] Nadanie dostępu dopiero po potwierdzeniu płatności.
+- [x] Obsługa zwrotów i odebrania dostępu.
 - [ ] Ustalenie, kto generuje faktury.
 
 **Kryterium:** opłacony zakup nadaje dostęp idempotentnie.
@@ -187,19 +212,19 @@ Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkow
 
 ## Bezpieczeństwo
 
-- [ ] Sprawdzić autoryzację każdego endpointu.
-- [ ] Sprawdzić, czy API nie ujawnia danych innych użytkowników.
-- [ ] Ograniczyć próby zmiany hasła i operacji administracyjnych.
-- [ ] Rozważyć unieważnianie sesji po zmianie hasła.
-- [ ] Dodać CSRF, jeśli będzie wymagany przez sposób wdrożenia.
-- [ ] Nie logować haseł, tokenów ani danych płatniczych.
+- [x] Sprawdzić autoryzację każdego endpointu.
+- [x] Sprawdzić, czy API nie ujawnia danych innych użytkowników.
+- [x] Ograniczyć próby zmiany hasła i operacji administracyjnych.
+- [x] Unieważniać bieżącą sesję po zmianie hasła przez regenerację sesji.
+- [x] Dodać ochronę CSRF opartą o weryfikację origin/referer dla żądań mutujących.
+- [x] Nie logować haseł, tokenów ani danych płatniczych.
 
 ## RODO
 
-- [ ] Opisać cele przetwarzania danych kontaktowych i fakturowych.
-- [ ] Ustalić retencję danych zakupowych i faktur.
-- [ ] Przygotować eksport danych użytkownika.
-- [ ] Przygotować usunięcie/anonymizację z zachowaniem wymogów księgowych.
+- [x] Opisać cele przetwarzania danych kontaktowych i fakturowych w dokumencie technicznym.
+- [ ] Zatwierdzić retencję danych zakupowych i faktur z księgowością.
+- [x] Przygotować eksport danych użytkownika.
+- [x] Przygotować usunięcie/anonimizację z zachowaniem wymogów księgowych.
 
 ## Testy i wdrożenie
 

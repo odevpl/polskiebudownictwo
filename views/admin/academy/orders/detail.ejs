@@ -1,0 +1,9 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<p><a href="<%= adminUrl('/academy/orders') %>">← Zamówienia</a></p>
+<h1>Zamówienie <%= order.order_number %></h1>
+<p>Status: <strong><%= order.status %></strong> · utworzone <%= new Date(order.created_at).toLocaleString('pl-PL') %></p>
+<h2>Pozycje</h2><ul><% order.items.forEach(item => { %><li><%= item.title_snapshot %> — <%= Number(item.line_total).toFixed(2) %> <%= item.currency %></li><% }); %></ul>
+<h2>Dane zamówienia</h2><p>Waluta: <%= order.currency %><br>Operator: <%= order.payment_provider || '—' %><br>Potwierdzenie płatności: <%= order.paid_at ? new Date(order.paid_at).toLocaleString('pl-PL') : 'brak' %></p>
+<% if (order.status === 'paid' && order.payment_provider === 'przelewy24' && !order.refund_requested_at) { %><form method="post" action="<%= adminUrl(`/academy/orders/${order.id}/refund`) %>"><button class="button button--danger" type="submit" onclick="return confirm('Rozpocząć zwrot tego zamówienia w Przelewy24?')">Rozpocznij zwrot</button></form><% } else if (order.refund_requested_at && order.status !== 'refunded') { %><p class="notice">Zwrot został zgłoszony i oczekuje na potwierdzenie Przelewy24.</p><% } %>
+<h2>Historia webhooków</h2><div class="table-wrap"><table><thead><tr><th>Operator</th><th>Zdarzenie</th><th>ID</th><th>Przetworzono</th></tr></thead><tbody><% if (!events.length) { %><tr><td colspan="4">Brak zdarzeń.</td></tr><% } %><% events.forEach(event => { %><tr><td><%= event.provider %></td><td><%= event.event_type %></td><td><%= event.event_id %></td><td><%= new Date(event.processed_at).toLocaleString('pl-PL') %></td></tr><% }); %></tbody></table></div>
+<%- include('../../../partials/admin-shell-end') %>

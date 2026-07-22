@@ -17,8 +17,15 @@ function validationFailure(request, response) {
   return true;
 }
 
-function establishSession(request, user) {
-  request.session.user = { id: user.id, email: user.email };
+function establishSession(request, user, callback) {
+  request.session.regenerate(error => {
+    if (error) {
+      callback(error);
+      return;
+    }
+    request.session.user = { id: user.id, email: user.email };
+    callback(null);
+  });
 }
 
 async function register(request, response) {
@@ -61,9 +68,12 @@ async function login(request, response) {
       return response.status(401).json({ success: false, message: 'Nieprawidłowy e-mail lub hasło.' });
     }
     if (!user.email_verified_at) return response.status(403).json({ success: false, message: 'Najpierw potwierdź adres e-mail.' });
-    establishSession(request, user);
-    await User.touchLogin(user.id);
-    return request.session.save(error => error ? response.status(500).json({ success: false, message: 'Nie udało się zapisać sesji.' }) : response.json({ success: true, message: 'Zalogowano.', redirect: '/akademia' }));
+    establishSession(request, user, async sessionError => {
+      if (sessionError) return response.status(500).json({ success: false, message: 'Nie udało się zapisać sesji.' });
+      await User.touchLogin(user.id);
+      return request.session.save(error => error ? response.status(500).json({ success: false, message: 'Nie udało się zapisać sesji.' }) : response.json({ success: true, message: 'Zalogowano.', redirect: '/akademia' }));
+    });
+    return;
   } catch (error) {
     console.error('User login error:', error);
     return response.status(500).json({ success: false, message: 'Nie udało się zalogować.' });

@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS users (
   email_verified_at TIMESTAMP NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   last_login_at TIMESTAMP NULL,
+  anonymized_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -105,6 +106,8 @@ CREATE TABLE IF NOT EXISTS courses (
   description TEXT NOT NULL,
   category VARCHAR(120),
   level VARCHAR(40),
+  price_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  currency CHAR(3) NOT NULL DEFAULT 'PLN',
   lesson_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   is_free TINYINT(1) NOT NULL DEFAULT 0,
   is_active TINYINT(1) NOT NULL DEFAULT 0,
@@ -183,6 +186,74 @@ CREATE TABLE IF NOT EXISTS academy_access_audit (
   FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE SET NULL,
   INDEX idx_academy_access_audit_access (access_id, created_at),
   INDEX idx_academy_access_audit_user (user_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS orders (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  order_number VARCHAR(40) NOT NULL,
+  status ENUM('pending', 'paid', 'cancelled', 'refunded') NOT NULL DEFAULT 'pending',
+  currency CHAR(3) NOT NULL DEFAULT 'PLN',
+  total_amount DECIMAL(10, 2) NOT NULL,
+  billing_snapshot JSON NOT NULL,
+  payment_provider VARCHAR(40),
+  provider_checkout_id VARCHAR(160),
+  provider_payment_id VARCHAR(160),
+  idempotency_key CHAR(64) NOT NULL,
+  paid_at TIMESTAMP NULL,
+  cancelled_at TIMESTAMP NULL,
+  refunded_at TIMESTAMP NULL,
+  refund_requested_at TIMESTAMP NULL,
+  refund_request_id VARCHAR(45),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+  UNIQUE INDEX uniq_orders_number (order_number),
+  UNIQUE INDEX uniq_orders_idempotency (idempotency_key),
+  UNIQUE INDEX uniq_orders_provider_checkout (payment_provider, provider_checkout_id),
+  INDEX idx_orders_user_status (user_id, status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS order_items (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT UNSIGNED NOT NULL,
+  course_id INT UNSIGNED NULL,
+  title_snapshot VARCHAR(255) NOT NULL,
+  slug_snapshot VARCHAR(160) NOT NULL,
+  unit_price DECIMAL(10, 2) NOT NULL,
+  quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  line_total DECIMAL(10, 2) NOT NULL,
+  currency CHAR(3) NOT NULL DEFAULT 'PLN',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+  UNIQUE INDEX uniq_order_course (order_id, course_id),
+  INDEX idx_order_items_course (course_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS payment_events (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  provider VARCHAR(40) NOT NULL,
+  event_id VARCHAR(160) NOT NULL,
+  event_type VARCHAR(80) NOT NULL,
+  payload JSON NOT NULL,
+  processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE INDEX uniq_payment_event (provider, event_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS invoices (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT UNSIGNED NOT NULL,
+  status ENUM('pending', 'issued', 'cancelled') NOT NULL DEFAULT 'pending',
+  invoice_number VARCHAR(80),
+  billing_snapshot JSON NOT NULL,
+  external_id VARCHAR(160),
+  issued_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  UNIQUE INDEX uniq_invoice_order (order_id),
+  UNIQUE INDEX uniq_invoice_number (invoice_number)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS sessions (

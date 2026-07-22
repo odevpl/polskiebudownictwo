@@ -3,7 +3,7 @@ const pool = require('../config/database');
 async function findAll({ activeOnly = false } = {}) {
   const where = activeOnly ? 'WHERE is_active = 1' : '';
   const [rows] = await pool.query(
-    `SELECT id, slug, title, description, category, level, lesson_count,
+    `SELECT id, slug, title, description, category, level, price_amount, currency, lesson_count,
             is_free, is_active, sort_order, created_at, updated_at
      FROM courses
      ${where}
@@ -25,14 +25,16 @@ async function findBySlug(slug) {
 async function create(data) {
   const [result] = await pool.execute(
     `INSERT INTO courses
-       (slug, title, description, category, level, lesson_count, is_free, is_active, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (slug, title, description, category, level, price_amount, currency, lesson_count, is_free, is_active, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.slug,
       data.title,
       data.description,
       data.category || null,
       data.level || null,
+      data.priceAmount ?? 0,
+      data.currency || 'PLN',
       data.lessonCount || 0,
       data.isFree ? 1 : 0,
       data.isActive ? 1 : 0,
@@ -48,9 +50,9 @@ async function update(id, data) {
   await pool.execute(
     `UPDATE courses
      SET slug = ?, title = ?, description = ?, category = ?, level = ?,
-         lesson_count = ?, is_free = ?, is_active = ?, sort_order = ?
+         price_amount = ?, currency = ?, lesson_count = ?, is_free = ?, is_active = ?, sort_order = ?
      WHERE id = ?`,
-    [data.slug, data.title, data.description, data.category || null, data.level || null, data.lessonCount ?? current.lesson_count, data.isFree ? 1 : 0, data.isActive ? 1 : 0, data.sortOrder || 0, id],
+    [data.slug, data.title, data.description, data.category || null, data.level || null, data.priceAmount ?? current.price_amount, data.currency || current.currency || 'PLN', data.lessonCount ?? current.lesson_count, data.isFree ? 1 : 0, data.isActive ? 1 : 0, data.sortOrder || 0, id],
   );
   return findById(id);
 }

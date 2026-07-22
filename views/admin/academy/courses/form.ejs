@@ -8,6 +8,8 @@
     <div class="adm-field"><label class="adm-label" for="title">Tytuł</label><input class="adm-control" id="title" name="title" maxlength="255" value="<%= course.title || '' %>" required></div>
     <div class="adm-field"><label class="adm-label" for="category">Kategoria</label><input class="adm-control" id="category" name="category" value="<%= course.category || '' %>"></div>
     <div class="adm-field"><label class="adm-label" for="level">Poziom</label><input class="adm-control" id="level" name="level" value="<%= course.level || '' %>"></div>
+    <div class="adm-field"><label class="adm-label" for="priceAmount">Cena</label><input class="adm-control" id="priceAmount" name="priceAmount" type="number" min="0" step="0.01" value="<%= course.price_amount ?? course.priceAmount ?? 0 %>"></div>
+    <div class="adm-field"><label class="adm-label" for="currency">Waluta</label><input class="adm-control" id="currency" name="currency" maxlength="3" value="<%= course.currency || 'PLN' %>"></div>
     <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><textarea class="adm-control adm-textarea" id="description" name="description" required><%= course.description || '' %></textarea></div>
     <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= course.sort_order ?? course.sortOrder ?? 0 %>"></div>
     <label class="adm-check"><input name="isFree" type="checkbox" value="1" <%= course.is_free || course.isFree ? 'checked' : '' %>><span>Kurs darmowy</span></label>

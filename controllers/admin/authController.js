@@ -32,15 +32,19 @@ async function login(request, response) {
       return;
     }
 
-    request.session.admin = {
-      id: admin.id,
-      email: admin.email,
-      fullName: admin.full_name,
-      role: admin.role,
-    };
-
-    await Admin.touchLogin(admin.id);
-    request.session.save((saveError) => {
+    request.session.regenerate(async regenerateError => {
+      if (regenerateError) {
+        response.status(500).render('admin/login', { title: 'Logowanie', error: 'Nie udalo sie zapisac sesji logowania.', values: { email } });
+        return;
+      }
+      request.session.admin = {
+        id: admin.id,
+        email: admin.email,
+        fullName: admin.full_name,
+        role: admin.role,
+      };
+      await Admin.touchLogin(admin.id);
+      request.session.save((saveError) => {
       if (saveError) {
         console.error('Session save error:', saveError);
         response.status(500).render('admin/login', {
@@ -52,6 +56,7 @@ async function login(request, response) {
       }
 
       response.redirect(adminUrl('/submissions'));
+      });
     });
   } catch (error) {
     console.error('Login error:', error);

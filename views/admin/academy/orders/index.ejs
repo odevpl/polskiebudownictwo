@@ -1,0 +1,12 @@
+<%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<h1>Zamówienia Akademii</h1>
+<form class="filters" method="get" action="<%= adminUrl('/academy/orders') %>">
+  <input name="search" value="<%= search %>" placeholder="E-mail, numer lub kurs" aria-label="Szukaj zamówień">
+  <select name="status" aria-label="Status"><option value="">Wszystkie statusy</option><% ['pending','paid','cancelled','refunded'].forEach(item => { %><option value="<%= item %>" <%= status === item ? 'selected' : '' %>><%= item %></option><% }); %></select>
+  <button class="button" type="submit">Filtruj</button>
+</form>
+<div class="table-wrap"><table><thead><tr><th>Numer</th><th>Użytkownik</th><th>Kurs</th><th>Status</th><th>Kwota</th><th>Utworzono</th><th></th></tr></thead><tbody>
+<% if (!orders.length) { %><tr><td colspan="7">Brak zamówień.</td></tr><% } %>
+<% orders.forEach(order => { %><tr><td><%= order.order_number %></td><td><%= order.email %></td><td><%= order.item_titles || '—' %></td><td><%= order.status %><%= order.refund_requested_at && order.status === 'paid' ? ' (zwrot oczekuje)' : '' %></td><td><%= Number(order.total_amount).toFixed(2) %> <%= order.currency %></td><td><%= new Date(order.created_at).toLocaleString('pl-PL') %></td><td><a href="<%= adminUrl(`/academy/orders/${order.id}`) %>">Szczegóły</a></td></tr><% }); %>
+</tbody></table></div>
+<%- include('../../../partials/admin-shell-end') %>

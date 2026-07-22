@@ -5,12 +5,13 @@ const eventsController = require('../controllers/admin/eventsController');
 const academyController = require('../controllers/admin/academyController');
 const { adminUrl } = require('../config/adminPath');
 const { requireAuth, requireRole } = require('../middleware/auth');
-const { loginLimiter } = require('../middleware/rateLimiter');
+const { loginLimiter, sensitiveActionLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
 router.get('/login', authController.showLogin);
 router.post('/login', loginLimiter, authController.login);
+router.use((request, response, next) => request.method === 'POST' ? sensitiveActionLimiter(request, response, next) : next());
 router.post('/logout', requireAuth, authController.logout);
 router.get('/', requireAuth, (request, response) => response.redirect(adminUrl('/submissions')));
 router.get('/submissions', requireAuth, submissionsController.index);
@@ -29,6 +30,9 @@ router.get('/events/:id/edit', requireAuth, eventsController.editForm);
 router.post('/events/:id/edit', requireAuth, eventsController.update);
 router.post('/events/:id/delete', requireAuth, eventsController.destroy);
 router.get('/academy/courses', requireAuth, academyController.coursesIndex);
+router.get('/academy/orders', requireAuth, academyController.ordersIndex);
+router.get('/academy/orders/:id', requireAuth, academyController.orderDetail);
+router.post('/academy/orders/:id/refund', requireRole('superadmin'), academyController.requestOrderRefund);
 router.get('/academy/courses/new', requireAuth, academyController.newCourse);
 router.post('/academy/courses/new', requireAuth, academyController.createCourse);
 router.get('/academy/courses/:id/edit', requireAuth, academyController.editCourse);

@@ -3,6 +3,8 @@ const { validationResult } = require('express-validator');
 const User = require('../../models/User');
 const UserProfile = require('../../models/UserProfile');
 const UserBilling = require('../../models/UserBilling');
+const PersonalData = require('../../models/PersonalData');
+const Order = require('../../models/Order');
 
 function validationFailure(request, response) {
   const errors = validationResult(request);
@@ -16,6 +18,7 @@ function value(value) {
 }
 
 async function getAccount(request, response) {
+  response.setHeader('Cache-Control', 'no-store');
   try {
     const user = await User.findById(request.session.user.id);
     if (!user) return response.status(401).json({ success: false, message: 'Sesja jest nieaktualna.' });
@@ -100,11 +103,55 @@ async function changePassword(request, response) {
       return response.status(400).json({ success: false, message: 'Aktualne hasło jest nieprawidłowe.' });
     }
     await User.updatePassword(user.id, await bcrypt.hash(request.body.newPassword, 12));
-    return response.json({ success: true, message: 'Hasło zostało zmienione.' });
+    return request.session.regenerate(error => {
+      if (error) return response.status(500).json({ success: false, message: 'Nie udało się odświeżyć sesji.' });
+      request.session.user = { id: user.id, email: user.email };
+      return request.session.save(saveError => saveError
+        ? response.status(500).json({ success: false, message: 'Nie udało się zapisać sesji.' })
+        : response.json({ success: true, message: 'Hasło zostało zmienione.' }));
+    });
   } catch (error) {
     console.error('Account password update error:', error);
     return response.status(500).json({ success: false, message: 'Nie udało się zmienić hasła.' });
   }
 }
 
-module.exports = { changePassword, getAccount, updateBilling, updateProfile };
+async function getOrders(request, response) {
+  response.setHeader('Cache-Control', 'no-store');
+  try { return response.json({ success: true, orders: await Order.findByUserId(request.session.user.id) }); }
+  catch (error) { console.error('Account orders read error:', error); return response.status(500).json({ success: false, message: 'Nie udaÅ‚o siÄ™ pobraÄ‡ historii zamÃ³wieÅ„.' }); }
+}
+
+async function exportAccount(request, response) {
+  try {
+    const data = await PersonalData.exportForUser(request.session.user.id);
+    if (!data) return response.status(404).json({ success: false, message: 'Konto nie istnieje.' });
+    response.setHeader('Cache-Control', 'no-store');
+    response.setHeader('Content-Type', 'application/json; charset=utf-8');
+    response.setHeader('Content-Disposition', 'attachment; filename="polskiebudownictwo-dane.json"');
+    return response.send(JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Account export error:', error);
+    return response.status(500).json({ success: false, message: 'Nie udało się przygotować eksportu danych.' });
+  }
+}
+
+async function deleteAccount(request, response) {
+  if (validationFailure(request, response)) return;
+  try {
+    const user = await User.findById(request.session.user.id);
+    if (!user || !await bcrypt.compare(request.body.password, user.password_hash)) {
+      return response.status(400).json({ success: false, message: 'Hasło jest nieprawidłowe.' });
+    }
+    const replacementHash = await bcrypt.hash(require('node:crypto').randomBytes(32).toString('base64url'), 12);
+    await PersonalData.anonymizeUser(user.id, replacementHash);
+    return request.session.destroy(error => error
+      ? response.status(500).json({ success: false, message: 'Nie udało się zakończyć sesji.' })
+      : response.json({ success: true, message: 'Konto zostało usunięte i zanonimizowane.' }));
+  } catch (error) {
+    console.error('Account deletion error:', error);
+    return response.status(500).json({ success: false, message: 'Nie udało się usunąć konta.' });
+  }
+}
+
+module.exports = { changePassword, deleteAccount, exportAccount, getAccount, getOrders, updateBilling, updateProfile };
