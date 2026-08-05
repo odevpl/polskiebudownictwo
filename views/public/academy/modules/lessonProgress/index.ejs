@@ -1,0 +1,11 @@
+<div class="lesson-progress-module" data-lesson-progress>
+  <button
+    class="button"
+    type="button"
+    data-lesson-complete
+    data-lesson-id="<%= lesson.id %>"
+    <%= progress && progress.completed_at ? 'disabled' : '' %>>
+    <%= progress && progress.completed_at ? 'Lekcja ukończona' : 'Oznacz jako ukończoną' %>
+  </button>
+  <p class="form-status" data-lesson-status aria-live="polite"></p>
+</div>

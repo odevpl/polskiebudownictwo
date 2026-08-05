@@ -55,5 +55,15 @@ Nie zapisuj sekretów SMTP ani danych dostępowych do bazy w plikach śledzonych
 - Nie dodawaj frameworków ani procesu kompilacji frontendu bez wyraźnej potrzeby.
 - Nie zmieniaj niepowiązanych sekcji strony.
 - Zachowuj działanie na urządzeniach mobilnych i komputerach.
+- Wszystkie pliki tekstowe zapisuj w UTF-8; przed zakończeniem zmian sprawdź, czy polskie znaki nie zostały zamienione na mojibake, np. `Å‚`, `Ä™`, `Ã³` lub `�`.
+- Przy komunikatach API, tekstach interfejsu i danych renderowanych po stronie klienta kontroluj kodowanie zarówno w pliku źródłowym, jak i w odpowiedzi HTTP.
 - Po zmianach formularza sprawdź spójność pól w `page/index.html`, `page/assets/js/form.js`, `controllers/public/submitController.js`, `middleware/validate.js` i `server.js`.
 - Nie zapisuj haseł ani nowych sekretów w plikach śledzonych przez Git.
+
+## Kierunek architektoniczny
+
+- Stopniowo przechodzimy na modułową strukturę całej aplikacji.
+- Nowe elementy interfejsu projektuj jako niezależne moduły, najlepiej z własnym `index.ejs`, CSS i JavaScript, zamiast rozbudowywać jeden duży szablon pełen warunków.
+- Moduły powinny mieć jasno określone dane wejściowe i komunikację podobną do propsów: dane przekazywane przez EJS `include`, konfigurację JSON lub `data-*`.
+- Modułowość ma zwiększać reużywalność kodu, ułatwiać późniejsze poprawki i umożliwić stopniowe testowanie poszczególnych elementów.
+- Jesteśmy w trakcie migracji — przy istniejących widokach nie wykonuj dużych, niepowiązanych refaktorów. Nowe zmiany wdrażaj modułowo, a stare fragmenty przenoś przy okazji bezpiecznych, zakresowych poprawek.

@@ -119,7 +119,7 @@ async function changePassword(request, response) {
 async function getOrders(request, response) {
   response.setHeader('Cache-Control', 'no-store');
   try { return response.json({ success: true, orders: await Order.findByUserId(request.session.user.id) }); }
-  catch (error) { console.error('Account orders read error:', error); return response.status(500).json({ success: false, message: 'Nie udaÅ‚o siÄ™ pobraÄ‡ historii zamÃ³wieÅ„.' }); }
+  catch (error) { console.error('Account orders read error:', error); return response.status(500).json({ success: false, message: 'Nie udało się pobrać historii zamówień.' }); }
 }
 
 async function exportAccount(request, response) {

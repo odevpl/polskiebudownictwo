@@ -1,0 +1,5 @@
+.academy-course-page .academy-detail__content { max-width: none; }
+.academy-course-player { display: grid; grid-template-columns: minmax(15rem, 0.34fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.academy-course-player__content { min-width: 0; }
+.academy-course-player__empty { padding: 2rem; border: 1px solid var(--color-border, #d9dde3); border-radius: 1rem; background: var(--color-surface, #fff); }
+@media (max-width: 800px) { .academy-course-player { grid-template-columns: 1fr; } .course-list-module { position: static; } }

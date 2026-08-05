@@ -1,0 +1,13 @@
+<article class="lesson-view-module" data-lesson-view>
+  <div class="lesson-view-module__intro">
+    <p class="course-card__tag"><%= lesson.content_type %></p>
+    <h1><%= lesson.title %></h1>
+    <% if (lesson.description) { %>
+      <p class="lesson-view-module__description"><%= lesson.description %></p>
+    <% } %>
+  </div>
+
+  <div class="lesson-view-module__body">
+    <%- lesson.content || '<p>Treść lekcji zostanie dodana.</p>' %>
+  </div>
+</article>

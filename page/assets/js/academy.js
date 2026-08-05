@@ -3,7 +3,6 @@ const courseList = document.querySelector('[data-course-list]');
 const catalogSection = document.querySelector('[data-catalog-section]');
 const catalogList = document.querySelector('[data-catalog-list]');
 const completeLessonButton = document.querySelector('[data-lesson-complete]');
-const exportAccountButton = document.querySelector('[data-account-export]');
 const deleteAccountButton = document.querySelector('[data-account-delete]');
 const checkoutForm = document.querySelector('[data-checkout-form]');
 
@@ -33,25 +32,6 @@ function privacyStatus(message, isError = false) {
   status.textContent = message;
   status.classList.toggle('form-status--error', isError);
 }
-
-exportAccountButton?.addEventListener('click', async () => {
-  exportAccountButton.disabled = true;
-  privacyStatus('Przygotowywanie eksportu…');
-  try {
-    const response = await fetch('/api/auth/account/export', { headers: { Accept: 'application/json' }, cache: 'no-store' });
-    if (!response.ok) throw new Error('Nie udało się przygotować eksportu danych.');
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'polskiebudownictwo-dane.json';
-    link.click();
-    URL.revokeObjectURL(url);
-    privacyStatus('Eksport danych został pobrany.');
-  } catch (error) {
-    privacyStatus(error.message, true);
-  } finally { exportAccountButton.disabled = false; }
-});
 
 deleteAccountButton?.addEventListener('click', async () => {
   const password = window.prompt('Podaj aktualne hasło:');

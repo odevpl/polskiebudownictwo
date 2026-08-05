@@ -1,0 +1,7 @@
+.lesson-navigation-module { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.lesson-navigation-module__link { display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; border: 1px solid var(--color-border, #d9dde3); border-radius: 0.8rem; color: inherit; text-decoration: none; background: var(--color-surface, #fff); }
+.lesson-navigation-module__link:hover, .lesson-navigation-module__link:focus-visible { border-color: currentColor; }
+.lesson-navigation-module__link--next { text-align: right; }
+.lesson-navigation-module__link span { color: var(--color-muted, #667085); font-size: 0.85rem; }
+.lesson-navigation-module__spacer { display: block; }
+@media (max-width: 560px) { .lesson-navigation-module { grid-template-columns: 1fr; } .lesson-navigation-module__link--next { text-align: left; } }

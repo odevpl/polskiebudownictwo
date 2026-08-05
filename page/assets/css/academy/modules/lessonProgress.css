@@ -1,0 +1,2 @@
+.lesson-progress-module { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.lesson-progress-module .form-status { margin: 0; }

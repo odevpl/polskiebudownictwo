@@ -15,10 +15,13 @@ async function course(request, response) {
       LessonProgress.findByUserAndCourse(request.session.user.id, record.id),
     ]);
     const progressByLesson = new Map(progress.map(item => [item.lesson_id, item]));
+    if (lessons.length > 0) {
+      return response.redirect(`/akademia/kurs/${encodeURIComponent(record.slug)}/lekcja/${encodeURIComponent(lessons[0].slug)}`);
+    }
     return response.render('public/academy/course', {
       title: record.title,
       course: record,
-      lessons: lessons.map(lesson => ({ ...lesson, progress: progressByLesson.get(lesson.id) || null })),
+      lessons: [],
     });
   } catch (error) {
     console.error('Academy course page error:', error);
@@ -33,10 +36,20 @@ async function lesson(request, response) {
     if (!await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) {
       return response.status(403).send('Nie masz dostępu do tego kursu.');
     }
-    const lessonRecord = await CourseLesson.findBySlug(record.id, request.params.lessonSlug, { publishedOnly: true });
+    const [lessons, progress] = await Promise.all([
+      CourseLesson.findByCourseId(record.id, { publishedOnly: true }),
+      LessonProgress.findByUserAndCourse(request.session.user.id, record.id),
+    ]);
+    const lessonRecord = lessons.find(item => item.slug === request.params.lessonSlug);
     if (!lessonRecord) return response.status(404).send('Lekcja nie istnieje.');
-    const progress = await LessonProgress.findByUserAndLesson(request.session.user.id, lessonRecord.id);
-    return response.render('public/academy/lesson', { title: lessonRecord.title, course: record, lesson: lessonRecord, progress });
+    const progressByLesson = new Map(progress.map(item => [item.lesson_id, item]));
+    return response.render('public/academy/lesson', {
+      title: lessonRecord.title,
+      course: record,
+      lesson: lessonRecord,
+      lessons: lessons.map(item => ({ ...item, progress: progressByLesson.get(item.id) || null })),
+      progress: progressByLesson.get(lessonRecord.id) || null,
+    });
   } catch (error) {
     console.error('Academy lesson page error:', error);
     return response.status(500).send('Nie udało się pobrać lekcji.');
