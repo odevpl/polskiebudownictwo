@@ -4,7 +4,7 @@ async function findAll() {
   const [rows] = await pool.query(
     `SELECT id, title, description, upcoming, event_date, event_time
      FROM events
-     ORDER BY event_date ASC, event_time ASC, id ASC`,
+     ORDER BY event_date DESC, event_time DESC, id DESC`,
   );
   return rows;
 }

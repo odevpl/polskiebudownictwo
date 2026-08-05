@@ -2319,3 +2319,101 @@ p {
     animation-iteration-count: 1 !important;
   }
 }
+.site-nav__dropdown {
+  position: relative;
+}
+
+.site-nav__dropdown-trigger {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-dark);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.site-nav__dropdown:hover .site-nav__dropdown-trigger,
+.site-nav__dropdown:focus-within .site-nav__dropdown-trigger,
+.site-nav__dropdown.is-open .site-nav__dropdown-trigger {
+  color: var(--color-primary);
+}
+
+.site-nav__dropdown-menu {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% - 0.25rem);
+  left: 50%;
+  display: none;
+  min-width: 13rem;
+  padding: 0.5rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.site-nav__dropdown:hover .site-nav__dropdown-menu,
+.site-nav__dropdown:focus-within .site-nav__dropdown-menu,
+.site-nav__dropdown.is-open .site-nav__dropdown-menu {
+  display: grid;
+}
+
+.site-nav__dropdown-menu a {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.site-nav__dropdown-menu a:hover,
+.site-nav__dropdown-menu a[aria-current="page"] {
+  background: var(--color-primary-soft);
+}
+
+  .site-nav__dropdown {
+    width: 100%;
+  }
+
+  .site-nav__dropdown-trigger {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .site-nav__dropdown-menu {
+    position: static;
+    min-width: 0;
+    padding: 0.25rem 0 0.5rem;
+    transform: none;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .site-nav__dropdown-menu a {
+    min-height: 2.35rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+  }
+
+  .site-nav__dropdown:not(.is-open) .site-nav__dropdown-menu {
+    display: none;
+  }
+
+  .site-nav__dropdown:hover .site-nav__dropdown-menu,
+  .site-nav__dropdown:focus-within .site-nav__dropdown-menu {
+    display: none;
+  }
+
+  .site-nav__dropdown.is-open .site-nav__dropdown-menu {
+    display: grid;
+  }
+

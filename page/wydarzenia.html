@@ -23,11 +23,22 @@
         </button>
 
         <nav class="site-nav" id="site-nav" aria-label="Główna nawigacja">
-          <a href="/#misja">Misja</a>
-          <a href="/#dzialania">Obszary działania</a>
-          <a href="/o_fundacji.html">O fundacji</a>
-          <a href="/wydarzenia" aria-current="page">Wydarzenia</a>
-          <a href="/#spolecznosc">Społeczność</a>
+          <div class="site-nav__dropdown">
+            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">O nas</button>
+            <div class="site-nav__dropdown-menu">
+              <a href="/#misja">Misja</a>
+              <a href="/o_fundacji.html">O fundacji</a>
+              <a href="/#spolecznosc">Społeczność</a>
+            </div>
+          </div>
+          <div class="site-nav__dropdown">
+            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Działania</button>
+            <div class="site-nav__dropdown-menu">
+              <a href="/#dzialania">Obszary działania</a>
+              <a href="/wydarzenia" aria-current="page">Wydarzenia</a>
+              <a href="/postulaty">Postulaty</a>
+            </div>
+          </div>
           <a href="/#kontakt">Kontakt</a>
           <a class="button button--nav" href="/#dolacz">Dołącz bezpłatnie</a>
         </nav>
@@ -50,9 +61,9 @@
 
           <div class="events-list">
             <article class="card event-card">
-              <p class="event-card__meta">12 sierpnia 2026, 18:00</p>
-              <h2>Jak zabezpieczać płatności w kontraktach</h2>
-              <p>Praktyczny przegląd zapisów, które pomagają ograniczać ryzyko zatorów płatniczych.</p>
+              <p class="event-card__meta">Wrzesień 2026, termin do potwierdzenia</p>
+              <h2>Panel: Wspólny głos branży</h2>
+              <p>Rozmowa o tym, jak firmy mogą skuteczniej współpracować i reprezentować swoje interesy.</p>
             </article>
             <article class="card event-card">
               <p class="event-card__meta">28 sierpnia 2026, 10:00</p>
@@ -60,9 +71,9 @@
               <p>Omówimy najczęstsze scenariusze sporów i sposoby przygotowania się do rozmów.</p>
             </article>
             <article class="card event-card">
-              <p class="event-card__meta">Wrzesień 2026, termin do potwierdzenia</p>
-              <h2>Panel: Wspólny głos branży</h2>
-              <p>Rozmowa o tym, jak firmy mogą skuteczniej współpracować i reprezentować swoje interesy.</p>
+              <p class="event-card__meta">12 sierpnia 2026, 18:00</p>
+              <h2>Jak zabezpieczać płatności w kontraktach</h2>
+              <p>Praktyczny przegląd zapisów, które pomagają ograniczać ryzyko zatorów płatniczych.</p>
             </article>
           </div>
         </div>

@@ -1,272 +1,144 @@
-# Akademia — plan rozwoju kursów i dostępów
+# Głos Polskiego Budownictwa — tickety wdrożeniowe
 
-## Cel produktu
+## Kontekst i decyzja produktowa
 
-Zbudować Akademię, w której zalogowany użytkownik widzi wyłącznie kursy, do których ma dostęp. Dostęp może wynikać z tego, że kurs jest darmowy, został zakupiony albo został nadany ręcznie przez administratora.
+Na stronie ma powstać publiczna sekcja pokazująca wspólną pracę Fundacji i Ambasadorów Polskiego Budownictwa.
 
-Panel administracyjny powinien pozwalać zarządzać kursami, lekcjami, użytkownikami i dostępami bez ręcznej edycji bazy danych.
+- nazwa w menu: **Postulaty**;
+- tytuł strony: **Głos Polskiego Budownictwa**;
+- adres: **`/postulaty`**;
+- pierwsza publikacja: „Czy polska firma budowlana musi finansować cudzą inwestycję?” — pięć zasad równowagi kontraktowej wypracowanych przez Ambasadorów;
+- źródło publikacji: [LinkedIn](https://www.linkedin.com/pulse/czy-polska-firma-budowlana-musi-finansowa%C4%87-cudz%C4%85-anna-sadowska-w%C3%B3jcik-h8n0f);
+- strona ma być rozwijalnym miejscem na kolejne stanowiska, postulaty, głosy i rekomendacje, a nie jednorazową kopią artykułu.
 
-## Stan obecny
+## Kolejność realizacji
 
-- Logowanie użytkowników i sesje już działają.
-- Istnieje tabela users oraz ochrona stron Akademii.
-- Istnieją ustawienia konta z danymi kontaktowymi i fakturowymi.
-- Istnieje wizualny placeholder z trzema kartami kursów.
-- Panel administracyjny obsługuje zgłoszenia i wydarzenia.
-- Nie istnieją jeszcze kursy, lekcje, uprawnienia do kursów ani płatności.
-- Lista kursów jest obecnie statyczna.
-
-## Założenia domenowe
-
-- Kurs może być darmowy albo płatny.
-- Kurs może być aktywny albo ukryty.
-- Dostęp może pochodzić z kursu darmowego, zakupu, ręcznego nadania albo kodu/promocji.
-- Odebranie dostępu nie usuwa historii zakupu ani postępów.
-- Każde sprawdzenie dostępu odbywa się po stronie backendu.
-- Frontend może ukrywać elementy, ale nie jest mechanizmem bezpieczeństwa.
+1. Przygotować i zaakceptować materiały oraz grafiki.
+2. Zbudować stronę `/postulaty` z pierwszą publikacją i sekcją Manifestu.
+3. Wykonać testy podstrony, responsywności i paczki wdrożeniowej.
 
 ---
 
-# Milestone 1 — model danych i migracje
+## PB-POST-01 — Przygotować materiały publikacji i model kolejnych wpisów
 
-## Story 1.1 — katalog kursów
+**Status:** Backlog
 
-- [x] Tabela courses: slug, tytuł, opis, kategoria, poziom, liczba lekcji, is_free, is_active, sort_order.
-- [x] Unikalny indeks na slug.
-- [x] Tabela course_lessons z kluczem course_id.
-- [x] Typ treści lekcji: tekst, wideo lub materiał.
-- [x] Modele Course i CourseLesson.
+**Cel:** Przygotować zaakceptowaną treść pierwszej publikacji oraz prosty standard dla następnych wpisów.
 
-## Story 1.2 — dostęp użytkownika
+**Zadania**
 
-- [x] Tabela user_course_access z user_id i course_id.
-- [x] access_type: free, purchase, grant, code.
-- [x] status: active, revoked, expired.
-- [x] Daty nadania, wygaśnięcia i odebrania dostępu.
-- [x] Informacja, który administrator nadał dostęp.
-- [x] Model CourseAccess.
-- [x] Funkcje hasActiveAccess(userId, courseId) i findAvailableCourses(userId).
+- [ ] Zatwierdzić finalną nazwę strony, lead i nazwy typów publikacji:
+  - Stanowisko Fundacji;
+  - Postulat Ambasadorów;
+  - Głos Ambasadora;
+  - Projekt do konsultacji;
+  - Rekomendacja dla branży.
+- [ ] Przygotować pierwszą publikację na podstawie artykułu LinkedIn, z zachowaniem sensu pięciu postulatów:
+  1. wady nieistotne nie blokują odbioru ani zapłaty;
+  2. płatność maksymalnie w ciągu 14 dni;
+  3. łączny limit kar umownych do 15% wartości umowy;
+  4. kaucje i zatrzymania do 5%;
+  5. jasne zasady rozliczania robót dodatkowych.
+- [ ] Nie przedstawiać postulatów jako obowiązującego prawa; oznaczyć je jako stanowisko/postulaty branżowe.
+- [ ] Uzupełnić metadane wpisu: typ publikacji, autor/autorzy, data, krótki opis, link źródłowy i ewentualna wersja PDF.
+- [ ] Przejrzeć komentarze pod artykułem i zapisać potencjalne kolejne tematy jako osobne propozycje, bez publikowania ich automatycznie jako stanowiska Fundacji.
 
-## Story 1.3 — postęp
+**Kryteria akceptacji**
 
-- [x] Tabela user_lesson_progress.
-- [x] Status rozpoczęcia i ukończenia lekcji.
-- [x] Unikalny indeks user_id + lesson_id.
-- [x] Model odczytu i zapisu postępu.
+- Tekst jest gotowy do publikacji i zaakceptowany merytorycznie.
+- Każdy wpis ma jednolity zestaw metadanych, który pozwoli dodać następne publikacje bez przebudowy całej strony.
 
-## Story 1.4 — migracja
+## PB-POST-02 — Dodać i opisać cztery grafiki
 
-- [x] Dodać tabele do sql/schema.sql.
-- [x] Rozszerzyć scripts/migrate.js dla istniejących instalacji.
-- [x] Dodać trzy kursy testowe w osobnym, idempotentnym seedzie.
-- [x] Opisać kolejność migracji na serwerze.
-- [x] Nie zapisywać sekretów ani danych płatności w repozytorium.
+**Status:** W toku
 
-**Kryterium:** baza pozwala utworzyć kurs, lekcję, dostęp i postęp.
+**Cel:** Przygotować cztery grafiki do użycia na stronie `/postulaty` i przypisać je do konkretnych sekcji.
 
----
+**Zadania**
 
-# Milestone 2 — backend i kontrola dostępu
+- [x] Umieścić pliki w `page/assets/images/postulaty/`.
+- [x] Zmienić nazwy plików na opisowe, bez spacji i polskich znaków:
+  - `ambasadorzy-stol-praca.png` — wspólna praca przy dokumentacji;
+  - `ambasadorzy-budowa.png` — grupa Ambasadorów na placu budowy;
+  - `ambasador-portret.png` — portret przedstawiciela branży;
+  - `wykonawca-technologia.png` — wykonawca korzystający z dokumentacji cyfrowej.
+- [ ] Zdecydować, czy PNG zostają w repozytorium, czy konwertujemy je do zoptymalizowanego WebP/AVIF.
+- [ ] Przygotować teksty alternatywne i użyć grafik jako uzupełnienia treści, a nie jej jedynego nośnika.
 
-## Story 2.1 — serwis dostępu
+**Proponowane rozmieszczenie**
 
-- [x] Utworzyć services/courseAccessService.js.
-- [x] Pobierać kursy dostępne dla użytkownika.
-- [x] Sprawdzać dostęp do kursu i konkretnej lekcji.
-- [x] Obsłużyć status revoked i expires_at.
-- [x] Nie ufać identyfikatorom przesyłanym tylko z frontendu.
+1. `ambasadorzy-stol-praca.png` — przy otwarciu strony lub sekcji „Stanowiska i postulaty”, jako obraz wspólnej pracy.
+2. `ambasadorzy-budowa.png` — w hero albo przy opisie Ambasadorów, jako szeroki kontekst branżowy.
+3. `ambasador-portret.png` — przy wyróżnionej publikacji lub cytacie „Głos Ambasadora”.
+4. `wykonawca-technologia.png` — przy końcowej sekcji „Zgłoś problem. Wskaż rozwiązanie.”, jako obraz praktyki wykonawczej.
 
-## Story 2.2 — API Akademii
+Jeżeli grafiki są kadrami z jednego filmu, należy dobrać je tak, aby nie powtarzały tej samej funkcji: hero, praca zespołowa, konkret merytoryczny, CTA.
 
-- [x] GET /api/academy/courses.
-- [x] GET /api/academy/courses/:slug.
-- [x] GET /api/academy/courses/:slug/lessons/:lessonSlug.
-- [x] POST /api/academy/lessons/:id/progress.
-- [x] Zwracać 401 bez sesji i 403 bez dostępu.
-- [x] Nie ujawniać treści niedostępnego kursu.
+**Kryteria akceptacji**
 
-## Story 2.3 — ochrona stron
+- Grafiki są dostępne w repozytorium w UTF-8-kompatybilnej ścieżce nazw bez spacji i polskich znaków.
+- Każda ma sensowny `alt`, wersję mobilną przez `object-fit`/responsywny układ i nie powoduje przesunięcia layoutu podczas ładowania.
 
-- [ ] Middleware wymagający zalogowania.
-- [ ] Middleware wymagający dostępu do kursu.
-- [ ] Przekierowanie do listy kursów przy braku dostępu.
-- [ ] Empty state, gdy użytkownik nie ma kursów.
-- [ ] Ustawienia konta zawsze dostępne dla zalogowanego użytkownika.
+## PB-POST-03 — Zbudować stronę `/postulaty`
 
-**Kryterium:** nie da się otworzyć lekcji bez aktywnego dostępu, nawet znając URL.
+**Status:** Gotowe
 
----
+**Cel:** Udostępnić publiczną stronę prezentującą Manifest, stanowiska i pierwszą publikację Ambasadorów.
 
-# Milestone 3 — lista kursów i lekcje
+**Zadania — pliki i struktura**
 
-## Wymaganie architektoniczne
+- [x] Utworzyć moduł strony w `page/postulaty/index.html`.
+- [x] Wydzielić style strony do `page/postulaty/postulaty.css`; wspólne elementy korzystają z `page/global.css`.
+- [x] Sprawdzić, że `express.static` obsługuje `/postulaty` oraz `/postulaty/` i że oba adresy zwracają 200.
 
-- [ ] Kursy nie mogą być statycznymi podstronami zapisanymi osobno w plikach HTML.
-- [ ] Lista kursów, szczegóły kursu i lekcje muszą być generowane dynamicznie na podstawie danych z bazy/API.
-- [ ] Widok kursu powinien korzystać z identyfikatora lub slugu, np. `/akademia/kurs/:slug`.
-- [ ] Jeden wspólny szablon EJS powinien obsługiwać wszystkie kursy i lekcje.
+**Zadania — układ i treść**
 
-- [x] Usunąć hardcoded kursy z obecnego widoku.
-- [x] Zostawić nagłówek „Dostępne kursy”.
-- [x] Pobierać listę z API.
-- [x] Renderować tytuł, kategorię, opis, poziom i liczbę lekcji.
-- [x] Dodać loading state, błąd i empty state.
-- [x] Przygotować widok szczegółów kursu.
-- [x] Przygotować widok lekcji.
-- [x] Zapisywać i wyświetlać postęp.
+- [x] Dodać header: „Głos Polskiego Budownictwa” i podtytuł „Stanowiska i postulaty Fundacji oraz Ambasadorów Polskiego Budownictwa”.
+- [x] Dodać intro z wyjaśnieniem, że problemy powtarzające się u wielu przedsiębiorców wymagają wspólnego głosu.
+- [x] Dodać dwa CTA:
+  - „Poznaj stanowiska i postulaty” — do listy publikacji;
+  - „Zgłoś problem lub propozycję zmiany” — do formularza/sekcji zgłoszenia.
+- [x] Dodać sekcję Manifestu z fundamentami podanymi w briefie i przyciskiem „Poznaj Manifest Polskiego Budownictwa”.
+- [x] Dodać sekcję „Stanowiska i postulaty” z oznaczeniem typu publikacji.
+- [x] Dodać pierwszą publikację jako wyróżniony wpis z pięcioma zasadami i linkiem do źródłowego artykułu LinkedIn.
+- [x] Dodać sekcję końcową: „Zgłoś problem. Wskaż rozwiązanie.” z linkiem do istniejącej sekcji kontaktu.
+- [x] Zachować footer z linkami do istniejących stron i powrotem do formularza dołączenia.
 
-**Kryterium:** karta prowadzi tylko do chronionej zawartości dostępnej dla danego użytkownika.
+**Kryteria akceptacji**
 
----
+- Strona jest dostępna bez logowania, czytelna na telefonie i komputerze oraz ma unikalny `<title>`, opis meta, jeden `<h1>` i poprawną hierarchię nagłówków.
+- Nawigacja główna zawiera „Postulaty”; aktywne CTA nie psują istniejących linków do `#dolacz`.
+- Treść nie obiecuje skutku prawnego postulatów i jasno rozróżnia Manifest, stanowisko i postulat.
 
-# Milestone 4 — panel administracyjny
+## PB-POST-04 — SEO, dostępność i testy podstrony
 
-## Story 4.1 — nawigacja i role
+**Status:** W toku
 
-- [x] Dodać Akademię do admin-shell-start.ejs.
-- [x] Dodać trasę panelu Akademii.
-- [x] Ustalić akcje dla admin i superadmin.
-- [x] Zablokować zwykłemu adminowi zarządzanie administratorami.
-- [x] Rejestrować ważne operacje.
+**Cel:** Zweryfikować jakość, dostępność i gotowość strony oraz nowych grafik do wdrożenia.
 
-## Story 4.2 — CRUD kursów
+**Zadania**
 
-- [x] Lista kursów z filtrowaniem.
-- [x] Tworzenie i edycja kursu.
-- [x] Aktywowanie i ukrywanie kursu.
-- [x] Ustawianie kolejności.
-- [x] Walidacja slugu, tytułu, opisu i statusu.
-- [x] Ostrzeżenie przed usunięciem kursu z dostępami.
+- [x] Dodać canonical dla `/postulaty`, opis meta i podstawowe dane Open Graph z grafiką hero.
+- [ ] Sprawdzić wizualnie alt texty, kontrast, focus, kolejność tabulatora i responsywność.
+- [x] Przeszukać zmieniane pliki pod kątem mojibake (`Å‚`, `Ä™`, `Ã³`, `�`) — brak markerów w nowych plikach.
+- [x] Sprawdzić linki CTA, Manifest PDF i link do LinkedIn.
+- [x] Uruchomić `npm run build:main` i sprawdzić obecność strony, stylu, grafik i PDF-u w `dists/polskiebudownictwo.org/`.
+- [x] Wykonać test HTTP dla `/postulaty` i `/postulaty/` — oba adresy zwracają 200.
 
-## Story 4.3 — lekcje
+## Otwarte decyzje przed implementacją
 
-- [x] Lista lekcji w kursie.
-- [x] Dodawanie i edycja lekcji.
-- [x] Zmiana kolejności.
-- [x] Publikowanie i ukrywanie.
-- [x] Obsługa treści tekstowej i wideo.
+- Czy „Manifest Legislacyjny” ma być wszędzie nazywany „Manifestem Polskiego Budownictwa”, czy zachowujemy dotychczasową nazwę dokumentu?
+- Czy pierwsza publikacja ma być pełnym artykułem na stronie, czy skrótem z linkiem do LinkedIn?
+- Kto zatwierdza merytorycznie postulaty przed publikacją?
 
-## Story 4.4 — dostępy
+## PB-POST-05 — Dodać stanowisko Fundacji w sprawie udziału MŚP w inwestycjach
 
-- [x] Wyszukiwanie użytkownika po e-mailu.
-- [x] Lista dostępów użytkownika.
-- [x] Ręczne nadanie i odebranie dostępu.
-- [x] Data wygaśnięcia i powód odebrania.
-- [x] Historia zmian dostępu.
-- [x] Rozróżnienie free, purchase, grant i code.
+**Status:** Gotowe
 
-## Story 4.5 — podgląd użytkownika
+**Zakres wykonany**
 
-- [x] Lista użytkowników Akademii.
-- [x] Status e-maila i konta.
-- [x] Podgląd danych kontaktowych i fakturowych według roli.
-- [x] Podgląd kursów i postępu.
-- [x] Dezaktywacja konta bez usuwania historii.
-
-**Kryterium:** administrator może utworzyć kurs, opublikować lekcje i nadać dostęp.
-
----
-
-# Milestone 5 — zakupy i płatności
-
-## Story 5.1 — katalog i zakup szkolenia
-
-- [x] Pokazać cenę i status darmowy/płatny na karcie szkolenia.
-- [x] Dodać przycisk „Kup szkolenie” dla kursu płatnego.
-- [x] Dodać przycisk „Rozpocznij szkolenie” dla kursu darmowego lub już posiadanego.
-- [x] Zbudować stronę podsumowania zakupu z nazwą, ceną i danymi użytkownika.
-- [x] Zablokować zakup kursu, do którego użytkownik ma już aktywny dostęp.
-- [x] Zapisać zamówienie przed przekierowaniem do Przelewy24.
-- [x] Po potwierdzeniu płatności dodać kurs do „Dostępnych kursów”.
-- [x] Obsłużyć powrót z Przelewy24 dla sukcesu, anulowania i błędu.
-
-## Story 5.2 — zamówienia użytkownika
-
-- [x] Dodać historię zamówień w ustawieniach Akademii.
-- [x] Pokazać status płatności i numer zamówienia.
-- [x] Pokazać informację o oczekiwaniu na potwierdzenie webhooka.
-- [x] Nie ujawniać danych płatniczych przechowywanych po stronie Przelewy24.
-
-## Story 5.3 — obsługa administracyjna sprzedaży
-
-- [x] Dodać listę zamówień w panelu administracyjnym.
-- [x] Filtrować zamówienia po statusie, użytkowniku i kursie.
-- [x] Pokazać szczegóły zamówienia i historię webhooków.
-- [x] Dodać bezpieczne rozpoczęcie zwrotu przez Przelewy24.
-
-- [x] Tabele orders i order_items.
-- [x] Zapis ceny i nazwy kursu z momentu zakupu.
-- [x] Powiązanie zamówienia z użytkownikiem i fakturą.
-- [x] Statusy pending, paid, cancelled i refunded.
-- [x] Wybór operatora płatności: Przelewy24.
-- [x] Podpisany webhook i idempotencja.
-- [x] Nadanie dostępu dopiero po potwierdzeniu płatności.
-- [x] Obsługa zwrotów i odebrania dostępu.
-- [ ] Ustalenie, kto generuje faktury.
-
-**Kryterium:** opłacony zakup nadaje dostęp idempotentnie.
-
----
-
-# Milestone 6 — bezpieczeństwo, RODO i wdrożenie
-
-## Bezpieczeństwo
-
-- [x] Sprawdzić autoryzację każdego endpointu.
-- [x] Sprawdzić, czy API nie ujawnia danych innych użytkowników.
-- [x] Ograniczyć próby zmiany hasła i operacji administracyjnych.
-- [x] Unieważniać bieżącą sesję po zmianie hasła przez regenerację sesji.
-- [x] Dodać ochronę CSRF opartą o weryfikację origin/referer dla żądań mutujących.
-- [x] Nie logować haseł, tokenów ani danych płatniczych.
-
-## RODO
-
-- [x] Opisać cele przetwarzania danych kontaktowych i fakturowych w dokumencie technicznym.
-- [ ] Zatwierdzić retencję danych zakupowych i faktur z księgowością.
-- [x] Przygotować eksport danych użytkownika.
-- [x] Przygotować usunięcie/anonimizację z zachowaniem wymogów księgowych.
-
-## Testy i wdrożenie
-
-- [ ] Test kursu darmowego, zakupionego, nadanego, revoked i expired.
-- [ ] Test próby wejścia w cudzy kurs.
-- [ ] Test panelu nadawania i odbierania dostępu.
-- [ ] Test formularzy ustawień i NIP.
-- [ ] Test webhooka z powtórzonym żądaniem.
-- [ ] Test desktop/mobile i empty state.
-- [ ] Backup bazy przed migracją produkcyjną.
-- [ ] Migracja testowa i produkcyjna.
-- [ ] Weryfikacja logów, sesji i procedury rollbacku.
-
----
-
-# Proponowana kolejność
-
-1. Baza danych i modele.
-2. Serwis dostępu i ochrona backendu.
-3. Dynamiczna lista kursów i lekcje.
-4. Panel administracyjny.
-5. Płatności i faktury.
-6. Bezpieczeństwo, RODO, testy i wdrożenie.
-
-## Pierwszy sprint
-
-- [ ] Tabele courses, course_lessons, user_course_access i user_lesson_progress.
-- [ ] Trzy kursy testowe.
-- [ ] GET /api/academy/courses.
-- [ ] Funkcja findAvailableCourses(userId).
-- [ ] Dynamiczne karty na stronie „Dostępne kursy”.
-- [ ] Jeden chroniony widok kursu.
-- [ ] Tymczasowe nadanie dostępu przez seed lub panel.
-
-Po tym sprincie mamy przepływ od bazy danych do widoku użytkownika bez czekania na płatności.
-
-## Definition of Done
-
-- Kod przechodzi sprawdzenie składni i build.
-- Migracja działa na pustej i istniejącej bazie.
-- Każdy endpoint ma kontrolę sesji i uprawnień.
-- Niedostępny kurs nie jest widoczny w API ani możliwy do otwarcia po URL.
-- Zmiany administracyjne są walidowane i audytowalne.
-- Nie ma sekretów w repozytorium.
-- Działa desktop, mobile i empty state.
+- [x] Dodać stanowisko z 5 sierpnia 2026 r. jako najnowszą publikację typu „Stanowisko Fundacji”.
+- [x] Przygotować zwięzłe streszczenie i listę najważniejszych tez.
+- [x] Skopiować pełny dokument do `page/assets/documents/positions/stanowisko-fundacji-rzecznik-msp-2026-08-05.pdf`.
+- [x] Dodać link do pełnego PDF-u na stronie `/postulaty`.
+- [x] Zachować dotychczasową publikację o pięciu zasadach jako osobny „Postulat Ambasadorów”.

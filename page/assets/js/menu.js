@@ -9,6 +9,7 @@ const menuVariants = {
 };
 const menuVariant = document.body.dataset.menuVariant || (document.body.classList.contains('academy-page') ? 'academy' : 'public');
 const menuConfig = menuVariants[menuVariant] || menuVariants.public;
+const dropdowns = [...document.querySelectorAll('.site-nav__dropdown')];
 
 if (siteNav) siteNav.dataset.mobileAccount = menuConfig.mobileAccount;
 
@@ -22,12 +23,68 @@ menuToggle?.addEventListener('click', () => {
   setMenuOpen(menuToggle.getAttribute('aria-expanded') !== 'true');
 });
 
+function setDropdownOpen(dropdown, open) {
+  dropdown.classList.toggle('is-open', open);
+  dropdown.querySelector('.site-nav__dropdown-trigger')?.setAttribute('aria-expanded', String(open));
+}
+
+function closeDropdowns(except = null) {
+  dropdowns.forEach(dropdown => {
+    if (dropdown !== except) setDropdownOpen(dropdown, false);
+  });
+}
+
+dropdowns.forEach(dropdown => {
+  const trigger = dropdown.querySelector('.site-nav__dropdown-trigger');
+  const links = [...dropdown.querySelectorAll('.site-nav__dropdown-menu a')];
+
+  trigger?.addEventListener('click', () => {
+    const open = !dropdown.classList.contains('is-open');
+    closeDropdowns(dropdown);
+    setDropdownOpen(dropdown, open);
+  });
+
+  trigger?.addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      closeDropdowns(dropdown);
+      setDropdownOpen(dropdown, true);
+      links[0]?.focus();
+    }
+  });
+
+  links.forEach((link, index) => {
+    link.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setDropdownOpen(dropdown, false);
+        trigger?.focus();
+      }
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        links[(index + 1) % links.length]?.focus();
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        links[(index - 1 + links.length) % links.length]?.focus();
+      }
+    });
+  });
+});
+
 siteNav?.addEventListener('click', event => {
   if (event.target.closest('a')) setMenuOpen(false);
 });
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') setMenuOpen(false);
+  if (event.key === 'Escape') {
+    closeDropdowns();
+    setMenuOpen(false);
+  }
+});
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('.site-nav__dropdown')) closeDropdowns();
 });
 
 async function updateAccountMenu() {

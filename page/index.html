@@ -29,11 +29,22 @@
         </button>
 
         <nav class="site-nav" id="site-nav" aria-label="Główna nawigacja">
-          <a href="#misja">Misja</a>
-          <a href="#dzialania">Obszary działania</a>
-          <a href="/o_fundacji.html">O fundacji</a>
-          <a href="/wydarzenia">Wydarzenia</a>
-          <a href="#spolecznosc">Społeczność</a>
+          <div class="site-nav__dropdown">
+            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">O nas</button>
+            <div class="site-nav__dropdown-menu">
+              <a href="#misja">Misja</a>
+              <a href="/o_fundacji.html">O fundacji</a>
+              <a href="#spolecznosc">Społeczność</a>
+            </div>
+          </div>
+          <div class="site-nav__dropdown">
+            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Działania</button>
+            <div class="site-nav__dropdown-menu">
+              <a href="#dzialania">Obszary działania</a>
+              <a href="/wydarzenia">Wydarzenia</a>
+              <a href="/postulaty">Postulaty</a>
+            </div>
+          </div>
           <a href="#kontakt">Kontakt</a>
           <span class="site-nav__account" data-auth-menu><a href="/logowanie.html">Zaloguj się</a></span>
           <a
