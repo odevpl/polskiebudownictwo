@@ -72,6 +72,7 @@ function newMainPackage() {
     'controllers',
     'middleware',
     'models',
+    'modules',
     'page',
     'public',
     'routes',

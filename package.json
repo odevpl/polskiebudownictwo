@@ -5,8 +5,8 @@
   "description": "Strona inicjatywy Polskie Budownictwo",
   "main": "app.js",
   "scripts": {
-    "dev": "node --watch --watch-path=page --watch-path=views --watch-path=public --watch-path=controllers --watch-path=models --watch-path=routes --watch-path=services server.js",
-    "watch": "node --watch --watch-path=page --watch-path=views --watch-path=public --watch-path=controllers --watch-path=models --watch-path=routes --watch-path=services server.js",
+    "dev": "node --watch --watch-path=page --watch-path=views --watch-path=public --watch-path=controllers --watch-path=models --watch-path=routes --watch-path=services --watch-path=modules server.js",
+    "watch": "node --watch --watch-path=page --watch-path=views --watch-path=public --watch-path=controllers --watch-path=models --watch-path=routes --watch-path=services --watch-path=modules server.js",
     "serve": "node server.js",
     "start": "node --watch --watch-path=page --watch-path=views --watch-path=public --watch-path=controllers --watch-path=models --watch-path=routes --watch-path=services app.js",
     "start:prod": "node app.js",

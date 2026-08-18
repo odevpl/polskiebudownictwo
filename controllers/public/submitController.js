@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const Submission = require('../../models/Submission');
 const { sendSubmissionEmails } = require('../../services/mailService');
+const { enqueue, processNext } = require('../../modules/mailerLite');
 
 function normalizeArray(value) {
   if (Array.isArray(value)) return value;
@@ -74,6 +75,18 @@ async function store(request, response) {
     }
 
     const submission = await Submission.create(submissionData);
+    console.log(`Submission created: id=${submission.id}`);
+    try {
+      await enqueue(submission.id);
+      await processNext();
+    } catch (mailerLiteError) {
+      console.error('MailerLite sync error:', {
+        message: mailerLiteError.message,
+        status: mailerLiteError.status,
+        payload: mailerLiteError.payload,
+      });
+    }
+
     try {
       await sendSubmissionEmails(submission);
     } catch (mailError) {

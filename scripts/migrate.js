@@ -21,6 +21,7 @@ async function migrate() {
     await ensureSubmissionNameColumns(connection);
     await ensureSubmissionGroupsColumn(connection);
     await ensureSubmissionStatusTagsColumn(connection);
+    await ensureMailerLiteSyncColumns(connection);
     await ensureUniqueSubmissionEmails(connection);
     await ensureEventsUpcomingColumn(connection);
     await ensureEventScheduleNullable(connection);
@@ -154,6 +155,45 @@ async function ensureSubmissionStatusTagsColumn(connection) {
   if (columns.length) return;
 
   await connection.query('ALTER TABLE submissions ADD COLUMN status_tags JSON NULL AFTER status');
+}
+
+async function ensureMailerLiteSyncColumns(connection) {
+  const columns = [
+    ['mailerlite_status', "VARCHAR(20) NOT NULL DEFAULT 'pending' AFTER status_tags"],
+    ['mailerlite_attempts', 'SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER mailerlite_status'],
+    ['mailerlite_last_error', 'TEXT NULL AFTER mailerlite_attempts'],
+    ['mailerlite_next_retry_at', 'DATETIME NULL AFTER mailerlite_last_error'],
+    ['mailerlite_synced_at', 'DATETIME NULL AFTER mailerlite_next_retry_at'],
+  ];
+
+  let statusColumnAdded = false;
+  for (const [name, definition] of columns) {
+    const [existing] = await connection.query('SHOW COLUMNS FROM submissions LIKE ?', [name]);
+    if (!existing.length) {
+      await connection.query(`ALTER TABLE submissions ADD COLUMN ${name} ${definition}`);
+      if (name === 'mailerlite_status') statusColumnAdded = true;
+    }
+  }
+
+  const [indexes] = await connection.query(
+    "SHOW INDEX FROM submissions WHERE Key_name = 'idx_mailerlite_retry'",
+  );
+  if (!indexes.length) {
+    await connection.query(
+      'ALTER TABLE submissions ADD INDEX idx_mailerlite_retry (mailerlite_status, mailerlite_next_retry_at)',
+    );
+  }
+
+  // Existing submissions are not imported automatically. New submissions are
+  // explicitly enqueued by the form handler after this migration is applied.
+  if (statusColumnAdded) {
+    await connection.query(
+      `UPDATE submissions
+       SET mailerlite_status = 'skipped'
+       WHERE mailerlite_status = 'pending'
+         AND mailerlite_synced_at IS NULL`,
+    );
+  }
 }
 
 async function ensureUniqueSubmissionEmails(connection) {

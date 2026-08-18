@@ -1,144 +1,113 @@
-# Głos Polskiego Budownictwa — tickety wdrożeniowe
+# Integracja formularza głównego z MailerLite
 
-## Kontekst i decyzja produktowa
+Zadania są ułożone w kolejności wykonania. Najpierw konfiguracja w kokpicie MailerLite, następnie zmiany w aplikacji.
 
-Na stronie ma powstać publiczna sekcja pokazująca wspólną pracę Fundacji i Ambasadorów Polskiego Budownictwa.
+## MailerLite — do wykonania przez właściciela konta
 
-- nazwa w menu: **Postulaty**;
-- tytuł strony: **Głos Polskiego Budownictwa**;
-- adres: **`/postulaty`**;
-- pierwsza publikacja: „Czy polska firma budowlana musi finansować cudzą inwestycję?” — pięć zasad równowagi kontraktowej wypracowanych przez Ambasadorów;
-- źródło publikacji: [LinkedIn](https://www.linkedin.com/pulse/czy-polska-firma-budowlana-musi-finansowa%C4%87-cudz%C4%85-anna-sadowska-w%C3%B3jcik-h8n0f);
-- strona ma być rozwijalnym miejscem na kolejne stanowiska, postulaty, głosy i rekomendacje, a nie jednorazową kopią artykułu.
+- [x] **ML-01. Utworzyć grupy odpowiadające rolom z formularza**
+  - `Generalny wykonawca`
+  - `Wykonawca`
+  - `Podwykonawca`
+  - `Dostawca materiałów`
+  - `Producent materiałów`
+  - `Inżynier, projektant lub architekt`
+  - `Usługodawca dla budownictwa`
+  - `Rzeczoznawca`
+  - `Prawnik`
+  - `Mediator`
+  - `Organizacja Branżowa`
+  - `Inna`
 
-## Kolejność realizacji
+- [x] **ML-02. Uwierzytelnić domenę nadawcy**
+  - Zweryfikować domenę `polskiebudownictwo.org` w MailerLite.
+  - Ustawić adres nadawcy używany przez kampanie i automatyzacje.
 
-1. Przygotować i zaakceptować materiały oraz grafiki.
-2. Zbudować stronę `/postulaty` z pierwszą publikacją i sekcją Manifestu.
-3. Wykonać testy podstrony, responsywności i paczki wdrożeniowej.
+- [x] **ML-03. Ustalić obsługę double opt-in**
+  - Na obecnym etapie nie włączać double opt-in dla API.
+  - Nie tworzyć teraz wiadomości potwierdzającej ani strony po potwierdzeniu.
+  - Wiadomość powitalna nadal jest wysyłana przez Polskie Budownictwo.
 
----
+- [ ] **ML-04. Automatyzacja powitalna — odłożona**
+  - Na obecnym etapie nie tworzyć automatyzacji w MailerLite.
+  - Wrócić do tego ticketu, gdy MailerLite ma przejąć wysyłkę wiadomości marketingowych.
 
-## PB-POST-01 — Przygotować materiały publikacji i model kolejnych wpisów
+- [x] **ML-05. Wygenerować token API**
+  - `Integrations → MailerLite API → Use → Generate new token`.
+  - Nazwać token np. `polskiebudownictwo.org production`.
+  - Ustawić ograniczenie po IP serwera, jeśli hosting ma stały adres IP.
+  - Przekazać token wyłącznie do konfiguracji serwera, nie do repozytorium Git.
 
-**Status:** Backlog
+- [x] **ML-06. Zebrać identyfikatory grup**
+  - Mapa `roles` → MailerLite `Group ID`:
+    - `Generalny wykonawca` → `192174106703037566`
+    - `Wykonawca` → `192174121393588053`
+    - `Podwykonawca` → `192174136389273291`
+    - `Dostawca materiałów` → `192174150210553036`
+    - `Producent materiałów` → `192174179865330813`
+    - `Inżynier, projektant lub architekt` → `192174192328705065`
+    - `Usługodawca dla budownictwa` → `192174998790604347`
+    - `Rzeczoznawca` → `19217493319587568`
+    - `Prawnik` → `191875008252871787`
+    - `Mediator` → `192174909181396766`
+    - `Organizacja Branżowa` → `192176612860495094`
+    - `Inna` → `1921750209658889393`
 
-**Cel:** Przygotować zaakceptowaną treść pierwszej publikacji oraz prosty standard dla następnych wpisów.
+## Aplikacja — do wykonania przeze mnie w kodzie
 
-**Zadania**
+- [x] **APP-01. Dodać konfigurację MailerLite bez sekretów w Git**
+  - Dodać odczyt `MAILERLITE_API_TOKEN` z ENV.
+  - Dodać konfigurację identyfikatorów grup MailerLite.
+  - Uzupełnić dokumentację wymaganych zmiennych środowiskowych bez wpisywania prawdziwego tokena.
 
-- [ ] Zatwierdzić finalną nazwę strony, lead i nazwy typów publikacji:
-  - Stanowisko Fundacji;
-  - Postulat Ambasadorów;
-  - Głos Ambasadora;
-  - Projekt do konsultacji;
-  - Rekomendacja dla branży.
-- [ ] Przygotować pierwszą publikację na podstawie artykułu LinkedIn, z zachowaniem sensu pięciu postulatów:
-  1. wady nieistotne nie blokują odbioru ani zapłaty;
-  2. płatność maksymalnie w ciągu 14 dni;
-  3. łączny limit kar umownych do 15% wartości umowy;
-  4. kaucje i zatrzymania do 5%;
-  5. jasne zasady rozliczania robót dodatkowych.
-- [ ] Nie przedstawiać postulatów jako obowiązującego prawa; oznaczyć je jako stanowisko/postulaty branżowe.
-- [ ] Uzupełnić metadane wpisu: typ publikacji, autor/autorzy, data, krótki opis, link źródłowy i ewentualna wersja PDF.
-- [ ] Przejrzeć komentarze pod artykułem i zapisać potencjalne kolejne tematy jako osobne propozycje, bez publikowania ich automatycznie jako stanowiska Fundacji.
+- [x] **APP-02. Utworzyć serwis integracji MailerLite**
+  - Użyć aktualnego API `https://connect.mailerlite.com/api`.
+  - Dodać funkcję tworzenia lub aktualizacji subskrybenta.
+  - Przesyłać e-mail, imię, nazwisko, firmę i telefon.
+  - Przypisywać wszystkie wybrane role do odpowiadających im grup.
+  - Nie wystawiać tokena ani wywołań MailerLite po stronie przeglądarki.
 
-**Kryteria akceptacji**
+- [x] **APP-03. Dodać bezpieczne mapowanie ról na grupy**
+  - Oprzeć mapę na wartościach już dozwolonych przez walidację formularza.
+  - Odrzucać lub logować nieznaną rolę zamiast wysyłać nieprawidłowy `Group ID`.
+  - Zachować role także w lokalnej bazie danych.
 
-- Tekst jest gotowy do publikacji i zaakceptowany merytorycznie.
-- Każdy wpis ma jednolity zestaw metadanych, który pozwoli dodać następne publikacje bez przebudowy całej strony.
+- [x] **APP-04. Włączyć synchronizację w obsłudze formularza**
+  - Zachować kolejność: walidacja → zapis lokalny → synchronizacja z MailerLite.
+  - Synchronizować tylko zgłoszenia z `consentMarketing`.
+  - Nie synchronizować honeypotów, błędnych zgłoszeń ani trybu testowego bez bazy.
+  - Nie ustawiać ręcznie statusu subskrybenta; o statusie decyduje konfiguracja MailerLite.
 
-## PB-POST-02 — Dodać i opisać cztery grafiki
+- [x] **APP-05. Zachować wiadomość powitalną po stronie aplikacji**
+  - Wiadomość z manifestem nadal wysyła Polskie Budownictwo przez SMTP.
+  - Nie tworzyć obecnie równoległej wiadomości powitalnej w MailerLite.
+  - Zachować wiadomość administracyjną, jeśli będzie potrzebna do obsługi zgłoszeń.
 
-**Status:** W toku
+- [x] **APP-06. Dodać obsługę błędów i ponawianie synchronizacji**
+  - Awaria MailerLite nie może kasować ani unieważniać poprawnego zgłoszenia lokalnego.
+  - Logować odpowiedź i kod błędu MailerLite bez ujawniania tokena.
+  - Zapisać status synchronizacji lub przygotować kolejkę ponowień w bazie.
+  - Obsłużyć timeout, błąd walidacji API, rate limit i konflikt istniejącego adresu.
+  - Migrację kolumn `mailerlite_*` uruchomić na środowisku z dostępem do bazy poleceniem `npm run migrate`.
+  - Migracja oznacza istniejące zgłoszenia jako `skipped`; do MailerLite trafiają tylko nowe zgłoszenia z formularza.
 
-**Cel:** Przygotować cztery grafiki do użycia na stronie `/postulaty` i przypisać je do konkretnych sekcji.
+- [ ] **APP-07. Przygotować testy integracyjne**
+  - Nowy kontakt z jedną rolą trafia do jednej właściwej grupy.
+  - Kontakt z wieloma rolami trafia do wszystkich wybranych grup.
+  - Brak zgody marketingowej nie tworzy subskrybenta w MailerLite.
+  - Istniejący adres nie tworzy duplikatu.
+  - Awaria MailerLite nie powoduje utraty wpisu w lokalnej bazie.
+  - Formularz i komunikaty zachowują poprawne kodowanie UTF-8.
 
-**Zadania**
+- [ ] **APP-08. Zweryfikować działanie produkcyjne**
+  - Wykonać test na adresie testowym MailerLite.
+  - Sprawdzić utworzenie kontaktu oraz przypisanie wszystkich wybranych grup.
+  - Sprawdzić, że MailerLite nie wysyła wiadomości, a powitanie przychodzi z aplikacji.
+  - Sprawdzić logi serwera oraz zgodność liczby wpisów w obu systemach.
 
-- [x] Umieścić pliki w `page/assets/images/postulaty/`.
-- [x] Zmienić nazwy plików na opisowe, bez spacji i polskich znaków:
-  - `ambasadorzy-stol-praca.png` — wspólna praca przy dokumentacji;
-  - `ambasadorzy-budowa.png` — grupa Ambasadorów na placu budowy;
-  - `ambasador-portret.png` — portret przedstawiciela branży;
-  - `wykonawca-technologia.png` — wykonawca korzystający z dokumentacji cyfrowej.
-- [ ] Zdecydować, czy PNG zostają w repozytorium, czy konwertujemy je do zoptymalizowanego WebP/AVIF.
-- [ ] Przygotować teksty alternatywne i użyć grafik jako uzupełnienia treści, a nie jej jedynego nośnika.
+## Później — opcjonalna synchronizacja zwrotna
 
-**Proponowane rozmieszczenie**
-
-1. `ambasadorzy-stol-praca.png` — przy otwarciu strony lub sekcji „Stanowiska i postulaty”, jako obraz wspólnej pracy.
-2. `ambasadorzy-budowa.png` — w hero albo przy opisie Ambasadorów, jako szeroki kontekst branżowy.
-3. `ambasador-portret.png` — przy wyróżnionej publikacji lub cytacie „Głos Ambasadora”.
-4. `wykonawca-technologia.png` — przy końcowej sekcji „Zgłoś problem. Wskaż rozwiązanie.”, jako obraz praktyki wykonawczej.
-
-Jeżeli grafiki są kadrami z jednego filmu, należy dobrać je tak, aby nie powtarzały tej samej funkcji: hero, praca zespołowa, konkret merytoryczny, CTA.
-
-**Kryteria akceptacji**
-
-- Grafiki są dostępne w repozytorium w UTF-8-kompatybilnej ścieżce nazw bez spacji i polskich znaków.
-- Każda ma sensowny `alt`, wersję mobilną przez `object-fit`/responsywny układ i nie powoduje przesunięcia layoutu podczas ładowania.
-
-## PB-POST-03 — Zbudować stronę `/postulaty`
-
-**Status:** Gotowe
-
-**Cel:** Udostępnić publiczną stronę prezentującą Manifest, stanowiska i pierwszą publikację Ambasadorów.
-
-**Zadania — pliki i struktura**
-
-- [x] Utworzyć moduł strony w `page/postulaty/index.html`.
-- [x] Wydzielić style strony do `page/postulaty/postulaty.css`; wspólne elementy korzystają z `page/global.css`.
-- [x] Sprawdzić, że `express.static` obsługuje `/postulaty` oraz `/postulaty/` i że oba adresy zwracają 200.
-
-**Zadania — układ i treść**
-
-- [x] Dodać header: „Głos Polskiego Budownictwa” i podtytuł „Stanowiska i postulaty Fundacji oraz Ambasadorów Polskiego Budownictwa”.
-- [x] Dodać intro z wyjaśnieniem, że problemy powtarzające się u wielu przedsiębiorców wymagają wspólnego głosu.
-- [x] Dodać dwa CTA:
-  - „Poznaj stanowiska i postulaty” — do listy publikacji;
-  - „Zgłoś problem lub propozycję zmiany” — do formularza/sekcji zgłoszenia.
-- [x] Dodać sekcję Manifestu z fundamentami podanymi w briefie i przyciskiem „Poznaj Manifest Polskiego Budownictwa”.
-- [x] Dodać sekcję „Stanowiska i postulaty” z oznaczeniem typu publikacji.
-- [x] Dodać pierwszą publikację jako wyróżniony wpis z pięcioma zasadami i linkiem do źródłowego artykułu LinkedIn.
-- [x] Dodać sekcję końcową: „Zgłoś problem. Wskaż rozwiązanie.” z linkiem do istniejącej sekcji kontaktu.
-- [x] Zachować footer z linkami do istniejących stron i powrotem do formularza dołączenia.
-
-**Kryteria akceptacji**
-
-- Strona jest dostępna bez logowania, czytelna na telefonie i komputerze oraz ma unikalny `<title>`, opis meta, jeden `<h1>` i poprawną hierarchię nagłówków.
-- Nawigacja główna zawiera „Postulaty”; aktywne CTA nie psują istniejących linków do `#dolacz`.
-- Treść nie obiecuje skutku prawnego postulatów i jasno rozróżnia Manifest, stanowisko i postulat.
-
-## PB-POST-04 — SEO, dostępność i testy podstrony
-
-**Status:** W toku
-
-**Cel:** Zweryfikować jakość, dostępność i gotowość strony oraz nowych grafik do wdrożenia.
-
-**Zadania**
-
-- [x] Dodać canonical dla `/postulaty`, opis meta i podstawowe dane Open Graph z grafiką hero.
-- [ ] Sprawdzić wizualnie alt texty, kontrast, focus, kolejność tabulatora i responsywność.
-- [x] Przeszukać zmieniane pliki pod kątem mojibake (`Å‚`, `Ä™`, `Ã³`, `�`) — brak markerów w nowych plikach.
-- [x] Sprawdzić linki CTA, Manifest PDF i link do LinkedIn.
-- [x] Uruchomić `npm run build:main` i sprawdzić obecność strony, stylu, grafik i PDF-u w `dists/polskiebudownictwo.org/`.
-- [x] Wykonać test HTTP dla `/postulaty` i `/postulaty/` — oba adresy zwracają 200.
-
-## Otwarte decyzje przed implementacją
-
-- Czy „Manifest Legislacyjny” ma być wszędzie nazywany „Manifestem Polskiego Budownictwa”, czy zachowujemy dotychczasową nazwę dokumentu?
-- Czy pierwsza publikacja ma być pełnym artykułem na stronie, czy skrótem z linkiem do LinkedIn?
-- Kto zatwierdza merytorycznie postulaty przed publikacją?
-
-## PB-POST-05 — Dodać stanowisko Fundacji w sprawie udziału MŚP w inwestycjach
-
-**Status:** Gotowe
-
-**Zakres wykonany**
-
-- [x] Dodać stanowisko z 5 sierpnia 2026 r. jako najnowszą publikację typu „Stanowisko Fundacji”.
-- [x] Przygotować zwięzłe streszczenie i listę najważniejszych tez.
-- [x] Skopiować pełny dokument do `page/assets/documents/positions/stanowisko-fundacji-rzecznik-msp-2026-08-05.pdf`.
-- [x] Dodać link do pełnego PDF-u na stronie `/postulaty`.
-- [x] Zachować dotychczasową publikację o pięciu zasadach jako osobny „Postulat Ambasadorów”.
+- [ ] **APP-09. Dodać webhooki MailerLite**
+  - Obsłużyć `subscriber.unsubscribed`, `subscriber.active`, `subscriber.bounced` i `subscriber.updated`.
+  - Weryfikować podpis HMAC webhooka.
+  - Aktualizować lokalny status zgody lub status kontaktu.
+  - Odpowiadać szybko kodem 2xx i przenosić cięższe operacje poza żądanie webhooka.

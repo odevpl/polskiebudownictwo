@@ -16,9 +16,15 @@ CREATE TABLE IF NOT EXISTS submissions (
   notes TEXT,
   status ENUM('new','contacted','member') DEFAULT 'new',
   status_tags JSON,
+  mailerlite_status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  mailerlite_attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  mailerlite_last_error TEXT NULL,
+  mailerlite_next_retry_at DATETIME NULL,
+  mailerlite_synced_at DATETIME NULL,
   UNIQUE INDEX uniq_submissions_email (email),
   INDEX idx_created_at (created_at),
-  INDEX idx_status (status)
+  INDEX idx_status (status),
+  INDEX idx_mailerlite_retry (mailerlite_status, mailerlite_next_retry_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS events (

@@ -11,8 +11,10 @@ const { createSessionMiddleware } = require('./config/session');
 const { requireUser } = require('./middleware/userAuth');
 const academyPageController = require('./controllers/public/academyPageController');
 const { csrfProtection } = require('./middleware/csrf');
+const { startWorker } = require('./modules/mailerLite');
 
 const app = express();
+startWorker();
 const port = Number(process.env.PORT || 3000);
 const publicRoot = path.join(__dirname, 'page');
 const appPublicRoot = path.join(__dirname, 'public');
