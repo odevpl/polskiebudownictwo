@@ -1,5 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const { renderDirectory } = require('./renderMenus');
 
 const target = process.argv[2] || 'all';
 const allowedTargets = new Set(['all', 'main', 'mediacje']);
@@ -84,6 +85,8 @@ function newMainPackage() {
 
   for (const item of items) copyDeployItem(root, destinationRoot, item);
 
+  renderDirectory(path.join(destinationRoot, 'page'), 'main');
+
   removeBlockedItems(destinationRoot);
   console.log(`Main dist package created: ${destinationRoot}`);
 }
@@ -105,6 +108,8 @@ function newMediationPackage() {
   for (const item of items) copyDeployItem(root, destinationRoot, item);
 
   fs.copyFileSync(path.join(root, 'app-mediacje.js'), path.join(destinationRoot, 'app.js'));
+
+  renderDirectory(path.join(destinationRoot, 'subdomain', 'mediacje'), 'mediation');
 
   removeBlockedItems(destinationRoot);
   console.log(`Mediation dist package created: ${destinationRoot}`);
