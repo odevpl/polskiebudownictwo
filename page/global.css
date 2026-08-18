@@ -160,6 +160,29 @@ p {
   background: var(--color-primary);
 }
 
+.join-cta__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  align-items: center;
+}
+
+.join-cta h2,
+.join-cta p:not(.eyebrow) {
+  color: var(--color-white);
+}
+
+.join-cta p:not(.eyebrow) {
+  max-width: 48rem;
+  color: rgb(255 255 255 / 82%);
+}
+
+@media (max-width: 700px) {
+  .join-cta__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
 .section--dark h1,
 .section--dark h2,
 .section--dark h3,

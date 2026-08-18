@@ -1,0 +1,52 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true">ME</div>
+    <div>
+      <p class="adm-kicker">Lista</p>
+      <h1>Mediatorzy</h1>
+      <p class="admin-hero__meta">Profile osób publikowanych na stronie Centrum Mediacji.</p>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <p class="alert"><%= error %></p>
+  <% } %>
+
+  <div class="adm-page-actions">
+    <a class="button" href="<%= adminUrl('/mediators/new') %>">Dodaj mediatora</a>
+  </div>
+
+  <div class="adm-table-panel">
+    <div class="table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Imię i nazwisko</th>
+            <th>Slug</th>
+            <th>Status</th>
+            <th>Kolejność</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!mediators.length) { %>
+            <tr><td colspan="5" class="muted">Brak mediatorów do wyświetlenia.</td></tr>
+          <% } %>
+          <% mediators.forEach(mediator => { %>
+            <tr>
+              <td data-label="Imię i nazwisko"><strong><%= mediator.name %></strong></td>
+              <td data-label="Slug"><%= mediator.slug %></td>
+              <td data-label="Status"><span class="adm-badge <%= mediator.is_published ? 'adm-badge--success' : '' %>"><%= mediator.is_published ? 'Opublikowany' : 'Szkic' %></span></td>
+              <td data-label="Kolejność"><%= mediator.sort_order %></td>
+              <td data-label="Akcje">
+                <a class="button button--ghost" href="<%= adminUrl('/mediators/' + mediator.id + '/edit') %>">Edytuj</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

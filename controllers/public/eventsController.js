@@ -1,12 +1,14 @@
 const Event = require('../../models/Event');
 const { renderMenu } = require('../../modules/menu');
+const { renderJoinCta } = require('../../modules/joinCta');
 
 const menu = renderMenu({ variant: 'public', currentPath: '/wydarzenia' });
+const joinCta = renderJoinCta();
 
 async function index(request, response) {
   try {
     const events = await Event.findAll();
-    response.render('public/events', { events, error: null, formatDate, formatTime, isPast, menu });
+    response.render('public/events', { events, error: null, formatDate, formatTime, isPast, menu, joinCta });
   } catch (error) {
     console.error('Public events list error:', error);
     response.status(500).render('public/events', {
@@ -16,6 +18,7 @@ async function index(request, response) {
       formatTime,
       isPast,
       menu,
+      joinCta,
     });
   }
 }

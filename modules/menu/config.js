@@ -27,14 +27,22 @@ const publicMenu = Object.freeze({
 
 const mediationMenu = Object.freeze({
   type: 'mediation',
+  groups: [
+    {
+      label: 'Mediacje',
+      items: [
+        { label: 'Mediacje gospodarcze', href: '/#mediacje-gospodarcze' },
+        { label: 'Mediacje inwestycyjne', href: '/#mediacje-inwestycyjne' },
+        { label: 'Lista mediatorów', href: '/mediatorzy', currentPath: '/mediatorzy' },
+      ],
+    },
+  ],
   links: [
-    { label: 'Mediacje gospodarcze', href: '/#mediacje-gospodarcze' },
-    { label: 'Mediacje inwestycyjne', href: '/#mediacje-inwestycyjne' },
     { label: 'Klauzula mediacyjna', href: '/#klauzula-mediacyjna' },
     { label: 'Baza wiedzy', href: '/baza-wiedzy', currentPath: '/baza-wiedzy' },
     { label: 'O fundacji', href: 'https://polskiebudownictwo.org/o_fundacji.html' },
-    { label: 'Zgłoś sprawę', href: '/zgloszenie', currentPath: '/zgloszenie' },
-    { label: 'Zostań mediatorem', href: '/zostan-mediatorem', currentPath: '/zostan-mediatorem', className: 'button button--nav' },
+    // { label: 'Zgłoś sprawę', href: '/zgloszenie', currentPath: '/zgloszenie' },
+    // { label: 'Zostań mediatorem', href: '/zostan-mediatorem', currentPath: '/zostan-mediatorem', className: 'button button--nav' },
   ],
 });
 

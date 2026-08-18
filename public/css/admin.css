@@ -490,6 +490,44 @@ svg {
   margin-bottom: 24px;
 }
 
+.adm-rich-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.adm-rich-editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.adm-rich-editor__toolbar .button {
+  min-width: 40px;
+  padding: 7px 10px;
+}
+
+.adm-rich-editor__input {
+  min-height: 180px;
+  padding: 12px 14px;
+  overflow-y: auto;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-sm);
+  background: var(--adm-bg-elevated);
+  color: var(--adm-text);
+  line-height: 1.6;
+}
+
+.adm-rich-editor__input:focus {
+  outline: 2px solid var(--adm-accent);
+  outline-offset: 1px;
+}
+
+.adm-rich-editor__input ul,
+.adm-rich-editor__input ol {
+  margin-block: 0.75rem;
+  padding-left: 1.5rem;
+}
+
 .adm-page-actions form,
 .adm-table-actions form {
   margin: 0;

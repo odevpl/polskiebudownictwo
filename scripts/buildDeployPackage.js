@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { renderDirectory } = require('./renderMenus');
+const { renderDirectory: renderJoinCtas } = require('./renderJoinCtas');
 
 const target = process.argv[2] || 'all';
 const allowedTargets = new Set(['all', 'main', 'mediacje']);
@@ -86,6 +87,7 @@ function newMainPackage() {
   for (const item of items) copyDeployItem(root, destinationRoot, item);
 
   renderDirectory(path.join(destinationRoot, 'page'), 'main');
+  renderJoinCtas(path.join(destinationRoot, 'page'));
 
   removeBlockedItems(destinationRoot);
   console.log(`Main dist package created: ${destinationRoot}`);
@@ -101,6 +103,9 @@ function newMediationPackage() {
     'package.json',
     'package-lock.json',
     '.env.example',
+    'config/database.js',
+    'models/Mediator.js',
+    'modules/menu',
     'subdomain',
     'public',
   ];

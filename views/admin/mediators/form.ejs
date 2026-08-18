@@ -1,0 +1,78 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<% const value = (camel, snake = camel) => mediator[camel] ?? mediator[snake] ?? ''; %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/mediators') %>">Wróć do mediatorów</a>
+  <div class="admin-hero">
+    <div class="admin-hero__art" aria-hidden="true">ME</div>
+    <div>
+      <p class="adm-kicker"><%= mode === 'edit' ? 'Edycja' : 'Nowy rekord' %></p>
+      <h1><%= mode === 'edit' ? ('Mediator #' + mediator.id) : 'Dodaj mediatora' %></h1>
+      <p class="admin-hero__meta">Treści profilu są przechowywane jako pola tekstowe i mogą zostać później podłączone do CMS-a.</p>
+    </div>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="adm-alert">
+      <% errors.forEach(error => { %><div><%= error %></div><% }) %>
+    </div>
+  <% } %>
+
+  <form class="adm-form" method="post" action="<%= action %>">
+    <div class="adm-form-grid">
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="name">Imię i nazwisko</label>
+        <input class="adm-control" id="name" name="name" type="text" maxlength="200" value="<%= value('name') %>" required>
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="slug">Slug</label>
+        <input class="adm-control" id="slug" name="slug" type="text" maxlength="160" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value="<%= value('slug') %>" required>
+        <small class="muted">Np. anna-sadowska-wojcik</small>
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="sortOrder">Kolejność</label>
+        <input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" step="1" value="<%= value('sortOrder', 'sort_order') || 0 %>">
+      </div>
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="shortDescription">Opis pod nazwiskiem</label>
+        <textarea class="adm-control adm-textarea" id="shortDescription" name="shortDescription" required><%= value('shortDescription', 'short_description') %></textarea>
+      </div>
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="fullDescription">Opis pełny</label>
+        <%- include('../../components/RichTextEditor', { id: 'fullDescription', name: 'fullDescription', value: value('fullDescription', 'full_description'), required: true }) %>
+      </div>
+      <div class="adm-field adm-form-grid__full">
+        <label class="adm-label" for="keyExperience">Kluczowe doświadczenie</label>
+        <%- include('../../components/RichTextEditor', { id: 'keyExperience', name: 'keyExperience', value: value('keyExperience', 'key_experience'), required: false, listHint: true }) %>
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="qualifications">Uprawnienia</label>
+        <input class="adm-control" id="qualifications" name="qualifications" type="text" value="<%= value('qualifications') %>">
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="specializations">Specjalizacje</label>
+        <input class="adm-control" id="specializations" name="specializations" type="text" value="<%= value('specializations') %>">
+      </div>
+      <div class="adm-field">
+        <label class="adm-label" for="mediationModes">Tryby mediacji</label>
+        <input class="adm-control" id="mediationModes" name="mediationModes" type="text" value="<%= value('mediationModes', 'mediation_modes') %>">
+      </div>
+      <label class="adm-check adm-form-grid__full">
+        <input name="isPublished" type="checkbox" value="1" <%= value('isPublished', 'is_published') ? 'checked' : '' %>>
+        <span>Publikuj profil na stronie mediacji</span>
+      </label>
+      <div class="adm-form-actions adm-form-grid__full">
+        <button class="button" type="submit"><%= mode === 'edit' ? 'Zapisz zmiany' : 'Dodaj mediatora' %></button>
+        <a class="button button--ghost" href="<%= adminUrl('/mediators') %>">Anuluj</a>
+        <% if (mode === 'edit') { %>
+          <button class="button button--ghost" type="submit" form="delete-mediator-form">Usuń</button>
+        <% } %>
+      </div>
+    </div>
+  </form>
+
+  <% if (mode === 'edit') { %>
+    <form id="delete-mediator-form" method="post" action="<%= adminUrl('/mediators/' + mediator.id + '/delete') %>" onsubmit="return confirm('Na pewno usunąć tego mediatora? Tej operacji nie można cofnąć.');"></form>
+  <% } %>
+</section>
+<script src="/js/admin-mediators.js?v=1" defer></script>
+<%- include('../../partials/admin-shell-end') %>

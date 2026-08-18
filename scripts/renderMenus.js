@@ -28,10 +28,16 @@ function menuOptions(relativePath, scope) {
 
 function renderFile(filePath, root, scope) {
   const source = fs.readFileSync(filePath, 'utf8');
+  if (source.includes('<!-- MENU_MODULE -->')) {
+    const relativePath = path.relative(root, filePath);
+    const menu = renderMenu(menuOptions(relativePath, scope));
+    fs.writeFileSync(filePath, source.replace('<!-- MENU_MODULE -->', menu), 'utf8');
+    return true;
+  }
   if (!source.includes('site-menu-toggle')) return false;
   const relativePath = path.relative(root, filePath);
   const menu = renderMenu(menuOptions(relativePath, scope));
-  const pattern = /(?:\s*<!-- Menu rendered by modules\/menu -->)+\s*<button class="site-menu-toggle"[\s\S]*?<\/nav>(?:\s*<a class="button button--nav site-header__mobile-cta"[\s\S]*?<\/a>)?/;
+  const pattern = /(?:\s*<!-- Menu rendered by modules\/menu -->)*\s*<button class="site-menu-toggle"[\s\S]*?<\/nav>(?:\s*<a class="button button--nav site-header__mobile-cta"[\s\S]*?<\/a>)?/;
   if (!pattern.test(source)) throw new Error(`Menu block not found in ${filePath}`);
   const next = source.replace(pattern, `<!-- Menu rendered by modules/menu -->\n${menu}`);
   if (next === source) return false;

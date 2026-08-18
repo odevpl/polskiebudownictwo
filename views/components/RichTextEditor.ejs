@@ -1,0 +1,11 @@
+<div class="adm-rich-editor" data-rich-editor>
+  <div class="adm-rich-editor__toolbar" role="toolbar" aria-label="Formatowanie tekstu">
+    <button class="button button--ghost button--compact" type="button" data-editor-command="bold" data-editor-target="<%= id %>"><strong>B</strong></button>
+    <button class="button button--ghost button--compact" type="button" data-editor-command="italic" data-editor-target="<%= id %>"><em>I</em></button>
+    <button class="button button--ghost button--compact" type="button" data-editor-command="insertUnorderedList" data-editor-target="<%= id %>">Lista</button>
+    <button class="button button--ghost button--compact" type="button" data-editor-command="insertOrderedList" data-editor-target="<%= id %>">Numeracja</button>
+  </div>
+  <div class="adm-rich-editor__input" id="<%= id %>-editor" contenteditable="true" role="textbox" aria-multiline="true"><%- value || '' %></div>
+  <textarea class="adm-rich-editor__source" id="<%= id %>" name="<%= name %>" <%= required ? 'required' : '' %> hidden><%= value || '' %></textarea>
+  <% if (typeof listHint !== 'undefined' && listHint) { %><small class="muted">Użyj przycisku „Lista”, aby utworzyć wypunktowanie kluczowego doświadczenia.</small><% } %>
+</div>

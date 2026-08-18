@@ -1,4 +1,5 @@
 const youtubeIdPattern = /^[a-zA-Z0-9_-]{6,32}$/;
+const { renderJoinCta } = require('../../modules/joinCta');
 
 function show(request, response) {
   const videoId = String(request.params.videoId || '').trim();
@@ -10,6 +11,7 @@ function show(request, response) {
   response.render('public/youtube', {
     title: 'Polskie Budownictwo - video',
     videoId,
+    joinCta: renderJoinCta(),
   });
 }
 
