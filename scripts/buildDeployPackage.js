@@ -103,8 +103,6 @@ function newMediationPackage() {
     'package.json',
     'package-lock.json',
     '.env.example',
-    'config/database.js',
-    'models/Mediator.js',
     'modules/menu',
     'subdomain',
     'public',

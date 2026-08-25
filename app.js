@@ -77,7 +77,7 @@ app.use('/api/mediacje', (request, response, next) => {
     response.setHeader('Access-Control-Allow-Origin', origin);
     response.setHeader('Vary', 'Origin');
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
-    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   }
   if (request.method === 'OPTIONS') {
     response.sendStatus(204);

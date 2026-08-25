@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { sendMediatorApplicationEmails } = require('../../services/mailService');
+const Mediator = require('../../models/Mediator');
 
 function hasMailConfig() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.MAIL_FROM);
@@ -51,6 +52,20 @@ async function submitApplication(request, response) {
   }
 }
 
+async function listPublished(request, response) {
+  try {
+    const mediators = await Mediator.findPublished();
+    response.json({ success: true, mediators });
+  } catch (error) {
+    console.error('Published mediators API error:', error);
+    response.status(500).json({
+      success: false,
+      message: 'Nie udało się pobrać listy mediatorów.',
+    });
+  }
+}
+
 module.exports = {
+  listPublished,
   submitApplication,
 };
