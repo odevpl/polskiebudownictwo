@@ -1,29 +1,5 @@
 <aside class="course-list-module" data-course-list>
-  <div class="course-list-module__header">
-    <p class="eyebrow">Program kursu</p>
-    <h2>Lista lekcji</h2>
-  </div>
-
-  <% if (!lessons.length) { %>
-    <p class="course-list-module__empty">Ten kurs nie ma jeszcze opublikowanych lekcji.</p>
-  <% } else { %>
-    <ol class="course-list-module__items">
-      <% lessons.forEach((item, index) => { %>
-        <li>
-          <a
-            class="course-list-module__link <%= item.id === activeLessonId ? 'is-active' : '' %>"
-            href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/lekcja/<%= encodeURIComponent(item.slug) %>"
-            <%= item.id === activeLessonId ? 'aria-current="page"' : '' %>>
-            <span class="course-list-module__number"><%= index + 1 %></span>
-            <span class="course-list-module__title"><%= item.title %></span>
-            <% if (item.progress && item.progress.completed_at) { %>
-              <span class="course-list-module__status" aria-label="Lekcja ukończona">✓</span>
-            <% } %>
-          </a>
-        </li>
-      <% }) %>
-    </ol>
-  <% } %>
-
-  <a class="button button--ghost course-list-module__home-link" href="/akademia/">Wróć do strony głównej Akademii</a>
+  <div class="course-list-module__header"><p class="eyebrow"><%= module ? 'Program modułu' : 'Program szkolenia' %></p><h2><%= module ? 'Lekcje' : 'Moduły' %></h2></div>
+  <% if (!lessons.length) { %><p class="course-list-module__empty">Brak opublikowanych lekcji.</p><% } else { %><ol class="course-list-module__items"><% lessons.forEach((item, index) => { %><li><a class="course-list-module__link <%= item.id === activeLessonId ? 'is-active' : '' %>" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>/lekcja/<%= encodeURIComponent(item.slug) %>" <%= item.id === activeLessonId ? 'aria-current="page"' : '' %>><span class="course-list-module__number"><%= index + 1 %></span><span class="course-list-module__title"><%= item.title %></span><% if (item.progress && item.progress.completed_at) { %><span class="course-list-module__status" aria-label="Lekcja ukończona">✓</span><% } %></a></li><% }) %></ol><% } %>
+  <a class="button button--ghost course-list-module__home-link" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>">Wróć do modułu</a>
 </aside>

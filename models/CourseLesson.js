@@ -3,7 +3,7 @@ const pool = require('../config/database');
 async function findByCourseId(courseId, { publishedOnly = false } = {}) {
   const where = publishedOnly ? 'AND is_published = 1' : '';
   const [rows] = await pool.execute(
-    `SELECT id, course_id, slug, title, description, content_type, content,
+    `SELECT id, course_id, module_id, slug, title, description, content_type, content, content_blocks,
             sort_order, is_published, created_at, updated_at
      FROM course_lessons
      WHERE course_id = ? ${where}
@@ -25,6 +25,17 @@ async function findBySlug(courseId, slug, { publishedOnly = false } = {}) {
   return rows[0] || null;
 }
 
+async function findByModuleId(moduleId, { publishedOnly = false } = {}) {
+  const where = publishedOnly ? 'AND is_published = 1' : '';
+  const [rows] = await pool.execute(
+    `SELECT id, course_id, module_id, slug, title, description, content_type, content, content_blocks,
+            sort_order, is_published, created_at, updated_at
+     FROM course_lessons WHERE module_id = ? ${where} ORDER BY sort_order ASC, id ASC`,
+    [moduleId],
+  );
+  return rows;
+}
+
 async function findById(id) {
   const [rows] = await pool.execute('SELECT * FROM course_lessons WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
@@ -33,15 +44,17 @@ async function findById(id) {
 async function create(data) {
   const [result] = await pool.execute(
     `INSERT INTO course_lessons
-       (course_id, slug, title, description, content_type, content, sort_order, is_published)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (course_id, module_id, slug, title, description, content_type, content, content_blocks, sort_order, is_published)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.courseId,
+      data.moduleId || null,
       data.slug,
       data.title,
       data.description || null,
       data.contentType || 'text',
       data.content || null,
+      data.contentBlocks ? JSON.stringify(data.contentBlocks) : null,
       data.sortOrder || 0,
       data.isPublished ? 1 : 0,
     ],
@@ -53,9 +66,9 @@ async function create(data) {
 async function update(id, data) {
   await pool.execute(
     `UPDATE course_lessons
-     SET slug = ?, title = ?, description = ?, content_type = ?, content = ?, sort_order = ?, is_published = ?
+     SET module_id = ?, slug = ?, title = ?, description = ?, content_type = ?, content = ?, content_blocks = ?, sort_order = ?, is_published = ?
      WHERE id = ?`,
-    [data.slug, data.title, data.description || null, data.contentType || 'text', data.content || null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
+    [data.moduleId || null, data.slug, data.title, data.description || null, data.contentType || 'text', data.content || null, data.contentBlocks ? JSON.stringify(data.contentBlocks) : null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
   );
   return findById(id);
 }
@@ -77,4 +90,4 @@ async function syncLessonCount(courseId) {
   );
 }
 
-module.exports = { create, findByCourseId, findById, findBySlug, remove, syncLessonCount, update };
+module.exports = { create, findByCourseId, findById, findByModuleId, findBySlug, remove, syncLessonCount, update };

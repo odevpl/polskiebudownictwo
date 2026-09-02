@@ -6,10 +6,9 @@
 2. Wdróż kod zawierający `sql/schema.sql` oraz modele Akademii.
 3. Uruchom `npm run migrate` z konfiguracją docelowej bazy danych.
 4. Sprawdź, czy istnieją tabele `courses`, `course_lessons`, `user_course_access` i `user_lesson_progress`.
-5. Dane demonstracyjne dodawaj wyłącznie lokalnie lub na środowisku testowym poleceniem `npm run seed:academy`.
-6. Na produkcji utwórz właściwe kursy przez panel administracyjny, gdy będzie gotowy.
+5. Na każdym środowisku utwórz właściwe kursy przez panel administracyjny.
 
-Migracja jest idempotentna: można ją uruchomić ponownie bez tworzenia tabel od początku. Seed kursów jest osobnym poleceniem i aktualizuje rekordy po `slug`.
+Migracja jest idempotentna: można ją uruchomić ponownie bez tworzenia tabel od początku. Aplikacja nie posiada seeda kursów — dane Akademii pochodzą wyłącznie z bazy i panelu administracyjnego.
 
 ## Weryfikacja po migracji
 

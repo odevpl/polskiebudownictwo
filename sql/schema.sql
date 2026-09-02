@@ -124,21 +124,40 @@ CREATE TABLE IF NOT EXISTS courses (
   INDEX idx_courses_listing (is_active, sort_order, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS course_lessons (
+CREATE TABLE IF NOT EXISTS course_modules (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   course_id INT UNSIGNED NOT NULL,
   slug VARCHAR(160) NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT,
+  image_url VARCHAR(500),
+  sort_order INT NOT NULL DEFAULT 0,
+  is_published TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE INDEX uniq_course_modules_slug (course_id, slug),
+  INDEX idx_course_modules_listing (course_id, is_published, sort_order, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS course_lessons (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  course_id INT UNSIGNED NOT NULL,
+  module_id INT UNSIGNED NULL,
+  slug VARCHAR(160) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
   content_type ENUM('text', 'video', 'material') NOT NULL DEFAULT 'text',
   content MEDIUMTEXT,
+  content_blocks JSON NULL,
   sort_order INT NOT NULL DEFAULT 0,
   is_published TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
   UNIQUE INDEX uniq_course_lessons_slug (course_id, slug),
-  INDEX idx_course_lessons_listing (course_id, is_published, sort_order, id)
+  INDEX idx_course_lessons_listing (course_id, is_published, sort_order, id),
+  INDEX idx_course_lessons_module (module_id, is_published, sort_order, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS user_course_access (

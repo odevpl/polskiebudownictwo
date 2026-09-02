@@ -30,6 +30,8 @@ router.delete('/api/auth/account', sensitiveActionLimiter, requireUser, deleteAc
 router.get('/api/academy/courses', requireUserApi, academyController.listCourses);
 router.get('/api/academy/catalog', requireUserApi, academyController.listCatalog);
 router.get('/api/academy/courses/:slug', requireUserApi, academyController.showCourse);
+router.get('/api/academy/courses/:slug/modules/:moduleSlug', requireUserApi, academyController.showModule);
+router.get('/api/academy/courses/:slug/modules/:moduleSlug/lessons/:lessonSlug', requireUserApi, academyController.showModuleLesson);
 router.get('/api/academy/courses/:slug/lessons/:lessonSlug', requireUserApi, academyController.showLesson);
 router.post('/api/academy/lessons/:id/progress', sensitiveActionLimiter, requireUserApi, academyController.updateLessonProgress);
 router.post('/api/academy/orders', sensitiveActionLimiter, requireUserApi, paymentController.createOrder);

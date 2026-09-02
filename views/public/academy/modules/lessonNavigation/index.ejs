@@ -1,21 +1,4 @@
 <nav class="lesson-navigation-module" aria-label="Nawigacja między lekcjami">
-  <% if (previousLesson) { %>
-    <a class="lesson-navigation-module__link" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/lekcja/<%= encodeURIComponent(previousLesson.slug) %>">
-      <span>← Poprzednia lekcja</span>
-      <strong><%= previousLesson.title %></strong>
-    </a>
-  <% } else { %>
-    <span class="lesson-navigation-module__spacer" aria-hidden="true"></span>
-  <% } %>
-  <% if (nextLesson) { %>
-    <a class="lesson-navigation-module__link lesson-navigation-module__link--next" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/lekcja/<%= encodeURIComponent(nextLesson.slug) %>">
-      <span>Następna lekcja →</span>
-      <strong><%= nextLesson.title %></strong>
-    </a>
-  <% } else { %>
-    <a class="lesson-navigation-module__link lesson-navigation-module__link--next" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>">
-      <span>← Wróć do kursu</span>
-      <strong>Program kursu</strong>
-    </a>
-  <% } %>
+  <% if (previousLesson) { %><a class="lesson-navigation-module__link" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>/lekcja/<%= encodeURIComponent(previousLesson.slug) %>"><span>← Poprzednia lekcja</span><strong><%= previousLesson.title %></strong></a><% } else { %><span class="lesson-navigation-module__spacer"></span><% } %>
+  <% if (nextLesson) { %><a class="lesson-navigation-module__link lesson-navigation-module__link--next" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>/lekcja/<%= encodeURIComponent(nextLesson.slug) %>"><span>Następna lekcja →</span><strong><%= nextLesson.title %></strong></a><% } else { %><a class="lesson-navigation-module__link lesson-navigation-module__link--next" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>"><span>← Wróć do modułu</span><strong>Program modułu</strong></a><% } %>
 </nav>

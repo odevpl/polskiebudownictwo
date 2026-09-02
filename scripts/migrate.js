@@ -27,6 +27,8 @@ async function migrate() {
     await ensureEventScheduleNullable(connection);
     await ensureAcademyLessonCountColumn(connection);
     await ensureAcademyPriceColumns(connection);
+    await ensureAcademyContentBlocksColumn(connection);
+    await ensureAcademyModules(connection);
     await ensureUserAnonymizedAtColumn(connection);
     await ensureOrderRefundColumns(connection);
     console.log('Migracje zakonczone.');
@@ -47,6 +49,33 @@ async function ensureAcademyLessonCountColumn(connection) {
     await connection.query(
       'ALTER TABLE courses ADD COLUMN lesson_count SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER level',
     );
+  }
+}
+
+async function ensureAcademyContentBlocksColumn(connection) {
+  const [columns] = await connection.query('SHOW COLUMNS FROM course_lessons LIKE \'content_blocks\'');
+  if (!columns.length) {
+    await connection.query('ALTER TABLE course_lessons ADD COLUMN content_blocks JSON NULL AFTER content');
+  }
+}
+
+async function ensureAcademyModules(connection) {
+  const [columns] = await connection.query('SHOW COLUMNS FROM course_lessons LIKE \'module_id\'');
+  if (!columns.length) await connection.query('ALTER TABLE course_lessons ADD COLUMN module_id INT UNSIGNED NULL AFTER course_id');
+  const [foreignKeys] = await connection.query(`SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'course_lessons' AND COLUMN_NAME = 'module_id' AND REFERENCED_TABLE_NAME = 'course_modules'`);
+  if (!foreignKeys.length) await connection.query('ALTER TABLE course_lessons ADD CONSTRAINT fk_course_lessons_module FOREIGN KEY (module_id) REFERENCES course_modules(id) ON DELETE CASCADE');
+  const [indexes] = await connection.query(`SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'course_lessons' AND INDEX_NAME = 'idx_course_lessons_module'`);
+  if (!indexes.length) await connection.query('ALTER TABLE course_lessons ADD INDEX idx_course_lessons_module (module_id, is_published, sort_order, id)');
+
+  const [courses] = await connection.query('SELECT c.id, c.title FROM courses c WHERE EXISTS (SELECT 1 FROM course_lessons l WHERE l.course_id = c.id AND l.module_id IS NULL)');
+  for (const course of courses) {
+    const [existing] = await connection.execute('SELECT id FROM course_modules WHERE course_id = ? ORDER BY id ASC LIMIT 1', [course.id]);
+    let moduleId = existing[0]?.id;
+    if (!moduleId) {
+      const [result] = await connection.execute('INSERT INTO course_modules (course_id, slug, title, description, sort_order, is_published) VALUES (?, \'materialy-szkolenia\', ?, ?, 0, 1)', [course.id, 'Materiały szkolenia', `Moduł utworzony podczas migracji szkolenia „${course.title}”.`]);
+      moduleId = result.insertId;
+    }
+    await connection.execute('UPDATE course_lessons SET module_id = ? WHERE course_id = ? AND module_id IS NULL', [moduleId, course.id]);
   }
 }
 

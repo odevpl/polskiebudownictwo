@@ -16,7 +16,6 @@
     "migrate": "node scripts/migrate.js",
     "migrate:mediators": "node scripts/migrateMediators.js",
     "migrate:mediator-profile": "node scripts/migrateMediatorProfile.js",
-    "seed:academy": "node scripts/seedAcademy.js",
     "create-superadmin": "node scripts/createSuperadmin.js",
     "reset-admin-password": "node scripts/resetAdminPassword.js",
     "test:smtp": "node scripts/testSmtp.js",

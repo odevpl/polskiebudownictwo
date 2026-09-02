@@ -1,20 +1,8 @@
 <!doctype html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title><%= title %> | Akademia</title>
-    <link rel="stylesheet" href="/global.css">
-    <link rel="stylesheet" href="/assets/css/academy/modules/courseList.css">
-    <link rel="stylesheet" href="/assets/css/academy/modules/coursePlayer.css">
-  </head>
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow"><title><%= title %> | Akademia</title><link rel="stylesheet" href="/global.css"><link rel="stylesheet" href="/assets/css/academy/modules/courseCards.css"></head>
   <body class="academy-page academy-course-page">
-    <header class="site-header"><div class="container site-header__inner"><a class="site-logo" href="/akademia/" aria-label="Akademia Polskiego Budownictwa"><img src="/assets/images/logo.png" alt="Polskie Budownictwo"></a><nav class="site-nav" aria-label="Główna nawigacja"><a href="/akademia/">Dostępne kursy</a><a href="/akademia/ustawienia/">Ustawienia konta</a><a href="/o_fundacji.html">O fundacji</a></nav></div></header>
-    <main class="academy-detail">
-      <section class="section section--dark academy-courses__hero"><div class="container"><p class="eyebrow"><%= course.category || 'Akademia' %></p><h1><%= course.title %></h1><p class="lead"><%= course.description %></p></div></section>
-      <section class="section"><div class="container academy-detail__content"><a class="button button--ghost" href="/akademia/">← Wróć do kursów</a><h2>Program kursu</h2><div class="academy-course-player"><%- include('./modules/courseList/index', { lessons, activeLessonId: null, course }) %><div class="academy-course-player__empty"><% if (!lessons.length) { %><p>Ten kurs nie ma jeszcze opublikowanych lekcji.</p><% } else { %><p>Wybierz lekcję z listy, aby rozpocząć naukę.</p><% } %></div></div></div></section>
-    </main>
-    <script src="/assets/js/menu.js?v=3" defer></script>
+    <header class="site-header"><div class="container site-header__inner"><a class="site-logo" href="/akademia/" aria-label="Akademia Polskiego Budownictwa"><img src="/assets/images/logo.png" alt="Polskie Budownictwo"></a><nav class="site-nav" aria-label="Główna nawigacja"><a href="/akademia/">Dostępne szkolenia</a><a href="/akademia/ustawienia/">Ustawienia konta</a><a href="/o_fundacji.html">O fundacji</a></nav></div></header>
+    <main class="academy-detail"><section class="section section--dark academy-courses__hero"><div class="container"><p class="eyebrow"><%= course.category || 'Akademia' %></p><h1><%= course.title %></h1><p class="lead"><%= course.description %></p></div></section><section class="section"><div class="container academy-detail__content"><a class="button button--ghost" href="/akademia/">← Wróć do szkoleń</a><header class="academy-section-heading"><p class="eyebrow">Program szkolenia</p><h2>Moduły</h2></header><div class="academy-module-grid"><% if (!modules.length) { %><p>To szkolenie nie ma jeszcze opublikowanych modułów.</p><% } %><% modules.forEach((item, index) => { %><a class="academy-module-card" href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(item.slug) %>"><span class="academy-module-card__number"><%= index + 1 %></span><strong><%= item.title %></strong><span><%= item.published_lesson_count || 0 %> lekcji</span><% if (item.description) { %><p><%= item.description %></p><% } %></a><% }) %></div></div></section></main>
   </body>
 </html>

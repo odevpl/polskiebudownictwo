@@ -26,7 +26,7 @@ app.use(helmet({
   contentSecurityPolicy: false,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }));
-app.use(express.urlencoded({ extended: false, limit: '30kb' }));
+app.use(express.urlencoded({ extended: false, limit: '300kb' }));
 app.use(express.json({ limit: '30kb' }));
 app.use(createSessionMiddleware());
 app.use(csrfProtection);
@@ -42,7 +42,9 @@ app.get('/health', (request, response) => {
 
 app.get('/wydarzenia', eventsController.index);
 app.get('/akademia/kurs/:slug', requireUser, academyPageController.course);
-app.get('/akademia/kurs/:slug/lekcja/:lessonSlug', requireUser, academyPageController.lesson);
+app.get('/akademia/kurs/:slug/modul/:moduleSlug', requireUser, academyPageController.module);
+app.get('/akademia/kurs/:slug/modul/:moduleSlug/lekcja/:lessonSlug', requireUser, academyPageController.lesson);
+app.get('/akademia/kurs/:slug/lekcja/:lessonSlug', requireUser, academyPageController.legacyLesson);
 app.get('/akademia/kup/:slug', requireUser, academyPageController.checkout);
 app.get('/akademia/platnosc/wynik', requireUser, academyPageController.paymentResult);
 const academyPages = {

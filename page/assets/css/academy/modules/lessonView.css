@@ -5,3 +5,10 @@
 .lesson-view-module__body { padding-top: 1.5rem; line-height: 1.75; }
 .lesson-view-module__body :first-child { margin-top: 0; }
 .lesson-view-module__body :last-child { margin-bottom: 0; }
+.lesson-content-block--rich-text h2, .lesson-content-block--rich-text h3, .lesson-content-block--rich-text h4 { margin-top: 1.6rem; }
+.lesson-content-block--rich-text ul, .lesson-content-block--rich-text ol { padding-left: 1.5rem; }
+.lesson-content-block--rich-text a { text-decoration: underline; }
+.lesson-content-block--youtube { margin: 1.5rem 0; }
+.lesson-content-block__video { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: .8rem; background: #111; }
+.lesson-content-block__video iframe { width: 100%; height: 100%; border: 0; }
+.lesson-content-block--youtube figcaption { margin-top: .5rem; color: var(--color-muted); font-size: .9rem; }

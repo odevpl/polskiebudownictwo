@@ -131,12 +131,11 @@ if (courseList) {
       if (!result.courses.length) {
         const empty = document.createElement('p');
         empty.className = 'academy-courses__state';
-        empty.textContent = 'Nie masz jeszcze dostępu do żadnego kursu.';
+        empty.textContent = 'Nie masz jeszcze dostępu do żadnego kursu. Sprawdź katalog poniżej.';
         courseList.append(empty);
-        return;
       }
-      result.courses.forEach(course => courseList.append(courseCard(course)));
       if (catalogList && catalogSection) {
+        result.courses.forEach(course => courseList.append(courseCard(course)));
         const catalogResponse = await fetch('/api/academy/catalog', { headers: { Accept: 'application/json' }, cache: 'no-store' });
         if (catalogResponse.ok) {
           const catalogResult = await catalogResponse.json();
@@ -144,8 +143,16 @@ if (courseList) {
           if (otherCourses.length) {
             catalogSection.hidden = false;
             otherCourses.forEach(course => catalogList.append(courseCard(course, true)));
+          } else if (!result.courses.length) {
+            catalogSection.hidden = false;
+            const emptyCatalog = document.createElement('p');
+            emptyCatalog.className = 'academy-courses__state';
+            emptyCatalog.textContent = 'Katalog kursów jest obecnie pusty.';
+            catalogList.append(emptyCatalog);
           }
         }
+      } else {
+        result.courses.forEach(course => courseList.append(courseCard(course)));
       }
     } catch (error) {
       if (state) state.textContent = error.message || 'Nie udało się pobrać kursów.';

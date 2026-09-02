@@ -1,0 +1,4 @@
+<figure class="lesson-content-block lesson-content-block--youtube">
+  <div class="lesson-content-block__video"><iframe src="https://www.youtube-nocookie.com/embed/<%= encodeURIComponent(block.data.videoId) %>" title="<%= block.data.title || 'Film edukacyjny YouTube' %>" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+  <% if (block.data.title) { %><figcaption><%= block.data.title %></figcaption><% } %>
+</figure>

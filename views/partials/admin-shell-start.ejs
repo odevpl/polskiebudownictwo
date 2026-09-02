@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin.css?v=8">
+    <link rel="stylesheet" href="/css/admin-course-content.css?v=1">
     <script src="/js/admin.js?v=2" defer></script>
   </head>
   <body>
@@ -19,7 +20,7 @@
           <a href="<%= adminUrl('/submissions') %>" <%= title === 'Zgloszenia' || title.startsWith('Edycja') || title === 'Nowe zgloszenie' ? 'aria-current="page"' : '' %>>Zgloszenia</a>
           <a href="<%= adminUrl('/events') %>" <%= title === 'Wydarzenia' ? 'aria-current="page"' : '' %>>Wydarzenia</a>
           <a href="<%= adminUrl('/mediators') %>" <%= title === 'Mediatorzy' || title.startsWith('Edycja mediatora') || title === 'Nowy mediator' ? 'aria-current="page"' : '' %>>Mediatorzy</a>
-          <a href="<%= adminUrl('/academy/courses') %>" <%= title === 'Akademia' || title.startsWith('Edycja kursu') || title === 'Nowy kurs' ? 'aria-current="page"' : '' %>>Akademia</a>
+          <a href="<%= adminUrl('/academy/courses') %>" <%= title === 'Akademia' || title.startsWith('Edycja kursu') || title === 'Nowy kurs' || title.startsWith('Moduły:') || title.startsWith('Edycja modułu') || title.startsWith('Nowy moduł') || title.startsWith('Lekcje:') ? 'aria-current="page"' : '' %>>Akademia</a>
           <a href="<%= adminUrl('/academy/orders') %>" <%= title === 'Zamówienia Akademii' || title.startsWith('Zamówienie #') ? 'aria-current="page"' : '' %>>Zamówienia</a>
           <a href="<%= adminUrl('/academy/access') %>" <%= title === 'Dostępy Akademii' ? 'aria-current="page"' : '' %>>Dostępy</a>
           <a href="<%= adminUrl('/academy/users') %>" <%= title === 'Użytkownicy Akademii' ? 'aria-current="page"' : '' %>>Użytkownicy</a>

@@ -45,6 +45,15 @@ router.post('/academy/courses/new', requireAuth, academyController.createCourse)
 router.get('/academy/courses/:id/edit', requireAuth, academyController.editCourse);
 router.post('/academy/courses/:id/edit', requireAuth, academyController.updateCourse);
 router.post('/academy/courses/:id/delete', requireAuth, academyController.deleteCourse);
+router.get('/academy/courses/:courseId/modules', requireAuth, academyController.modulesIndex);
+router.get('/academy/courses/:courseId/modules/new', requireAuth, academyController.newModule);
+router.post('/academy/courses/:courseId/modules/new', requireAuth, academyController.createModule);
+router.get('/academy/modules/:id/edit', requireAuth, academyController.editModule);
+router.post('/academy/modules/:id/edit', requireAuth, academyController.updateModule);
+router.post('/academy/modules/:id/delete', requireAuth, academyController.deleteModule);
+router.get('/academy/modules/:moduleId/lessons', requireAuth, academyController.moduleLessonsIndex);
+router.get('/academy/modules/:moduleId/lessons/new', requireAuth, academyController.newModuleLesson);
+router.post('/academy/modules/:moduleId/lessons/new', requireAuth, academyController.createModuleLesson);
 router.get('/academy/courses/:courseId/lessons', requireAuth, academyController.lessonsIndex);
 router.get('/academy/courses/:courseId/lessons/new', requireAuth, academyController.newLesson);
 router.post('/academy/courses/:courseId/lessons/new', requireAuth, academyController.createLesson);

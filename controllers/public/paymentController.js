@@ -7,6 +7,10 @@ const paymentProvider = require('../../services/paymentProvider');
 const paymentService = require('../../services/paymentService');
 const przelewy24Provider = require('../../services/przelewy24Provider');
 
+function paymentBypassEnabled() {
+  return ['1', 'true', 'yes'].includes(String(process.env.PAYMENT_BYPASS_ENABLED || '').trim().toLowerCase());
+}
+
 async function createOrder(request, response) {
   response.setHeader('Cache-Control', 'no-store');
   const slug = String(request.body.courseSlug || '').trim();
@@ -19,6 +23,16 @@ async function createOrder(request, response) {
     const billing = { ...(await UserBilling.findByUserId(request.session.user.id)), email: request.session.user.email };
     const order = await Order.createPending({ userId: request.session.user.id, course, billingSnapshot: billing });
     await BillingInvoice.createPending(order.id, billing);
+    if (paymentBypassEnabled()) {
+      await paymentService.completeManualPurchase(order.id);
+      return response.status(201).json({
+        success: true,
+        orderNumber: order.order_number,
+        temporary: true,
+        checkoutUrl: `/akademia/kurs/${encodeURIComponent(course.slug)}`,
+        message: 'Dostęp do kursu został aktywowany.',
+      });
+    }
     try {
       const checkout = await paymentProvider.createCheckout(order, request);
       const updatedOrder = await Order.attachCheckout(order.id, checkout);

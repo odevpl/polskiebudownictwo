@@ -2,12 +2,14 @@
   <div class="lesson-view-module__intro">
     <p class="course-card__tag"><%= lesson.content_type %></p>
     <h1><%= lesson.title %></h1>
-    <% if (lesson.description) { %>
-      <p class="lesson-view-module__description"><%= lesson.description %></p>
-    <% } %>
+    <% if (lesson.description) { %><p class="lesson-view-module__description"><%= lesson.description %></p><% } %>
   </div>
-
   <div class="lesson-view-module__body">
-    <%- lesson.content || '<p>Treść lekcji zostanie dodana.</p>' %>
+    <% if (lesson.contentBlocks && lesson.contentBlocks.length) { %>
+      <% lesson.contentBlocks.forEach(block => { %>
+        <% if (block.type === 'richText') { %><%- include('../contentBlock/richText', { block }) %><% } %>
+        <% if (block.type === 'youtube') { %><%- include('../contentBlock/youtube', { block }) %><% } %>
+      <% }) %>
+    <% } else { %><p>Treść modułu zostanie dodana.</p><% } %>
   </div>
 </article>

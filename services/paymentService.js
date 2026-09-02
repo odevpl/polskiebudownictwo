@@ -53,6 +53,48 @@ async function processWebhook({ provider, eventId, eventType, payload }) {
   }
 }
 
+async function completeManualPurchase(orderId) {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [orderRows] = await connection.execute('SELECT * FROM orders WHERE id = ? LIMIT 1 FOR UPDATE', [orderId]);
+    const order = orderRows[0] || null;
+    if (!order) throw new Error('Nie znaleziono zamówienia.');
+    if (order.status === 'paid') {
+      await connection.commit();
+      return { orderNumber: order.order_number, alreadyPaid: true };
+    }
+    if (order.status !== 'pending') throw new Error('Zamówienie nie może zostać zrealizowane.');
+
+    await connection.execute(
+      `INSERT IGNORE INTO payment_events (provider, event_id, event_type, payload)
+       VALUES ('temporary', ?, 'temporary.completed', ?)`,
+      [`temporary:${order.order_number}`, JSON.stringify({ orderNumber: order.order_number, status: 'paid' })],
+    );
+    await connection.execute(
+      `UPDATE orders
+       SET status = 'paid', paid_at = CURRENT_TIMESTAMP,
+           payment_provider = 'temporary', provider_payment_id = ?
+       WHERE id = ? AND status = 'pending'`,
+      [order.order_number, order.id],
+    );
+    await grantOrderAccess(connection, order, { paymentId: order.order_number });
+    await connection.execute(
+      `INSERT INTO invoices (order_id, status, billing_snapshot)
+       VALUES (?, 'pending', ?)
+       ON DUPLICATE KEY UPDATE billing_snapshot = VALUES(billing_snapshot)`,
+      [order.id, order.billing_snapshot],
+    );
+    await connection.commit();
+    return { orderNumber: order.order_number, alreadyPaid: false };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
 async function grantOrderAccess(connection, order, payload) {
   const [items] = await connection.execute('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
   for (const item of items) {
@@ -86,4 +128,4 @@ async function revokeOrderAccess(connection, order) {
   }
 }
 
-module.exports = { processWebhook };
+module.exports = { completeManualPurchase, processWebhook };
