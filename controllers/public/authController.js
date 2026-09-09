@@ -2,7 +2,9 @@ const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
 const User = require('../../models/User');
 const UserToken = require('../../models/UserToken');
+const RegistrationAttempt = require('../../models/RegistrationAttempt');
 const { sendAccountVerificationEmail, sendPasswordResetEmail } = require('../../services/mailService');
+const { isBlockedEmailDomain, registrationConfig, verifyRecaptcha } = require('../../services/registrationSecurity');
 
 const genericResetMessage = 'Jeśli konto dla tego adresu istnieje, wysłaliśmy wiadomość z instrukcją resetu hasła.';
 
@@ -31,18 +33,62 @@ function establishSession(request, user, callback) {
 async function register(request, response) {
   if (validationFailure(request, response)) return;
   const email = request.body.email.trim().toLowerCase();
+  const logAttempt = (status, reason = null) => RegistrationAttempt.create({ email, ipAddress: request.ip, userAgent: request.get('user-agent'), status, reason }).catch(error => console.error('Registration attempt log error:', error));
   try {
+    if (String(request.body.website || '').trim()) {
+      await logAttempt('rejected', 'honeypot');
+      return response.status(422).json({ success: false, message: 'Nie udało się utworzyć konta.' });
+    }
+    const startedAt = Number(request.body.formStartedAt);
+    const elapsed = Date.now() - startedAt;
+    if (!Number.isFinite(startedAt) || elapsed < 3000 || elapsed > 24 * 60 * 60 * 1000) {
+      await logAttempt('rejected', 'form-timing');
+      return response.status(422).json({ success: false, message: 'Wypełnij formularz ponownie.' });
+    }
+    if (isBlockedEmailDomain(email)) {
+      await logAttempt('rejected', 'temporary-email-domain');
+      return response.status(422).json({ success: false, message: 'Użyj stałego adresu e-mail.' });
+    }
+    const captcha = await verifyRecaptcha(request.body['g-recaptcha-response'], request.ip);
+    if (!captcha.success) {
+      await logAttempt('rejected', 'recaptcha');
+      return response.status(422).json({ success: false, message: 'Potwierdź, że nie jesteś botem.' });
+    }
     if (await User.findByEmail(email)) {
+      await logAttempt('rejected', 'duplicate-email');
       response.status(409).json({ success: false, message: 'Konto dla tego adresu już istnieje.' });
       return;
     }
     const user = await User.create({ email, passwordHash: await bcrypt.hash(request.body.password, 12) });
     const token = await UserToken.create(user.id, 'email_verification');
     await sendAccountVerificationEmail(user.email, `${publicUrl(request)}/weryfikacja-email.html?token=${encodeURIComponent(token)}`);
+    await logAttempt('accepted');
     response.status(201).json({ success: true, message: 'Konto utworzone. Sprawdź skrzynkę e-mail, aby potwierdzić adres.' });
   } catch (error) {
+    await logAttempt('rejected', 'server-error');
     console.error('Registration error:', error);
     response.status(500).json({ success: false, message: 'Nie udało się utworzyć konta. Spróbuj ponownie później.' });
+  }
+}
+
+function registrationSettings(request, response) {
+  response.setHeader('Cache-Control', 'no-store');
+  response.json({ recaptcha: registrationConfig() });
+}
+
+async function resendVerification(request, response) {
+  if (validationFailure(request, response)) return;
+  const email = request.body.email.trim().toLowerCase();
+  try {
+    const user = await User.findByEmail(email);
+    if (user && !user.email_verified_at && user.is_active === 0) {
+      const token = await UserToken.create(user.id, 'email_verification');
+      await sendAccountVerificationEmail(user.email, `${publicUrl(request)}/weryfikacja-email.html?token=${encodeURIComponent(token)}`);
+    }
+    return response.json({ success: true, message: 'Jeśli konto wymaga potwierdzenia, wysłaliśmy nową wiadomość.' });
+  } catch (error) {
+    console.error('Verification resend error:', error);
+    return response.json({ success: true, message: 'Jeśli konto wymaga potwierdzenia, wysłaliśmy nową wiadomość.' });
   }
 }
 
@@ -120,4 +166,4 @@ function sessionInfo(request, response) {
   });
 }
 
-module.exports = { login, logout, register, requestPasswordReset, resetPassword, sessionInfo, verifyEmail };
+module.exports = { login, logout, register, registrationSettings, resendVerification, requestPasswordReset, resetPassword, sessionInfo, verifyEmail };

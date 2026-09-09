@@ -12,14 +12,14 @@ async function findById(id) {
 
 async function create({ email, passwordHash }) {
   const [result] = await pool.execute(
-    'INSERT INTO users (email, password_hash) VALUES (?, ?)',
+    'INSERT INTO users (email, password_hash, is_active) VALUES (?, ?, 0)',
     [email, passwordHash],
   );
   return findById(result.insertId);
 }
 
 async function verifyEmail(id) {
-  await pool.execute('UPDATE users SET email_verified_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
+  await pool.execute('UPDATE users SET email_verified_at = CURRENT_TIMESTAMP, is_active = 1 WHERE id = ?', [id]);
 }
 
 async function updatePassword(id, passwordHash) {

@@ -8,7 +8,13 @@ const paymentService = require('../../services/paymentService');
 const przelewy24Provider = require('../../services/przelewy24Provider');
 
 function paymentBypassEnabled() {
-  return ['1', 'true', 'yes'].includes(String(process.env.PAYMENT_BYPASS_ENABLED || '').trim().toLowerCase());
+  const configured = String(process.env.PAYMENT_BYPASS_ENABLED || '').trim().toLowerCase();
+  if (['1', 'true', 'yes'].includes(configured)) return true;
+  if (['0', 'false', 'no'].includes(configured)) return false;
+
+  // Temporary fallback: while no payment operator is configured, allow the
+  // temporary purchase flow without requiring an extra production setting.
+  return !String(process.env.PAYMENT_PROVIDER || '').trim();
 }
 
 async function createOrder(request, response) {

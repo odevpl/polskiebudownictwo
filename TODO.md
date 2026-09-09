@@ -1,462 +1,169 @@
-# Akademia — wprowadzanie treści edukacyjnych z panelu admina
-
-## Status bieżącej implementacji
-
-Zrealizowany jest przepływ MVP end-to-end:
-
-`Katalog szkoleń → Szkolenie → Moduły → Lekcje → bloki treści`
-
-- `course_modules` przechowuje moduły przypisane do kursu.
-- `course_lessons.module_id` przypisuje lekcję do modułu; istniejące lekcje są migrowane do modułu technicznego.
-- Panel admina prowadzi przez kurs, moduły i lekcje, bez konieczności ręcznego budowania adresów.
-- Lekcja może mieć naprzemiennie reużywalne bloki `richText` i `youtube`.
-- Publiczne adresy kanoniczne to `/akademia/kurs/:kurs/modul/:modul` oraz `/lekcja/:lekcja`; stary adres lekcji przekierowuje do nowego.
-- Nie ma seedów demonstracyjnych. Przy braku rekordów katalog pozostaje pusty.
-
-Do dalszego rozwoju pozostają przede wszystkim: podgląd admin-only, drag-and-drop kolejności, testy automatyczne oraz kolejne typy bloków (PDF, obraz, quiz).
-
-## Cel
-
-Administrator ma móc utworzyć kurs, uzupełnić jego dane ogólne, dodać uporządkowane moduły edukacyjne oraz opublikować je tak, aby zalogowany klient z dostępem do kursu widział treści w Akademii.
-
-Zakładany przepływ: `Lista kursów → Edycja kursu → Lista modułów → Edycja modułu → zapis szkicu/publikacja → publiczny kurs`.
-
-W tym dokumencie rozróżniamy `course_modules` jako moduły szkolenia oraz `course_lessons` jako lekcje należące do modułu. Bloki treści są zapisywane w `course_lessons.content_blocks` jako JSON.
-
----
-
-## Ustalenia z inwestygacji
-
-### Co już istnieje
-
-- `sql/schema.sql` zawiera `courses`, `course_lessons`, `user_course_access` i `user_lesson_progress`.
-- `models/Course.js` oraz `models/CourseLesson.js` obsługują CRUD; model modułu synchronizuje `courses.lesson_count`.
-- Panel ma już trasy listy/dodawania/edycji kursu oraz listy/dodawania/edycji lekcji.
-- Publiczne API zwraca aktywne kursy, opublikowane lekcje i postęp użytkownika.
-- Publiczny widok modułu renderuje `lesson.content` jako HTML (`<%- ... %>`), więc zawartość z panelu musi być sanitizowana.
-- Istnieje `views/components/RichTextEditor.ejs` i prosty edytor oparty o `document.execCommand`, ale służy on obecnie mediatorom.
-- `modules/richText/index.js` dopuszcza tylko `p`, `br`, `strong`, `b`, `em`, `i`, `ul`, `ol`, `li`; nie obsługuje nagłówków, linków ani bezpiecznych osadzeń YouTube.
-- Seed Akademii zawiera demonstracyjne kursy i puste treści. Produkcja powinna być uzupełniana z panelu.
-
-### Problemy do rozwiązania
-
-1. Formularz modułu ma zwykły `textarea`, więc nie obsługuje wygodnie nagłówków, list, pogrubień i linków.
-2. `content_type = 'video'` jest tylko etykietą; nie ma pola ani walidacji URL YouTube.
-3. Jedno pole `content` nie deklaruje, czy przechowuje HTML, tekst czy inny format.
-4. Sanitizacja nie jest podłączona do zapisu lekcji, a renderer ufa HTML.
-5. Lista modułów nie pokazuje stanu treści, wideo, publikacji i kolejności w sposób wygodny redakcyjnie.
-6. Panel nie komunikuje jasno, że klient zobaczy wyłącznie `is_active = 1` i `is_published = 1`.
-7. W istniejących plikach Akademii występuje mojibake (`ZarzÄ…dzaj`, `Nie udaĹ‚o siÄ™`, `TytuĹ‚`). Dotknięte komunikaty trzeba poprawić i sprawdzić UTF-8.
-
-### Rekomendacja edytora
-
-Docelowo można użyć Tiptap z ograniczonym zestawem rozszerzeń: akapity, `h2`/`h3`/`h4`, pogrubienie, kursywa, listy punktowane/numerowane, link, cytat oraz undo/redo. Osadzanie YouTube powinno być osobnym, kontrolowanym polem albo kontrolowanym rozszerzeniem — nie dowolnym iframe z HTML.
-
-Pierwsza implementacja używa lekkiego, natywnego `contenteditable` zamkniętego w reużywalnym module `richText`, aby nie dodawać teraz frameworka ani procesu bundlowania. Migracja do Tiptap pozostaje lokalną zmianą tego modułu, bez zmiany kontraktu `content_blocks`. Oficjalny `StarterKit` obejmuje m.in. nagłówki, listy, akapity, pogrubienie, kursywę i linki, a rozszerzenie YouTube obsługuje adres filmu.
-
-### Decyzja architektoniczna — realizacja prac
-
-Edytor musi być zbudowany z reużywalnych modułów blokowych, a nie jako jeden liniowy formularz z powtarzalnym kodem. Aktywne są moduły `richText` i `youtube`, które można układać naprzemiennie w jednym module kursu. Każdy następny typ treści (np. PDF, obraz, quiz lub akordeon) ma być dodawany przez rejestrację nowego modułu z własnym rendererem i własną walidacją.
-
-Format zapisu modułu:
-
-```json
-[
-  { "type": "richText", "data": { "html": "<h2>Wprowadzenie</h2><p>...</p>" } },
-  { "type": "youtube", "data": { "url": "https://youtu.be/...", "title": "Materiał wideo" } }
-]
-```
-
-Nie wolno kopiować toolbaru, obsługi usuwania, serializacji ani renderowania w każdym typie bloku. Wspólne zachowania należą do kontenera edytora, a różnice do modułu danego typu.
-
----
-
-## Proponowany model danych
-
-### MVP — rozdzielenie szkolenia, modułu i lekcji
-
-Tabela `course_modules` jest kontenerem pomiędzy `courses` i `course_lessons`. Lekcja ma `module_id`, dzięki czemu zachowujemy istniejący model postępu i dostępów, a jednocześnie otrzymujemy czteropoziomową nawigację.
-
-Do rozważenia w migracji:
-
-- `content_format ENUM('html') NOT NULL DEFAULT 'html'` — jawny format `content`;
-- `video_url VARCHAR(500) NULL` — jedno główne wideo w MVP;
-- `video_provider ENUM('youtube') NULL` lub stała po stronie aplikacji;
-- `published_at DATETIME NULL` — faktyczny czas publikacji;
-- `updated_by_admin_id INT UNSIGNED NULL` z FK do `admins` — audyt ostatniej zmiany.
-
-Jeśli od początku potrzebne są liczne filmy/materiały, utworzyć `course_lesson_media`:
-
-```text
-id, lesson_id → course_lessons.id, media_type, title, url,
-provider_id/video_id, sort_order, created_at, updated_at
-```
-
-Rekomendacja dla obecnej wersji: `content_blocks` jako JSON z blokami `richText` i `youtube`. Tabelę mediów dodać osobno, gdy potrzebne będzie wiele plików lub niezależne zarządzanie załącznikami.
-
-### Kurs
-
-Istniejące `courses` pokrywa dane ogólne. Nie należy pozwalać na ręczne ustawianie `lesson_count`; licznik ma być wynikiem synchronizacji z modułami. Panel powinien pokazywać liczbę wszystkich, opublikowanych i posiadających treść modułów.
-
----
-
-## Tickety implementacyjne
-
-### [ ] EDU-01 — Kontrakt treści i zasady publikacji
-
-**Do wykonania:** ustalić, że `content` przechowuje sanitizowany HTML, a `description` jest zwykłym tekstem; spisać dozwolone tagi (`p`, `br`, `h2`, `h3`, `h4`, `strong`, `em`, `ul`, `ol`, `li`, `blockquote`, `a`), atrybuty i protokoły URL (`http`, `https`, `mailto`); ustalić, że dowolny iframe jest zabroniony; zdefiniować stany szkicu i publikacji.
-
-**Decyzja do potwierdzenia:** rekomendowane jest dopuszczenie aktywnego kursu bez opublikowanych modułów, ale z widocznym ostrzeżeniem w panelu.
-
-**Akceptacja:** kontrakt jest zapisany w kodzie/dokumentacji i kolejne prace używają jednoznacznych nazw.
-
-### [ ] EDU-02 — Migracja bazy dla treści modułów
-
-**Do wykonania:** przygotować idempotentną migrację w `scripts/migrate.js` i `sql/schema.sql`; dodać zaakceptowane pola (`content_format`, `video_url`, opcjonalnie `published_at`/audyt); zachować istniejące `content_type`; ustawić wartości domyślne dla starych rekordów; opisać backup i rollback w `docs/academy-migration.md`; dla tabeli mediów dodać FK, `ON DELETE CASCADE`, kolejność i indeksy.
-
-**Akceptacja:** `npm run migrate` można uruchamiać ponownie, stare kursy działają, a migracja nie zawiera sekretów ani danych demonstracyjnych.
-
-### [ ] EDU-03 — Bezpieczna sanitizacja i normalizacja HTML
-
-**Do wykonania:** rozbudować lub wydzielić `modules/richText/index.js`; usuwać skrypty, style, event handlery, formularze, obiekty, embed i nieznane tagi; zachować tylko kontrakt z EDU-01; filtrować URL; osobno walidować YouTube i wyciągać ID; nie zapisywać dowolnego iframe; sanitizować przy zapisie i mieć obronę przy renderowaniu; dodać testy XSS, `javascript:`, `onerror` i wklejonego HTML.
-
-**Akceptacja:** treść jest bezpiecznym HTML, a niebezpieczny payload nie prowadzi do XSS ani niekontrolowanego iframe.
-
-### [ ] EDU-04 — Model i serwis modułów edukacyjnych
-
-**Do wykonania:** rozszerzyć `models/CourseLesson.js` o nowe pola; dodać serwis walidujący payload, sanitizujący HTML, normalizujący slug i synchronizujący licznik; sprawdzać przynależność modułu do kursu także przy edycji po ID; zachować stabilną kolejność `sort_order, id`; rozważyć osobne `saveDraft`/`publish`; dodać testy CRUD, duplikatu sluga, usuwania i kaskady.
-
-**Akceptacja:** kontroler nigdy nie zapisuje surowego HTML, a licznik kursu jest poprawny po dodaniu i usunięciu modułu.
-
-### [ ] EDU-05 — Panel: lista kursów i dane ogólne
-
-**Do wykonania:** zachować `/academy/courses`; dodać status, cenę, wszystkie/opublikowane moduły, datę aktualizacji i podgląd; dodać filtr statusu/wyszukiwanie przy większej liczbie kursów; podzielić formularz na identyfikację, opis, sprzedaż, publikację i sortowanie; usunąć pole ręcznego `lessonCount`; po zapisie dać link do modułów; ostrzegać przed aktywacją pustego kursu; zachować auth, rate limiting i potwierdzenie usuwania.
-
-**Akceptacja:** administrator tworzy kurs i przechodzi do jego modułów bez ręcznego budowania URL; aktywny kurs trafia do istniejącego katalogu.
-
-### [ ] EDU-06 — Panel: lista i kolejność modułów
-
-**Do wykonania:** w UI użyć nazwy „Moduły kursu” przy zachowaniu kompatybilnych tras; pokazywać numer, tytuł, slug, typ, status, obecność treści/wideo i aktualizację; dodać edycję, publikację/cofnięcie, usunięcie i podgląd; minimum obsłużyć `sort_order`, docelowo drag-and-drop; ostrzegać o opublikowanym module bez treści; po usunięciu odświeżać licznik; sprawdzać własność kursu.
-
-**Akceptacja:** administrator widzi moduły w kolejności klienta i przygotowuje kurs bez SQL.
-
-### [ ] EDU-07 — Panel: edycja pojedynczego modułu
-
-**Pola:** wymagany tytuł, slug generowany z tytułu przy tworzeniu, opis jako tekst, typ modułu, treść główna, opcjonalny link YouTube, kolejność oraz publikacja.
-
-**Edytor:** `h2`/`h3`/`h4` (bez `h1`), pogrubienie, kursywa, listy punktowane/numerowane, bezpieczne linki, opcjonalny cytat, undo/redo i podgląd. Przycisk „Wstaw YouTube” ma zapisywać kontrolowany URL/ID, nie dowolny iframe.
-
-**Akceptacja:** administrator zapisuje moduł z nagłówkami, listami i pogrubieniem; klient widzi tę strukturę, a błędny URL YouTube nie może zostać opublikowany.
-
-### [ ] EDU-08 — Integracja Tiptap w statycznym panelu
-
-**Do wykonania:** dodać zależności tylko jeśli build/deploy je obsłuży; przygotować niezależny `public/js/admin-course-editor.js` i komponent widoku; synchronizować HTML do hidden input; obsłużyć brak JS czytelnym błędem; dodać CSS toolbaru, focusu, placeholdera, nagłówków i list; ograniczyć rozszerzenia do potrzeb edukacyjnych; sprawdzić assety w paczce wdrożeniowej.
-
-**Akceptacja:** edytor działa desktop/mobile, nie wpływa na formularze mediatorów i jest obecny w `dists/polskiebudownictwo.org/`.
-
-### [ ] EDU-09 — Publiczny renderer modułu i YouTube
-
-**Do wykonania:** rozbudować `views/public/academy/modules/lessonView/index.ejs`; generować embed wyłącznie z zweryfikowanego ID, preferować `youtube-nocookie.com`; dodać responsywny wrapper 16:9 i opisowy tytuł; renderować sanitizowane `content`; zachować filtrowanie po aktywnym kursie/opublikowanym module; sprawdzić widok kursu, nawigację i postęp.
-
-**Akceptacja:** klient z dostępem widzi treść i responsywny film, a klient bez dostępu nie dostaje treści przez API.
-
-### [ ] EDU-10 — Statusy, podgląd i bezpieczna publikacja
-
-**Do wykonania:** dodać admin-only podgląd tą samą ścieżką renderowania albo podpisany token; rozdzielić zapis szkicu od publikacji; przed publikacją pokazać checklistę tytułu, opisu, treści, wideo, kolejności i statusu kursu; pokazywać ostrzeżenia o pustych/nieopublikowanych modułach; rozważyć log admin/rekord/akcja/czas.
-
-**Akceptacja:** administrator wie, co będzie widoczne i nie publikuje przez ręczne SQL.
-
-### [ ] EDU-11 — Walidacja, uprawnienia i testy end-to-end
-
-**Do wykonania:** walidować długości, slug, kolejność, typy, URL i rozmiar HTML; używać parametrów SQL; sprawdzić `requireAuth` i role dla POST; testować UTF-8; przetestować utworzenie/edycję/publikację/cofnięcie/usunięcie, duplikaty, kaskadę, dostęp aktywny/wygasły/brak dostępu i synchronizację `lesson_count`.
-
-**Akceptacja:** scenariusz „admin dodaje kurs → publikuje moduł → klient z dostępem widzi treść” przechodzi na środowisku testowym.
-
-### [ ] EDU-12 — Dokumentacja i wdrożenie
-
-**Do wykonania:** zaktualizować `docs/academy-migration.md`; opisać assety edytora i `npm run build:deploy`; przygotować instrukcję dla administratora; sprawdzić paczkę głównej domeny; wykonać test kursu darmowego i płatnego; poprawić mojibake w dotkniętych plikach.
-
-**Akceptacja:** wdrożenie jest powtarzalne, a administrator potrafi samodzielnie opublikować kurs.
-
----
-
-## Kolejność realizacji
-
-1. EDU-01 — kontrakt i decyzje modelu.
-2. EDU-02 — migracja bazy.
-3. EDU-03 — sanitizacja.
-4. EDU-04 — model/serwis.
-5. EDU-05 i EDU-06 — listy kursów i modułów.
-6. EDU-07 i EDU-08 — formularz i edytor.
-7. EDU-09 — publiczne renderowanie.
-8. EDU-10 — publikacja i podgląd.
-9. EDU-11 — testy bezpieczeństwa i end-to-end.
-10. EDU-12 — dokumentacja i wdrożenie.
-
-## Poza MVP
-
-- wiele filmów i plików w jednym module (`course_lesson_media`),
-- upload plików do storage,
-- wersjonowanie i historia zmian,
-- autosave szkicu,
-- quizy i punktacja,
-- certyfikaty,
-- role autora/redaktora i akceptacja publikacji,
-- automatyczny spis treści.
-
-## Definition of Done pierwszego kursu
-
-- Kurs można utworzyć w panelu z tytułem, slugiem, opisem, ceną i statusem.
-- Można dodać moduł z tytułem, kolejnością i treścią z edytora.
-- Treść obsługuje nagłówki, listy, pogrubienia, linki i opcjonalny YouTube.
-- HTML przechodzi sanitizację i nie umożliwia XSS.
-- Kurs i moduł można opublikować z panelu.
-- Klient z dostępem widzi kurs, treść, film, nawigację i postęp.
-- Klient bez dostępu nie otrzymuje treści.
-- Liczniki i statusy są zgodne z bazą.
-- Migracja i build wdrożeniowy przechodzą poprawnie, a teksty są poprawnym UTF-8.
-
----
-
-## Docelowa hierarchia Akademii — katalog szkoleń → szkolenie → moduł → lekcja
-
-### Decyzja nazewnicza
-
-Przyjmujemy cztery główne poziomy:
-
-```text
-Katalog szkoleń
-  → Szkolenie
-    → Moduł
-      → Lekcja
-        → bloki treści: tekst, YouTube, później PDF/quiz/obraz
-```
-
-„Etap” i „podmoduł” nie będą używane jako nazwy domenowe. Widok ze screenów jest widokiem lekcji. Po lewej stronie lekcji znajduje się „Program szkolenia” lub „Lekcje modułu”, a nie „Lista podmodułów”.
-
-### Docelowa struktura katalogów
-
-Nowe elementy należy dodawać modułowo, bez rozbudowywania jednego dużego kontrolera lub szablonu:
-
-```text
-models/
-  Course.js
-  CourseModule.js              # nowy model modułu
-  CourseLesson.js              # obecny model; semantycznie lekcja
-
-controllers/admin/
-  academyController.js         # tymczasowo może obsłużyć przepływ
-  academyModuleController.js   # docelowo osobny kontroler modułów
-
-controllers/public/
-  academyPageController.js     # strony katalogu/szkolenia/modułu/lekcji
-  academyController.js         # API Akademii
-
-views/admin/academy/
-  courses/                     # lista i dane szkolenia
-  modules/                     # lista i formularz modułu
-  lessons/                     # lista i formularz lekcji
-
-views/public/academy/
-  catalog.ejs                  # opcjonalnie, jeśli katalog przestanie być statycznym HTML
-  course.ejs                   # szkolenie i klocki modułów
-  module.ejs                   # moduł i lista lekcji
-  lesson.ejs                   # obecny widok lekcji
-  modules/
-    courseCard/
-    moduleCard/                # nowy klocek modułu
-    lessonList/
-    lessonView/
-    contentBlock/              # renderer tekstu/YouTube
-
-public/js/admin/courseContent/
-  editor.js                    # kontener i rejestr bloków lekcji
-  modules/richText.js
-  modules/youtube.js
-
-modules/courseContent/
-  index.js                     # normalizacja, sanitizacja i walidacja bloków
-```
-
-Nazwy mogą pozostać przy obecnych trasach dla kompatybilności, ale kod i UI powinny używać `module` dla modułu szkolenia oraz `lesson` dla lekcji.
-
-### Zmiany w bazie danych
-
-Dodać tabelę `course_modules`:
-
-```text
-id                  INT UNSIGNED PK
-course_id           INT UNSIGNED FK → courses.id ON DELETE CASCADE
-slug                VARCHAR(160)
-title               VARCHAR(255)
-description         TEXT NULL
-image_url           VARCHAR(500) NULL      # opcjonalnie, nie blokuje MVP
-sort_order          INT NOT NULL DEFAULT 0
-is_published        TINYINT(1) NOT NULL DEFAULT 0
-created_at          TIMESTAMP
-updated_at          TIMESTAMP
-UNIQUE(course_id, slug)
-INDEX(course_id, is_published, sort_order, id)
-```
-
-Do `course_lessons` dodać:
-
-```text
-module_id INT UNSIGNED NULL FK → course_modules.id ON DELETE CASCADE
-```
-
-`module_id` powinien być chwilowo nullable na czas migracji. Po przypisaniu istniejących lekcji można rozważyć `NOT NULL`.
-
-Pozostałe zasady:
-
-- `courses` pozostaje szkoleniem i nadal przechowuje cenę, dostęp oraz aktywność sprzedażową;
-- `course_lessons` staje się lekcją należącą do modułu;
-- `content_blocks` pozostaje w `course_lessons`, bo tekst i YouTube są zawartością lekcji;
-- `user_lesson_progress` pozostaje tabelą postępu lekcji;
-- `user_course_access` pozostaje dostępem do całego szkolenia, nie do pojedynczego modułu;
-- `lesson_count` powinien zostać uzupełniony o `module_count` albo być liczony zapytaniem; nie należy ręcznie wpisywać tych wartości z panelu.
-
-### Migracja istniejących danych
-
-Nie wolno przypisywać wszystkich obecnych lekcji bezpośrednio do przypadkowego modułu. Migracja powinna:
-
-1. utworzyć tabelę `course_modules`;
-2. dla każdego istniejącego kursu utworzyć tymczasowy moduł, np. slug `materialy-kursu`, z tytułem „Materiały szkolenia”;
-3. przypisać obecne `course_lessons.module_id` do tego modułu;
-4. zachować slugi, kolejność, publikację, `content`, `content_blocks` i postęp użytkowników;
-5. pozwolić administratorowi później rozdzielić lekcje do właściwych modułów;
-6. po weryfikacji ustalić, czy `module_id` może stać się wymagane.
-
-### Publiczny przepływ i routing
-
-Obecnie `/akademia/kurs/:slug` przekierowuje do pierwszej lekcji. Należy zmienić to na stronę szkolenia z kartami modułów.
-
-Rekomendowane adresy:
-
-```text
-/akademia                         # katalog szkoleń
-/akademia/kurs/:courseSlug       # szkolenie, lista modułów
-/akademia/kurs/:courseSlug/modul/:moduleSlug
-                                  # moduł, lista lekcji
-/akademia/kurs/:courseSlug/modul/:moduleSlug/lekcja/:lessonSlug
-                                  # lekcja, treść i postęp
-```
-
-Istniejący adres `/akademia/kurs/:courseSlug/lekcja/:lessonSlug` należy tymczasowo obsłużyć jako legacy route. Jeśli slug lekcji jest jednoznaczny w kursie, można przekierować do nowego URL; w przeciwnym przypadku zwrócić bezpieczny wybór modułu.
-
-Do API dodać lub zmienić:
-
-- `GET /api/academy/courses/:slug` — szkolenie z opublikowanymi modułami i liczbami lekcji;
-- `GET /api/academy/courses/:slug/modules/:moduleSlug` — moduł z opublikowanymi lekcjami;
-- `GET /api/academy/courses/:slug/modules/:moduleSlug/lessons/:lessonSlug` — lekcja;
-- dotychczasowy endpoint lekcji zachować jako kompatybilność;
-- postęp nadal zapisywać po `lesson_id`.
-
-Każdy endpoint musi najpierw sprawdzić dostęp do szkolenia. Moduł i lekcja nie mogą ujawnić danych, jeśli kurs jest nieaktywny albo użytkownik nie ma dostępu.
-
-### Zmiany w zapleczu admina
-
-#### Lista szkoleń
-
-Pozostaje pierwszym ekranem Akademii i pokazuje:
-
-- nazwę szkolenia,
-- status aktywności,
-- liczbę modułów,
-- liczbę lekcji,
-- liczbę opublikowanych modułów/lekcji,
-- cenę,
-- datę aktualizacji,
-- akcję „Edytuj szkolenie”.
-
-#### Edycja szkolenia
-
-Formularz danych sprzedażowych i ogólnych pozostaje bez zmian. Należy dodać panel „Struktura szkolenia” z:
-
-- listą modułów,
-- liczbą lekcji w każdym module,
-- statusem publikacji,
-- zmianą kolejności,
-- akcją „Zarządzaj modułami”.
-
-#### Lista modułów szkolenia
-
-Nowy ekran, np. `/admin/academy/courses/:courseId/modules`:
-
-- karty lub tabela modułów,
-- kolejność,
-- tytuł i opis,
-- liczba lekcji,
-- liczba opublikowanych lekcji,
-- status modułu,
-- „Edytuj moduł”, „Zarządzaj lekcjami”, „Podgląd”, „Usuń”.
-
-#### Edycja modułu
-
-Nowy formularz powinien zawierać wyłącznie dane organizacyjne:
-
-- tytuł,
-- slug,
-- opis,
-- opcjonalną grafikę/ikonę,
-- kolejność,
-- publikację.
-
-Treść edukacyjna nie powinna być wpisywana na tym ekranie. Przycisk „Zarządzaj lekcjami” prowadzi do podmodułów nazywanych w UI „Lekcjami modułu”.
-
-#### Lista lekcji modułu
-
-Obecny ekran `lessons/index.ejs` należy przenieść semantycznie pod moduł. Powinien pokazywać:
-
-- kolejność,
-- tytuł lekcji,
-- typ/bloki treści,
-- status publikacji,
-- obecność treści,
-- obecność YouTube,
-- akcje edycji i podglądu.
-
-#### Edycja lekcji
-
-Obecny edytor blokowy tekst/YouTube pozostaje na poziomie lekcji. Nie należy przenosić `content_blocks` do modułu. Lekcja może zawierać dowolną sekwencję:
-
-```text
-tekst → YouTube → tekst → YouTube
-```
-
-### Kolejność prac
-
-1. Dodać model `CourseModule` i migrację `course_modules`.
-2. Dodać `module_id` do `course_lessons` oraz migrację danych tymczasowych.
-3. Wydzielić kontroler i widoki modułów w panelu admina.
-4. Przenieść obecne lekcje do kontekstu wybranego modułu.
-5. Zmienić `/akademia/kurs/:slug` na widok kart modułów.
-6. Dodać publiczny widok modułu z listą lekcji.
-7. Dodać kanoniczny URL lekcji oraz legacy redirect.
-8. Rozszerzyć API i zachować kontrolę dostępu na poziomie szkolenia.
-9. Uzupełnić liczby modułów/lekcji i statusy publikacji w panelu.
-10. Przetestować migrację, dostęp, postęp, zakup i widoki na telefonie.
-
-### Kryterium końcowe
-
-Administrator wykonuje:
-
-```text
-Dodaj szkolenie
-  → Dodaj moduł
-    → Dodaj lekcję
-      → Dodaj tekst / YouTube
-        → Opublikuj lekcję
-          → Opublikuj moduł
-            → Aktywuj szkolenie
-```
-
-Klient wykonuje:
-
-```text
-Katalog szkoleń
-  → Szkolenie
-    → Moduł
-      → Lekcja
-        → czyta bloki treści i zapisuje postęp
-```
+# TODO — Polskie Budownictwo
+
+Legenda: `[ZROBIONE]` — wdrożone i sprawdzone, `[DO ZROBIENIA]` — zadanie otwarte.
+
+## 1. Akademia — kursy, moduły i lekcje
+
+- 1.1 [ZROBIONE] Kursy są pobierane wyłącznie z bazy danych.
+- 1.2 [ZROBIONE] Usunięto seed demonstracyjny Akademii.
+- 1.3 [ZROBIONE] Dodano tabelę `course_modules` powiązaną z `courses`.
+- 1.4 [ZROBIONE] Dodano `module_id` w `course_lessons`.
+- 1.5 [ZROBIONE] Dodano migrację istniejących lekcji do modułu technicznego.
+- 1.6 [ZROBIONE] Zachowano istniejące dostępy, zamówienia i postęp użytkownika.
+- 1.7 [ZROBIONE] Panel obsługuje przepływ: kurs → moduły → lekcje.
+- 1.8 [ZROBIONE] Dodano listę i formularz edycji modułów.
+- 1.9 [ZROBIONE] Dodano listę i formularz edycji lekcji w module.
+- 1.10 [ZROBIONE] Dodano kanoniczne adresy kursu, modułu i lekcji.
+- 1.11 [ZROBIONE] Stare adresy lekcji przekierowują do nowej struktury.
+- 1.12 [DO ZROBIENIA] Dodać zmianę kolejności modułów i lekcji metodą drag-and-drop.
+- 1.13 [DO ZROBIENIA] Dodać podgląd nieopublikowanego kursu wyłącznie dla administratora.
+- 1.14 [DO ZROBIENIA] Dodać checklistę przed publikacją kursu i modułu.
+
+## 2. Edytor treści edukacyjnych
+
+- 2.1 [ZROBIONE] Wydzielono reużywalny kontener bloków treści.
+- 2.2 [ZROBIONE] Dodano moduł bloku tekstowego rich text.
+- 2.3 [ZROBIONE] Dodano moduł bloku YouTube.
+- 2.4 [ZROBIONE] Można mieszać tekst i YouTube w dowolnej kolejności.
+- 2.5 [ZROBIONE] Dodano nagłówki, pogrubienie, kursywę i listy.
+- 2.6 [ZROBIONE] YouTube jest zapisywany jako zweryfikowane ID filmu.
+- 2.7 [ZROBIONE] Treści są normalizowane i filtrowane przed zapisem oraz renderowaniem.
+- 2.8 [ZROBIONE] Zabezpieczono renderowanie przed skryptami i niekontrolowanym iframe.
+- 2.9 [DO ZROBIENIA] Dodać automatyczne testy sanitizacji HTML i payloadów XSS.
+- 2.10 [DO ZROBIENIA] Rozważyć migrację lokalnego edytora do Tiptap.
+- 2.11 [DO ZROBIENIA] Dodać blok „Pliki” z managerem uploadu zgodnie z ticketami w sekcji 10; w dalszym rozwoju rozważyć osobne podglądy PDF i obrazów oraz bloki cytatu, quizu i akordeonu.
+
+## 3. Akademia — zakup i dostęp
+
+- 3.1 [ZROBIONE] Dodano tymczasowy workaround płatności aktywujący zakup bez operatora.
+- 3.2 [ZROBIONE] Dostęp do kursu jest kontrolowany przez `user_course_access`.
+- 3.3 [ZROBIONE] Przy braku danych Akademia wyświetla pustą listę.
+- 3.4 [DO ZROBIENIA] Usunąć workaround płatności po uruchomieniu właściwego operatora.
+- 3.5 [DO ZROBIENIA] Wykonać testy zakupu kursu darmowego i płatnego.
+- 3.6 [DO ZROBIENIA] Dodać testy dostępu aktywnego, wygasłego, cofniętego i braku dostępu.
+
+## 4. Publiczne landing pages szkoleń
+
+- 4.1 [ZROBIONE] Dodano `/szkolenia`.
+- 4.2 [ZROBIONE] Dodano `/szkolenia/bezpieczny-podwykonawca`.
+- 4.3 [ZROBIONE] Landing przygotowano na podstawie dostarczonego PDF-a.
+- 4.4 [ZROBIONE] Landing nie został dodany do głównego menu.
+- 4.5 [ZROBIONE] Skopiowano główne menu wraz z dropdownami i wersją mobilną.
+- 4.6 [ZROBIONE] Dodano responsywny sticky footer.
+- 4.7 [ZROBIONE] Ujednolicono style sekcji, kart, nagłówków i CTA ze stroną główną.
+- 4.8 [DO ZROBIENIA] Przygotować system wielu landing pages opartych o dane z bazy.
+- 4.9 [DO ZROBIENIA] Dodać model landing page powiązany z kursem.
+- 4.10 [DO ZROBIENIA] Dodać reużywalne sekcje landing page: hero, korzyści, program, FAQ, opinie i CTA.
+- 4.11 [DO ZROBIENIA] Dodać SEO title, description, Open Graph i dane strukturalne.
+- 4.12 [DO ZROBIENIA] Dodać formularz kwalifikujący przed rozmową wprowadzającą.
+
+## 5. Rejestracja użytkowników — bezpieczeństwo przed publikacją
+
+- 5.1 [ZROBIONE] Rejestracja wymaga poprawnego e-maila i hasła minimum 12 znaków.
+- 5.2 [ZROBIONE] Hasła są haszowane przez bcrypt.
+- 5.3 [ZROBIONE] Potwierdzenie e-maila wykorzystuje jednorazowe tokeny przechowywane jako hash.
+- 5.4 [ZROBIONE] Rejestracja i logowanie mają podstawowy limit żądań.
+- 5.5 [ZROBIONE] Istnieje ochrona CSRF dla żądań modyfikujących.
+- 5.6 [ZROBIONE] Dodać Google reCAPTCHA v2 Checkbox przed utworzeniem konta.
+- 5.7 [ZROBIONE] Dodać honeypot i minimalny czas wypełniania formularza.
+- 5.8 [ZROBIONE] Ustawiać nowe konto jako `is_active = 0` do czasu potwierdzenia e-maila.
+- 5.9 [ZROBIONE] Dodać limit ponownego wysłania wiadomości weryfikacyjnej.
+- 5.10 [DO ZROBIENIA] Zastąpić pamięciowy rate limit wspólnym storage, np. Redisem.
+- 5.11 [ZROBIONE] Dodać limity per IP, e-mail, domena i globalną liczbę rejestracji.
+- 5.12 [ZROBIONE] Dodać oznaczanie lub blokowanie tymczasowych domen e-mail.
+- 5.13 [DO ZROBIENIA] Dodać monitoring nagłego wzrostu rejestracji.
+- 5.14 [ZROBIONE] Dodać logowanie prób rejestracji: IP, User-Agent, czas i wynik.
+- 5.15 [DO ZROBIENIA] Dodać automatyczne czyszczenie niepotwierdzonych kont.
+- 5.16 [DO ZROBIENIA] Rozważyć zatwierdzanie kont przez administratora.
+
+## 6. Audyt obecnych kont po incydencie
+
+- 6.1 [DO ZROBIENIA] Przejrzeć sześć potwierdzonych kont i ustalić ich źródło w logach.
+- 6.2 [DO ZROBIENIA] Sprawdzić, czy obce konta mają zamówienia, dostępy lub aktywność w Akademii.
+- 6.3 [DO ZROBIENIA] Wyłączyć obce konta przez `is_active = 0` po identyfikacji.
+- 6.4 [DO ZROBIENIA] Usunąć niepotrzebne konta i tokeny po backupie oraz audycie.
+- 6.5 [DO ZROBIENIA] Sprawdzić żądania `POST /api/auth/register` i `POST /api/auth/verify-email`.
+- 6.6 [DO ZROBIENIA] Zweryfikować logi dostępu do panelu i bazy danych.
+- 6.7 [DO ZROBIENIA] Zmienić sekrety i hasła, jeżeli logi wykażą dostęp spoza aplikacji.
+
+## 7. Panel administracyjny
+
+- 7.1 [ZROBIONE] Panel ma osobne sekcje kursów, modułów i lekcji.
+- 7.2 [ZROBIONE] POST-y panelu wymagają uwierzytelnienia.
+- 7.3 [ZROBIONE] Usuwanie kursów, modułów i lekcji wymaga potwierdzenia.
+- 7.4 [DO ZROBIENIA] Dodać 2FA dla administratorów.
+- 7.5 [DO ZROBIENIA] Dodać dziennik działań administratorów.
+- 7.6 [DO ZROBIENIA] Dodać ostrzeżenia przed publikacją pustego kursu lub modułu.
+- 7.7 [DO ZROBIENIA] Dodać filtrowanie i wyszukiwanie kursów.
+
+## 8. Baza danych i wdrożenie
+
+- 8.1 [ZROBIONE] Migracje są uruchamiane przez `npm run migrate`.
+- 8.2 [ZROBIONE] Migracja modułów jest idempotentna.
+- 8.3 [ZROBIONE] Seed Akademii został usunięty.
+- 8.4 [ZROBIONE] Build głównej domeny działa przez `npm run build:main`.
+- 8.5 [ZROBIONE] Build obu domen działa przez `npm run build:deploy`.
+- 8.6 [DO ZROBIENIA] Wykonywać backup przed każdą migracją produkcyjną.
+- 8.7 [DO ZROBIENIA] Ograniczyć uprawnienia użytkownika bazy danych.
+- 8.8 [DO ZROBIENIA] Dodać procedurę rollbacku migracji dla produkcji.
+- 8.9 [DO ZROBIENIA] Dodać test smoke po wdrożeniu obu paczek.
+- 8.10 [DO ZROBIENIA] Sprawdzić poprawność UTF-8 w dotkniętych plikach i odpowiedziach HTTP.
+
+## 9. Najbliższa kolejność prac
+
+9.1 [DO ZROBIENIA] Zabezpieczyć rejestrację CAPTCHA, honeypotem i mocniejszym rate limitingiem.
+9.2 [DO ZROBIENIA] Przeprowadzić audyt sześciu potwierdzonych kont i logów serwera.
+9.3 [DO ZROBIENIA] Włączyć `is_active` dopiero po potwierdzeniu e-maila.
+9.4 [DO ZROBIENIA] Dodać testy bezpieczeństwa i scenariusze end-to-end Akademii.
+9.5 [DO ZROBIENIA] Zdecydować o modelu i panelu dynamicznych landing pages.
+9.6 [DO ZROBIENIA] Usunąć workaround płatności po uruchomieniu operatora.
+
+## 10. Moduł plików i sekcje „Pliki” w lekcjach
+
+Aktualny zakres: w edytorze lekcji obok „Dodaj tekst” i „Dodaj YouTube” pojawia się „Dodaj pliki”. Przycisk tworzy niezależny blok w wybranym miejscu treści. Każdy blok zawiera manager w formie galerii plików i przycisk „+”, którym można kolejno dodawać następne pliki. Lekcja może zawierać wiele takich bloków, przeplatanych tekstem i filmami. Zastępuje to wcześniejszy pomysł jednej listy załączników na samym dole lekcji.
+
+### 10.A. Architektura i model danych
+
+- 10.1 [DO ZROBIENIA] Wydzielić ogólny moduł `modules/files/` z operacjami przyjęcia, weryfikacji, zapisu, odczytu i usuwania plików. Kryterium odbioru: moduł nie zależy od modeli kursów, a typy, limity i wymagania skanowania wynikają z polityki wybieranej przez serwer.
+- 10.2 [DO ZROBIENIA] Dodać tabelę `files` i model metadanych: identyfikator, klucz magazynu, nazwa oryginalna, wykryty MIME, rozmiar, status weryfikacji, autor i daty. Kryterium odbioru: ścieżki fizyczne nie trafiają do klienta, a pliki oczekujące lub odrzucone nie są dostępne uczestnikom.
+- 10.3 [DO ZROBIENIA] Rozszerzyć kontrakt `content_blocks` o typ `files`, trwały identyfikator bloku i uporządkowane referencje do plików; dodać relację `lesson_attachments` powiązaną z lekcją, blokiem i plikiem. Kryterium odbioru: wiele bloków zachowuje własną zawartość i kolejność po ponownym otwarciu lekcji; relacja SQL i JSON są aktualizowane spójnie w transakcji. Nazwy wyświetlane i kolejność mają jedno jasno wskazane źródło prawdy.
+- 10.4 [DO ZROBIENIA] Dodać idempotentną migrację tabel i indeksów oraz obsługę dotychczasowych bloków bez identyfikatorów. Kryterium odbioru: istniejące teksty, filmy, dostępy i postępy pozostają poprawne, a ponowne uruchomienie migracji jest bezpieczne.
+- 10.5 [DO ZROBIENIA] Zdefiniować cykl życia uploadu i zapisu lekcji: upload tymczasowy przypisany do administratora, zatwierdzenie powiązania przy zapisie lekcji i wygasanie porzuconych plików. Kryterium odbioru: manager działa również w nowej, jeszcze niezapisanej lekcji; upload nie przeładowuje formularza, a anulowanie edycji nie zmienia opublikowanych powiązań. Serwer weryfikuje prawo do każdego przypisywanego pliku.
+
+### 10.B. Magazyn i zabezpieczenia
+
+- 10.6 [DO ZROBIENIA] Dodać lokalny magazyn wskazany przez `UPLOAD_STORAGE_PATH`, poza `page/`, `public/` i katalogiem paczki wdrożeniowej. Kryterium odbioru: pliki mają losowe nazwy techniczne, nie można odczytać ich przez statyczny URL ani wyjść poza katalog magazynu; interfejs magazynu pozwala później zmienić sposób przechowywania.
+- 10.7 [DO ZROBIENIA] Dodać parser `multipart/form-data` uruchamiany wyłącznie na trasach uploadu, po kontroli sesji i uprawnień. Kryterium odbioru: strumieniowy zapis do obszaru tymczasowego, ograniczenia rozmiaru, liczby plików, pól i czasu żądania oraz sprzątanie po przerwanym transferze; duże pliki nie są w całości buforowane w pamięci. Przed wyborem zależności sprawdzić jej utrzymanie i aktualne poprawki bezpieczeństwa.
+- 10.8 [DO ZROBIENIA] Wprowadzić politykę formatów PDF, JPG/JPEG i WebP oraz walidację rozszerzenia, deklarowanego MIME i faktycznej zawartości. Kryterium odbioru: odrzucenie plików pustych, uszkodzonych, niedozwolonych i podszywających się pod inny format; kontrola wymiarów obrazów i kosztu ich przetwarzania; bezpieczne wyświetlanie nazw i nagłówki pobierania.
+- 10.9 [DO ZROBIENIA] Ustalić i skonfigurować limity plików, bloków i miejsca. Propozycja początkowa: 20 MB na plik i 10 plików łącznie na lekcję; dodatkowo określić limit bajtów na lekcję, uploady tymczasowe administratora i cały magazyn. Kryterium odbioru: limity obowiązują także przy równoległych uploadach i nie można ich obejść dodawaniem kolejnych sekcji.
+- 10.10 [DO ZROBIENIA] Dodać adapter skanera malware i kwarantannę; sprawdzić dostępność skanowania na hostingu. Kryterium odbioru: polityka wymagająca skanu udostępnia wyłącznie pliki z pozytywnym wynikiem; błąd lub niedostępność skanera nie oznacza akceptacji. Uwzględnić przyszłe wykorzystanie modułu w mediacjach i wymagania z `wymagania odev.md`.
+- 10.11 [DO ZROBIENIA] Przygotować opcjonalną obsługę DOCX po wdrożeniu podstawowych formatów. Kryterium odbioru: walidacja struktury pakietu OOXML, ograniczenie liczby wpisów i rozmiaru po rozpakowaniu, ochrona przed wyjściem poza katalog oraz odrzucanie dokumentów z makrami; sam podpis ZIP nie wystarcza. Format pozostaje wyłączony do ukończenia walidacji i skanowania.
+- 10.12 [DO ZROBIENIA] Dodać trasy zarządzania plikami z kontrolą aktualnej aktywności administratora, uprawnień, CSRF i limitami uploadu per konto oraz IP. Kryterium odbioru: brak możliwości podpinania lub usuwania cudzych uploadów tymczasowych, osobna polityka źródła żądań administracyjnych oraz jednoznaczne odpowiedzi JSON przy wygaśnięciu sesji.
+- 10.13 [DO ZROBIENIA] Ujednolicić kontrolę dostępu do lekcji i plików w `courseAccessService`: aktywne konto i kurs, opublikowany moduł należący do kursu, opublikowana lekcja oraz aktywny dostęp lub kurs darmowy. Kryterium odbioru: cofnięcie dostępu, jego wygaśnięcie lub ukrycie modułu blokuje również bezpośrednie pobranie pliku; uwzględnić starsze endpointy lekcji.
+- 10.14 [DO ZROBIENIA] Dodać kontrolowane pobieranie przez identyfikator powiązania załącznika z lekcją oraz oddzielny dostęp administracyjny. Kryterium odbioru: kontrola uprawnień przy każdym pobraniu, strumieniowanie, `Content-Disposition: attachment`, właściwy MIME, `nosniff`, prywatna polityka cache bez przechowywania odpowiedzi oraz brak ujawniania ścieżek dyskowych. Losowy identyfikator nie zastępuje autoryzacji.
+
+### 10.C. Edytor i manager plików
+
+- 10.15 [DO ZROBIENIA] Dodać przycisk „Dodaj pliki” i moduł bloku `files` w `public/js/admin/courseContent/`. Kryterium odbioru: blok można dodać, przesunąć i usunąć tak jak pozostałe sekcje; można mieszać wiele sekcji plików z tekstem i YouTube.
+- 10.16 [DO ZROBIENIA] Zbudować reużywalny manager plików z własnym `index.ejs`, CSS i JavaScriptem. Kryterium odbioru: dane początkowe, identyfikator instancji, endpointy i limity są przekazywane jawnie przez konfigurację lub `data-*`; wiele managerów na stronie działa niezależnie.
+- 10.17 [DO ZROBIENIA] Dodać galerię z przyciskiem „+” do iteracyjnego uploadu. Kryterium odbioru: każdy kolejny plik pojawia się w odpowiedniej sekcji bez przeładowania; karta pokazuje nazwę, format, rozmiar, postęp i wynik weryfikacji oraz umożliwia ponowienie błędu lub anulowanie uploadu. Błąd jednego pliku nie usuwa pozostałych.
+- 10.18 [DO ZROBIENIA] Dodać zmianę nazwy wyświetlanej, kolejności kart i usuwanie pliku z sekcji. Kryterium odbioru: odpięcie pliku jest odróżnione od fizycznego usunięcia, a usunięcie bloku obejmuje wszystkie jego referencje dopiero po zapisaniu lekcji.
+- 10.19 [DO ZROBIENIA] Rozszerzyć serializację edytora, normalizację `modules/courseContent`, walidację kontrolera i obsługę błędów formularza o bloki plików. Kryterium odbioru: serwer odrzuca podmienione identyfikatory i niespójne powiązania; błąd walidacji tytułu lub sluga zachowuje sekcje i poprawne uploady. Trwające lub nieudane transfery nie są po cichu pomijane przy zapisie.
+- 10.20 [DO ZROBIENIA] Zapewnić dostępność i responsywność managera. Kryterium odbioru: przycisk „+” ma czytelną etykietę, upload i zmiana kolejności działają klawiaturą, postęp i błędy są komunikowane czytnikom ekranu, a długie polskie nazwy nie rozbijają widoku mobilnego.
+
+### 10.D. Widok uczestnika i API
+
+- 10.21 [DO ZROBIENIA] Dodać moduł renderowania bloku plików w `views/public/academy/modules/contentBlock/` z osobnym CSS. Kryterium odbioru: galeria pojawia się dokładnie w miejscu bloku w treści lekcji; każda karta zawiera nazwę, format, rozmiar i pobranie. W pierwszej wersji wystarczą ikony typów; podglądy PDF i obrazów są dalszym rozszerzeniem.
+- 10.22 [DO ZROBIENIA] Rozszerzyć kontrolery strony i API lekcji o bezpieczne metadane bloków plików. Kryterium odbioru: renderowanie EJS i odpowiedzi JSON pokazują te same zatwierdzone materiały, bez wewnętrznych ścieżek, cudzych plików i pozycji oczekujących na weryfikację; unikać osobnego zapytania SQL dla każdej karty.
+
+### 10.E. Cykl życia, wdrożenie i weryfikacja
+
+- 10.23 [DO ZROBIENIA] Dodać sprzątanie po usunięciu pliku z bloku, całego bloku, lekcji, modułu i kursu. Kryterium odbioru: kaskady SQL nie pozostawiają trwale osieroconych plików, plik używany w innym miejscu nie zostaje usunięty, a nieudane operacje dyskowe można bezpiecznie ponowić.
+- 10.24 [DO ZROBIENIA] Dodać okresowe czyszczenie wygasłych uploadów, kwarantanny i osieroconych danych oraz uzgadnianie bazy z magazynem. Kryterium odbioru: awaria między zapisem dysku a transakcją SQL jest naprawialna; sprzątanie nie usuwa trwającego transferu ani pliku właśnie zatwierdzanego.
+- 10.25 [DO ZROBIENIA] Dodać rejestrowanie uploadów, odrzuceń, powiązań, usunięć i pobrań oraz monitoring błędów skanera i zajętości magazynu. Kryterium odbioru: logi zawierają identyfikatory i wynik operacji, bez zawartości dokumentów, sekretów i niepotrzebnych danych osobowych.
+- 10.26 [DO ZROBIENIA] Uzupełnić `.env.example`, `.gitignore` i dokumentację wdrożenia o magazyn, kwarantannę, limity, skaner i harmonogram sprzątania. Kryterium odbioru: sprawdzone uprawnienia i limity Passenger/proxy, brak uploadów w Git i paczkach, trwałość danych po ponownym wdrożeniu oraz udokumentowany backup i test odtworzenia bazy razem z plikami.
+- 10.27 [DO ZROBIENIA] Dodać testy integracyjne autoryzacji uploadu i pobierania. Kryterium odbioru: sprawdzone sesje gościa, uczestnika i administratora, konto nieaktywne, brak/cofnięcie/wygaśnięcie dostępu, kurs darmowy, ukryty kurs/moduł/lekcja, podmiana identyfikatora pliku i CSRF.
+- 10.28 [DO ZROBIENIA] Dodać testy walidacji i odporności uploadu. Kryterium odbioru: sprawdzone fałszywe rozszerzenia i MIME, niedozwolone typy, nazwy z próbą zmiany ścieżki lub XSS, przekroczenie limitów, równoległe transfery, przerwanie żądania, błąd skanera, brak miejsca oraz awaria bazy.
+- 10.29 [DO ZROBIENIA] Sprawdzić pełny przepływ nowej i istniejącej lekcji: wiele bloków plików, kolejne uploady przez „+”, zmiana kolejności, zapis, ponowne otwarcie, anulowanie edycji, pobieranie i usunięcie kursu. Kryterium odbioru: zachowana treść tekstowa i YouTube, poprawne sprzątanie, działanie na telefonie i komputerze oraz poprawne UTF-8 nazw i komunikatów w źródłach, HTML, JSON i nagłówkach pobierania.
+
+Kolejność realizacji: kontrakt i model danych (10.1–10.5) → magazyn, upload i kontrola dostępu (10.6–10.14, z DOCX jako opcjonalnym rozszerzeniem) → edytor i widok uczestnika (10.15–10.22) → domknięcie cyklu życia i wdrożenia (10.23–10.26). Testy 10.27–10.29 realizować wraz z odpowiednimi etapami; sprzątanie i zabezpieczenia muszą być gotowe przed udostępnieniem uploadu produkcyjnie.

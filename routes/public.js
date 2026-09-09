@@ -7,7 +7,7 @@ const accountController = require('../controllers/public/accountController');
 const academyController = require('../controllers/public/academyController');
 const paymentController = require('../controllers/public/paymentController');
 const youtubeController = require('../controllers/public/youtubeController');
-const { sensitiveActionLimiter, submitLimiter } = require('../middleware/rateLimiter');
+const { registrationDomainLimiter, registrationEmailLimiter, registrationGlobalLimiter, registrationLimiter, sensitiveActionLimiter, submitLimiter, verificationResendLimiter } = require('../middleware/rateLimiter');
 const { loginValidation, mediationCaseValidation, mediatorApplicationValidation, passwordChangeValidation, registrationValidation, resetValidation, submitValidation } = require('../middleware/validate');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { requireUser, requireUserApi } = require('../middleware/userAuth');
@@ -16,7 +16,9 @@ const { accountBillingValidation, accountProfileValidation, authenticatedPasswor
 const router = express.Router();
 
 router.post('/api/submit', submitLimiter, submitValidation, submitController.store);
-router.post('/api/auth/register', loginLimiter, registrationValidation, authController.register);
+router.get('/api/auth/registration-settings', authController.registrationSettings);
+router.post('/api/auth/register', registrationGlobalLimiter, registrationLimiter, registrationEmailLimiter, registrationDomainLimiter, registrationValidation, authController.register);
+router.post('/api/auth/resend-verification', verificationResendLimiter, registrationValidation, authController.resendVerification);
 router.post('/api/auth/login', loginLimiter, loginValidation, authController.login);
 router.post('/api/auth/logout', sensitiveActionLimiter, authController.logout);
 router.get('/api/auth/session', authController.sessionInfo);

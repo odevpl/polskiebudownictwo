@@ -41,4 +41,4 @@ Zdarzenie jest zapisywane w `payment_events`, więc ponowienie tego samego webho
 Przed produkcją trzeba przygotować adapter wybranego operatora, mapowanie jego statusów oraz ustalić system wystawiania faktur. Sekrety pozostają wyłącznie w konfiguracji serwera.
 ## Tymczasowy tryb bez operatora
 
-Na czas konfiguracji operatora można ustawić `PAYMENT_BYPASS_ENABLED=1`. Wtedy utworzenie zamówienia przez Akademię lokalnie oznacza je jako opłacone, nadaje użytkownikowi dostęp typu `purchase` i kieruje go do kursu. Jest to wyłącznie workaround — po uruchomieniu operatora należy ustawić `PAYMENT_BYPASS_ENABLED=0` albo usunąć zmienną.
+Na czas konfiguracji operatora można ustawić `PAYMENT_BYPASS_ENABLED=1`. Wtedy utworzenie zamówienia przez Akademię oznacza je jako opłacone, nadaje użytkownikowi dostęp typu `purchase` i kieruje go do kursu. Dodatkowo, jeśli `PAYMENT_PROVIDER` nie jest ustawiony, ten tryb jest aktywowany automatycznie. Jest to wyłącznie workaround — po uruchomieniu operatora należy ustawić `PAYMENT_BYPASS_ENABLED=0` i skonfigurować operatora.

@@ -124,6 +124,19 @@ CREATE TABLE IF NOT EXISTS courses (
   INDEX idx_courses_listing (is_active, sort_order, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS registration_attempts (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(254) NULL,
+  ip_address VARCHAR(45) NULL,
+  user_agent VARCHAR(500) NULL,
+  status ENUM('accepted','rejected','verified') NOT NULL,
+  reason VARCHAR(160) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_registration_attempts_created (created_at),
+  INDEX idx_registration_attempts_email (email),
+  INDEX idx_registration_attempts_ip_created (ip_address, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS course_modules (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   course_id INT UNSIGNED NOT NULL,
