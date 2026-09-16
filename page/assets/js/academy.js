@@ -98,13 +98,24 @@ if (courseList) {
       <a class="course-card__link" href="#">Zobacz kurs <span aria-hidden="true">→</span></a>`;
     card.querySelector('.course-card__tag').textContent = course.category || 'Kurs Akademii';
     card.querySelector('h3').textContent = course.title;
-    card.querySelector('.course-card__description').innerHTML = course.description || '';
+    const description = document.createElement('div');
+    description.innerHTML = course.description || '';
+    card.querySelector('.course-card__description').textContent = description.textContent.trim();
     card.querySelector('.course-card__meta li:first-child').textContent = course.level || 'Poziom podstawowy';
     card.querySelector('.course-card__meta li:last-child').textContent = `${course.lesson_count || 0} lekcji`;
     const link = card.querySelector('.course-card__link');
     const hasAccess = Number(course.has_access) === 1;
     const isFree = Number(course.is_free) === 1;
-    if (catalogMode && !hasAccess && !isFree) {
+    if (['bezpieczny-pod-wykonawca', 'bezpieczny-podwykonawca'].includes(course.slug)) {
+      link.textContent = 'Zobacz więcej ';
+      const arrow = document.createElement('span');
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.textContent = '→';
+      link.append(arrow);
+      link.href = '/akademia/bezpieczny-pod-wykonawca';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    } else if (catalogMode && !hasAccess && !isFree) {
       link.textContent = `Kup szkolenie · ${formatPrice(course)} `;
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');

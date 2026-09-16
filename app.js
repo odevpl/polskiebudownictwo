@@ -44,6 +44,9 @@ app.get('/health', (request, response) => {
 });
 
 app.get('/wydarzenia', eventsController.index);
+app.get('/akademia/bezpieczny-pod-wykonawca', (request, response) => {
+  response.sendFile(path.join(publicRoot, 'szkolenia', 'bezpieczny-podwykonawca', 'index.html'));
+});
 app.get('/akademia/kurs/:slug', requireUser, academyPageController.course);
 app.get('/akademia/kurs/:slug/modul/:moduleSlug', requireUser, academyPageController.module);
 app.get('/akademia/kurs/:slug/modul/:moduleSlug/lekcja/:lessonSlug', requireUser, academyPageController.lesson);
