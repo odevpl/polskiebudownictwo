@@ -785,7 +785,7 @@ textarea.adm-control.adm-textarea {
 
 .adm-rich-textarea {
   display: grid;
-  gap: 8px;
+  gap: 0;
 }
 
 .adm-rich-textarea__toolbar {
@@ -811,20 +811,59 @@ textarea.adm-control.adm-textarea {
 }
 
 .adm-rich-textarea__input {
-  min-height: 160px;
-  padding: 14px 16px;
-  overflow: auto;
-  border: 1px solid var(--adm-border);
-  border-radius: var(--adm-radius-sm);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.adm-rich-textarea .ql-toolbar.ql-snow {
+  padding: 9px 10px;
+  border: 1px solid #fff;
+  border-radius: var(--adm-radius-sm) var(--adm-radius-sm) 0 0;
+  background: #fff;
+}
+
+.adm-rich-textarea .ql-container.ql-snow {
+  min-height: 180px;
+  border: 1px solid #fff;
+  border-top: 1px solid #d5d8dc;
+  border-radius: 0 0 var(--adm-radius-sm) var(--adm-radius-sm);
   background: #fff;
   color: #121212;
+  font-family: var(--adm-font);
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.adm-rich-textarea__input:focus {
+.adm-rich-textarea .ql-editor {
+  min-height: 180px;
+  padding: 14px 16px;
+}
+
+.adm-rich-textarea .ql-container.ql-snow:focus-within {
   border-color: var(--adm-accent);
-  outline: none;
   box-shadow: 0 0 0 3px rgb(29 185 84 / 22%);
+}
+
+.adm-rich-textarea .ql-toolbar.ql-snow:has(+ .ql-container:focus-within) {
+  border-color: var(--adm-accent);
+}
+
+.adm-rich-textarea .ql-snow .ql-stroke { stroke: #34383d; }
+.adm-rich-textarea .ql-snow .ql-fill { fill: #34383d; }
+.adm-rich-textarea .ql-snow .ql-picker { color: #34383d; }
+.adm-rich-textarea .ql-snow .ql-picker-options { border-color: #d5d8dc; background: #fff; }
+.adm-rich-textarea .ql-snow.ql-toolbar button:hover .ql-stroke,
+.adm-rich-textarea .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--adm-accent); }
+.adm-rich-textarea .ql-snow.ql-toolbar button:hover .ql-fill,
+.adm-rich-textarea .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: var(--adm-accent); }
+.adm-rich-textarea .ql-snow.ql-toolbar button:hover,
+.adm-rich-textarea .ql-snow.ql-toolbar button.ql-active { color: var(--adm-accent); }
+
+.adm-rich-textarea .ql-editor.ql-blank::before {
+  color: #767d85;
+  font-style: normal;
 }
 
 .adm-rich-textarea__input p:first-child,
@@ -834,7 +873,7 @@ textarea.adm-control.adm-textarea {
 .adm-rich-textarea__input ul:last-child,
 .adm-rich-textarea__input ol:last-child { margin-bottom: 0; }
 .adm-rich-textarea__value { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.adm-rich-textarea__hint { margin: 0; color: var(--adm-text-subtle); font-size: 12px; }
+.adm-rich-textarea__hint { margin: 8px 0 0; color: var(--adm-text-subtle); font-size: 12px; }
 
 .adm-consents {
   display: grid;
