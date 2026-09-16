@@ -99,7 +99,9 @@ if (courseList) {
     card.querySelector('.course-card__tag').textContent = course.category || 'Kurs Akademii';
     card.querySelector('h3').textContent = course.title;
     const description = document.createElement('div');
-    description.innerHTML = course.description || '';
+    description.innerHTML = String(course.description || '')
+      .replace(/<br\s*\/?\s*>/gi, '\n')
+      .replace(/<\/\s*(p|li)\s*>/gi, '\n');
     card.querySelector('.course-card__description').textContent = description.textContent.trim();
     card.querySelector('.course-card__meta li:first-child').textContent = course.level || 'Poziom podstawowy';
     card.querySelector('.course-card__meta li:last-child').textContent = `${course.lesson_count || 0} lekcji`;
