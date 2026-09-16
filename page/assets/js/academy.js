@@ -93,12 +93,12 @@ if (courseList) {
     card.innerHTML = `
       <p class="course-card__tag"></p>
       <h3></h3>
-      <p class="course-card__description"></p>
+      <div class="course-card__description academy-rich-text"></div>
       <ul class="course-card__meta" aria-label="Informacje o kursie"><li></li><li></li></ul>
       <a class="course-card__link" href="#">Zobacz kurs <span aria-hidden="true">→</span></a>`;
     card.querySelector('.course-card__tag').textContent = course.category || 'Kurs Akademii';
     card.querySelector('h3').textContent = course.title;
-    card.querySelector('.course-card__description').textContent = course.description;
+    card.querySelector('.course-card__description').innerHTML = course.description || '';
     card.querySelector('.course-card__meta li:first-child').textContent = course.level || 'Poziom podstawowy';
     card.querySelector('.course-card__meta li:last-child').textContent = `${course.lesson_count || 0} lekcji`;
     const link = card.querySelector('.course-card__link');

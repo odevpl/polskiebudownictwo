@@ -8,6 +8,7 @@ const User = require('../../models/User');
 const Order = require('../../models/Order');
 const przelewy24Provider = require('../../services/przelewy24Provider');
 const { normalizeForStorage, youtubeVideoId } = require('../../modules/courseContent');
+const { sanitizeRichText } = require('../../modules/richText');
 
 async function coursesIndex(request, response) {
   try {
@@ -375,12 +376,12 @@ async function renderAccessWithErrors(request, response, errors, status) {
 }
 
 function courseFromBody(body) {
-  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: String(body.description || '').trim(), category: String(body.category || '').trim(), level: String(body.level || '').trim(), priceAmount: body.priceAmount === undefined ? null : Number(body.priceAmount || 0), currency: String(body.currency || 'PLN').trim().toUpperCase(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
+  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), category: String(body.category || '').trim(), level: String(body.level || '').trim(), priceAmount: body.priceAmount === undefined ? null : Number(body.priceAmount || 0), currency: String(body.currency || 'PLN').trim().toUpperCase(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
 }
 
 function lessonFromBody(body, courseId, moduleId = null) {
   const contentBlocks = normalizeForStorage(body.contentBlocks, body.content);
-  return { courseId, moduleId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: String(body.description || '').trim(), contentType: String(body.contentType || 'text'), content: String(body.content || ''), rawContentBlocks: body.contentBlocks, contentBlocks, sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
+  return { courseId, moduleId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), contentType: String(body.contentType || 'text'), content: String(body.content || ''), rawContentBlocks: body.contentBlocks, contentBlocks, sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
 }
 
 function validateCourse(data) {
@@ -408,7 +409,7 @@ function emptyModule(courseId) { return { course_id: courseId, slug: '', title: 
 function emptyLesson(courseId, moduleId = null) { return { course_id: courseId, module_id: moduleId, slug: '', title: '', description: '', content_type: 'text', content: '', contentBlocks: [], sort_order: 0, is_published: 0 }; }
 
 function moduleFromBody(body, courseId) {
-  return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: String(body.description || '').trim(), imageUrl: String(body.imageUrl || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
+  return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), imageUrl: String(body.imageUrl || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
 }
 
 function validateModule(data) {

@@ -1,4 +1,9 @@
 const pool = require('../config/database');
+const { sanitizeRichText } = require('../modules/richText');
+
+function withRichDescriptions(rows) {
+  return rows.map(row => ({ ...row, description: sanitizeRichText(row.description) }));
+}
 
 async function hasActiveAccess(userId, courseId) {
   const [rows] = await pool.execute(
@@ -34,7 +39,7 @@ async function findAvailableCourses(userId) {
      ORDER BY c.sort_order ASC, c.id ASC`,
     [userId],
   );
-  return rows;
+  return withRichDescriptions(rows);
 }
 
 async function findCatalogCourses(userId) {
@@ -52,7 +57,7 @@ async function findCatalogCourses(userId) {
      ORDER BY c.sort_order ASC, c.id ASC`,
     [userId],
   );
-  return rows;
+  return withRichDescriptions(rows);
 }
 
 async function hasLessonAccess(userId, lessonId) {

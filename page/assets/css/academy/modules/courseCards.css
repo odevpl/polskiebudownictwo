@@ -13,3 +13,8 @@
 .academy-module-lessons__list a:hover { background: var(--color-background, #f4f6f8); }
 .academy-module-lessons__list span { grid-row: span 2; color: var(--color-muted); }
 .academy-module-lessons__list small { color: var(--color-muted); }
+
+.academy-rich-text > :first-child { margin-top: 0; }
+.academy-rich-text > :last-child { margin-bottom: 0; }
+.course-card__description p { margin: 0; }
+.course-card__description p + p { margin-top: .5rem; }

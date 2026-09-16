@@ -783,6 +783,59 @@ textarea.adm-control.adm-textarea {
   resize: vertical;
 }
 
+.adm-rich-textarea {
+  display: grid;
+  gap: 8px;
+}
+
+.adm-rich-textarea__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.adm-rich-textarea__toolbar button {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-xs);
+  background: var(--adm-bg-elevated);
+  color: var(--adm-text);
+  cursor: pointer;
+}
+
+.adm-rich-textarea__toolbar button:hover,
+.adm-rich-textarea__toolbar button:focus-visible {
+  border-color: var(--adm-accent);
+  outline: none;
+}
+
+.adm-rich-textarea__input {
+  min-height: 160px;
+  padding: 14px 16px;
+  overflow: auto;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-sm);
+  background: #fff;
+  color: #121212;
+  line-height: 1.5;
+}
+
+.adm-rich-textarea__input:focus {
+  border-color: var(--adm-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(29 185 84 / 22%);
+}
+
+.adm-rich-textarea__input p:first-child,
+.adm-rich-textarea__input ul:first-child,
+.adm-rich-textarea__input ol:first-child { margin-top: 0; }
+.adm-rich-textarea__input p:last-child,
+.adm-rich-textarea__input ul:last-child,
+.adm-rich-textarea__input ol:last-child { margin-bottom: 0; }
+.adm-rich-textarea__value { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.adm-rich-textarea__hint { margin: 0; color: var(--adm-text-subtle); font-size: 12px; }
+
 .adm-consents {
   display: grid;
   gap: 10px;

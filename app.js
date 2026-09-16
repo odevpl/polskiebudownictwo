@@ -12,6 +12,7 @@ const { requireUser } = require('./middleware/userAuth');
 const academyPageController = require('./controllers/public/academyPageController');
 const { csrfProtection } = require('./middleware/csrf');
 const { startWorker } = require('./modules/mailerLite');
+const { sanitizeRichText } = require('./modules/richText');
 
 const app = express();
 startWorker();
@@ -36,6 +37,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.locals.adminBasePath = adminPath;
 app.locals.adminUrl = adminUrl;
+app.locals.richText = sanitizeRichText;
 
 app.get('/health', (request, response) => {
   response.status(200).json({ status: 'ok' });

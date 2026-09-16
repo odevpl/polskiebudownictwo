@@ -1,0 +1,12 @@
+<div class="adm-rich-textarea" data-rich-textarea>
+  <div class="adm-rich-textarea__toolbar" role="toolbar" aria-label="Formatowanie tekstu">
+    <button type="button" data-rich-text-command="bold" aria-label="Pogrubienie" title="Pogrubienie"><strong>B</strong></button>
+    <button type="button" data-rich-text-command="italic" aria-label="Kursywa" title="Kursywa"><em>I</em></button>
+    <button type="button" data-rich-text-command="insertUnorderedList" aria-label="Lista punktowana" title="Lista punktowana">• Lista</button>
+    <button type="button" data-rich-text-command="insertOrderedList" aria-label="Lista numerowana" title="Lista numerowana">1. Lista</button>
+    <button type="button" data-rich-text-command="formatBlock" data-rich-text-value="p" aria-label="Akapit" title="Akapit">¶</button>
+  </div>
+  <div class="adm-rich-textarea__input" data-rich-text-input contenteditable="true" role="textbox" aria-multiline="true" aria-label="<%= label %>"></div>
+  <textarea class="adm-rich-textarea__value" id="<%= id %>" name="<%= name %>" <%= required ? 'required' : '' %>><%= value || '' %></textarea>
+  <p class="adm-rich-textarea__hint">Enter tworzy nowy akapit. Wklejany tekst zachowuje wyłącznie formatowanie dostępne w edytorze.</p>
+</div>

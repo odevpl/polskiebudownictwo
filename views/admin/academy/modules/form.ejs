@@ -6,7 +6,7 @@
   <form class="adm-form" method="post" action="<%= action %>"><div class="adm-form-grid">
     <div class="adm-field"><label class="adm-label" for="slug">Slug</label><input class="adm-control" id="slug" name="slug" value="<%= module.slug || '' %>" required></div>
     <div class="adm-field"><label class="adm-label" for="title">Tytuł modułu</label><input class="adm-control" id="title" name="title" value="<%= module.title || '' %>" required></div>
-    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><textarea class="adm-control adm-textarea" id="description" name="description"><%= module.description || '' %></textarea></div>
+    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><%- include('../../../components/RichTextTextarea', { id: 'description', name: 'description', label: 'Opis modułu', value: module.description, required: false }) %></div>
     <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= module.sort_order ?? module.sortOrder ?? 0 %>"></div>
     <div class="adm-field"><label class="adm-label" for="imageUrl">Adres grafiki (opcjonalnie)</label><input class="adm-control" id="imageUrl" name="imageUrl" type="url" value="<%= module.image_url || module.imageUrl || '' %>"></div>
     <label class="adm-check"><input name="isPublished" type="checkbox" value="1" <%= module.is_published || module.isPublished ? 'checked' : '' %>><span>Opublikowany</span></label>
@@ -14,4 +14,5 @@
   </div></form>
   <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/modules/' + module.id + '/delete') %>" onsubmit="return confirm('Usunąć moduł i jego lekcje?');"><button class="button button--ghost" type="submit">Usuń moduł</button></form><% } %>
 </section>
+<script src="/js/admin/richTextTextarea.js" defer></script>
 <%- include('../../../partials/admin-shell-end') %>

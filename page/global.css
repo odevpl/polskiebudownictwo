@@ -1612,6 +1612,11 @@ p {
   text-align: center;
 }
 
+.academy-rich-text > :first-child { margin-top: 0; }
+.academy-rich-text > :last-child { margin-bottom: 0; }
+.academy-rich-text ul,
+.academy-rich-text ol { padding-left: 1.4em; }
+
 .academy-courses__state {
   grid-column: 1 / -1;
   margin: 0;
