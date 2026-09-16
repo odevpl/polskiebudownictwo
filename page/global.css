@@ -1618,6 +1618,10 @@ p {
 .academy-rich-text ol { padding-left: 1.4em; }
 .academy-rich-text ol:has(> li[data-list="bullet"]) { list-style-type: disc; }
 
+.academy-course-page .academy-courses__hero .lead {
+  max-width: none;
+}
+
 .academy-courses__state {
   grid-column: 1 / -1;
   margin: 0;
