@@ -94,6 +94,7 @@ if (courseList) {
       <p class="course-card__tag"></p>
       <h3></h3>
       <div class="course-card__description academy-rich-text"></div>
+      <a class="course-card__more" href="#" target="_blank" rel="noopener noreferrer">Przeczytaj więcej <span aria-hidden="true">→</span></a>
       <ul class="course-card__meta" aria-label="Informacje o kursie"><li></li><li></li></ul>
       <a class="course-card__link" href="#">Zobacz kurs <span aria-hidden="true">→</span></a>`;
     card.querySelector('.course-card__tag').textContent = course.category || 'Kurs Akademii';
@@ -106,18 +107,22 @@ if (courseList) {
     card.querySelector('.course-card__meta li:first-child').textContent = course.level || 'Poziom podstawowy';
     card.querySelector('.course-card__meta li:last-child').textContent = `${course.lesson_count || 0} lekcji`;
     const link = card.querySelector('.course-card__link');
+    const moreLink = card.querySelector('.course-card__more');
     const hasAccess = Number(course.has_access) === 1;
     const isFree = Number(course.is_free) === 1;
     if (['bezpieczny-pod-wykonawca', 'bezpieczny-podwykonawca'].includes(course.slug)) {
-      link.textContent = 'Zobacz więcej ';
+      moreLink.href = '/akademia/bezpieczny-pod-wykonawca';
+    } else {
+      moreLink.hidden = true;
+    }
+    if (hasAccess) {
+      link.textContent = 'Przejdź do kursu ';
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');
       arrow.textContent = '→';
       link.append(arrow);
-      link.href = '/akademia/bezpieczny-pod-wykonawca';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-    } else if (catalogMode && !hasAccess && !isFree) {
+      link.href = `/akademia/kurs/${encodeURIComponent(course.slug)}`;
+    } else if (catalogMode && !isFree) {
       link.textContent = `Kup szkolenie · ${formatPrice(course)} `;
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');

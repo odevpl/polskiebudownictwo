@@ -24,3 +24,16 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
+
+.course-card__more {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: .25rem;
+  color: var(--color-primary, #e31b23);
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.course-card__more:hover,
+.course-card__more:focus-visible { text-decoration: underline; }
