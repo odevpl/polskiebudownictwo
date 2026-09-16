@@ -36,15 +36,15 @@ async function reserve(adminId) {
     return id;
   });
 }
-async function ready(id, metadata, scanStatus) {
+async function ready(id, metadata) {
   await transaction(async connection => {
-    const [result] = await connection.execute(`UPDATE files SET original_name = ?, mime_type = ?, size_bytes = ?, status = 'ready', scan_status = ? WHERE id = ? AND status = 'uploading'`, [metadata.name, metadata.mime, metadata.size, scanStatus, id]);
+    const [result] = await connection.execute(`UPDATE files SET original_name = ?, mime_type = ?, size_bytes = ?, status = 'ready' WHERE id = ? AND status = 'uploading'`, [metadata.name, metadata.mime, metadata.size, id]);
     if (!result.affectedRows) throw new FileError('Upload wygasł. Prześlij plik ponownie.', 409);
   });
   return find(id);
 }
 async function find(id) { const [rows] = await pool.execute('SELECT * FROM files WHERE id = ?', [id]); return rows[0] || null; }
-function readable(file) { return file?.status === 'ready' && (!config().scanRequired || file.scan_status === 'clean'); }
+function readable(file) { return file?.status === 'ready'; }
 function metadata(file, url) { return { id: file.id, name: file.original_name, mime: file.mime_type, size: Number(file.size_bytes), url }; }
 async function canManage(file, adminId) {
   if (!readable(file)) return false;

@@ -2,7 +2,6 @@ const storage = require('./storage');
 const repository = require('./repository');
 const { receive } = require('./upload');
 const { inspect } = require('./validate');
-const { scan } = require('./scanner');
 const { audit } = require('./config');
 
 async function upload(request, response, adminId) {
@@ -12,11 +11,9 @@ async function upload(request, response, adminId) {
   try {
     const info = await receive(request, response);
     await storage.restrict(id);
-    // Scan before complex parsing; validation still applies if development explicitly skips the scanner.
-    const scanStatus = await scan(storage.location(id));
     const metadata = await inspect(storage.location(id), info.originalname, info.mimetype);
-    const file = await repository.ready(id, metadata, scanStatus);
-    audit('accepted', { fileId: id, adminId, scanStatus, bytes: metadata.size });
+    const file = await repository.ready(id, metadata);
+    audit('accepted', { fileId: id, adminId, bytes: metadata.size });
     return file;
   } catch (error) {
     audit('rejected', { fileId: id, adminId, code: error.status || 500 });

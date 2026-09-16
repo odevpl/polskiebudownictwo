@@ -26,13 +26,9 @@ function config() {
     storageBytes: number('UPLOAD_STORAGE_BYTES', 5 * 1024 * 1024 * 1024),
     ttlHours: number('UPLOAD_TEMP_HOURS', 24),
     timeoutMs: number('UPLOAD_TIMEOUT_MS', 120000),
-    scanTimeoutMs: number('UPLOAD_SCAN_TIMEOUT_MS', 60000),
     maxPixels: number('UPLOAD_MAX_PIXELS', 25000000),
     concurrentFiles: number('UPLOAD_CONCURRENT_FILES', 4),
     adminConcurrentFiles: number('UPLOAD_ADMIN_CONCURRENT_FILES', 2),
-    scanRequired: process.env.NODE_ENV === 'production' || process.env.UPLOAD_SCAN_REQUIRED !== '0',
-    scannerHost: process.env.UPLOAD_CLAMD_HOST || '',
-    scannerPort: number('UPLOAD_CLAMD_PORT', 3310),
     docx: process.env.UPLOAD_DOCX_ENABLED === '1',
   };
 }

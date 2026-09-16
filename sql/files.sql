@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS files (
   mime_type VARCHAR(100) NOT NULL,
   size_bytes BIGINT UNSIGNED NOT NULL,
   status ENUM('uploading', 'ready') NOT NULL,
-  scan_status ENUM('pending', 'clean', 'skipped') NOT NULL DEFAULT 'pending',
   uploaded_by INT UNSIGNED NULL,
   attached_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

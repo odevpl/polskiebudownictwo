@@ -24,7 +24,7 @@ async function main() {
     await db.changeUser({ database });
     const probe = net.createServer(); await new Promise(resolve => probe.listen(0, '127.0.0.1', resolve));
     const port = probe.address().port; await new Promise(resolve => probe.close(resolve));
-    const env = { ...process.env, DB_NAME: database, NODE_ENV: 'test', PORT: String(port), ADMIN_PATH: 'admin', MAILERLITE_API_TOKEN: '', UPLOAD_STORAGE_PATH: path.join(directory, 'storage'), UPLOAD_SCAN_REQUIRED: '0', UPLOAD_CLAMD_HOST: '', UPLOAD_DOCX_ENABLED: '0', SESSION_SECRET: randomUUID(), UPLOAD_MAX_BYTES: '1048576', UPLOAD_LESSON_BYTES: '5242880', UPLOAD_TEMP_FILES: '30', UPLOAD_TEMP_BYTES: '31457280', UPLOAD_STORAGE_BYTES: '104857600', UPLOAD_TIMEOUT_MS: '2000' };
+    const env = { ...process.env, DB_NAME: database, NODE_ENV: 'test', PORT: String(port), ADMIN_PATH: 'admin', MAILERLITE_API_TOKEN: '', UPLOAD_STORAGE_PATH: path.join(directory, 'storage'), UPLOAD_DOCX_ENABLED: '0', SESSION_SECRET: randomUUID(), UPLOAD_MAX_BYTES: '1048576', UPLOAD_LESSON_BYTES: '5242880', UPLOAD_TEMP_FILES: '30', UPLOAD_TEMP_BYTES: '31457280', UPLOAD_STORAGE_BYTES: '104857600', UPLOAD_TIMEOUT_MS: '2000' };
     const run = script => { const result = spawnSync(process.execPath, [script], { env, encoding: 'utf8', windowsHide: true }); if (result.status !== 0) throw new Error(`${script}: ${result.stdout}\n${result.stderr}`); return result.stdout; };
     run('scripts/migrate.js'); run('scripts/migrate.js');
     console.log('PASS isolated database migration, including second run');
@@ -220,7 +220,7 @@ async function main() {
     const [[remaining]] = await db.query('SELECT COUNT(*) AS count FROM files'); assert.equal(remaining.count, 0);
     assert.equal((await fs.readdir(env.UPLOAD_STORAGE_PATH)).length, 0);
     console.log('PASS concurrent quota, inactive administrator, SQL rollback, stale upload cleanup and course cascade cleanup');
-    console.log('All file E2E scenarios passed. Scanner protocol is covered separately; this run uses explicit development skip.');
+    console.log('All file E2E scenarios passed.');
   } catch (error) {
     console.error(serverLog.slice(-12000)); throw error;
   } finally {
