@@ -1,5 +1,5 @@
 const { request } = require('./client');
-const { getConfig, isConfigured } = require('./config');
+const { getConfig, isSyncEnabled } = require('./config');
 
 function normalizeRoles(roles) {
   if (Array.isArray(roles)) return roles;
@@ -37,9 +37,9 @@ async function syncSubmission(submission) {
     return { skipped: true, reason: 'marketing-consent-not-granted' };
   }
 
-  if (!isConfigured()) {
-    console.warn('MailerLite sync skipped: API token is not configured.');
-    return { skipped: true, reason: 'api-token-not-configured' };
+  if (!isSyncEnabled()) {
+    console.warn('MailerLite sync skipped: wymaga NODE_ENV=production i ustawionego tokenu API.');
+    return { skipped: true, reason: 'sync-disabled' };
   }
 
   const payload = subscriberPayload(submission);

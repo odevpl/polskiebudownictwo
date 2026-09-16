@@ -25,7 +25,12 @@ function isConfigured() {
   return Boolean(getConfig().apiToken);
 }
 
+function isSyncEnabled() {
+  return process.env.NODE_ENV === 'production' && isConfigured();
+}
+
 module.exports = {
   getConfig,
   isConfigured,
+  isSyncEnabled,
 };

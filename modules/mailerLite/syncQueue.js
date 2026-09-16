@@ -1,6 +1,6 @@
 const pool = require('../../config/database');
 const Submission = require('../../models/Submission');
-const { isConfigured } = require('./config');
+const { isSyncEnabled } = require('./config');
 const { syncSubmission } = require('./subscriberService');
 
 const workerIntervalMs = Number(process.env.MAILERLITE_SYNC_INTERVAL_MS || 30000);
@@ -116,8 +116,8 @@ async function processOne(id) {
     console.warn(`MailerLite queue skipped: submission=${id} marketing consent is missing`);
     return;
   }
-  if (!isConfigured()) {
-    console.warn(`MailerLite queue skipped: submission=${id} API token is missing`);
+  if (!isSyncEnabled()) {
+    console.warn(`MailerLite queue skipped: submission=${id} synchronizacja jest wyłączona poza produkcją lub bez tokenu API`);
     return;
   }
 
@@ -147,8 +147,7 @@ async function processOne(id) {
 }
 
 async function processNext() {
-  if (!isConfigured()) {
-    console.warn('MailerLite queue idle: API token is not configured');
+  if (!isSyncEnabled()) {
     return;
   }
   const id = await claimNext();
@@ -160,8 +159,8 @@ async function processNext() {
 }
 
 function startWorker() {
-  if (!isConfigured()) {
-    console.warn('MailerLite sync disabled: MAILERLITE_API_TOKEN is not configured.');
+  if (!isSyncEnabled()) {
+    console.warn('MailerLite sync disabled: wymaga NODE_ENV=production i MAILERLITE_API_TOKEN.');
     return null;
   }
   console.log(`MailerLite sync worker started (interval: ${workerIntervalMs} ms).`);
