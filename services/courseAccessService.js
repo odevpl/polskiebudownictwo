@@ -60,6 +60,8 @@ async function hasLessonAccess(userId, lessonId) {
     `SELECT 1
      FROM course_lessons l
      INNER JOIN courses c ON c.id = l.course_id
+     INNER JOIN course_modules m ON m.id = l.module_id AND m.course_id = c.id AND m.is_published = 1
+     INNER JOIN users u ON u.id = ? AND u.is_active = 1
      LEFT JOIN user_course_access a
        ON a.course_id = c.id
       AND a.user_id = ?
@@ -70,7 +72,7 @@ async function hasLessonAccess(userId, lessonId) {
        AND c.is_active = 1
        AND (c.is_free = 1 OR a.id IS NOT NULL)
      LIMIT 1`,
-    [userId, lessonId],
+    [userId, userId, lessonId],
   );
   return rows.length > 0;
 }

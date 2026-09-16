@@ -23,10 +23,15 @@
     "build:main": "node scripts/buildDeployPackage.js main",
     "build:mediacje": "node scripts/buildDeployPackage.js mediacje",
     "build:deploy": "node scripts/buildDeployPackage.js",
-    "dist": "node scripts/buildDeployPackage.js"
+    "dist": "node scripts/buildDeployPackage.js",
+    "cleanup-files": "node scripts/cleanupFiles.js",
+    "test:files": "node --test tests/files/*.test.js",
+    "test:files:e2e": "node scripts/testFilesE2E.js",
+    "migrate:files": "node scripts/migrateFiles.js",
+    "files:check": "node scripts/checkFiles.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.9.0"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -39,7 +44,15 @@
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
     "helmet": "^8.2.0",
+    "multer": "^2.3.0",
     "mysql2": "^3.22.5",
-    "nodemailer": "^9.0.1"
+    "nodemailer": "^9.0.1",
+    "pdf-lib": "^1.17.1",
+    "saxes": "^6.0.0",
+    "sharp": "^0.35.4",
+    "yauzl": "^3.4.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

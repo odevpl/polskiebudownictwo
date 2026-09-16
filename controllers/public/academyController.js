@@ -1,3 +1,4 @@
+const lessonAttachments = require('../../services/lessonAttachmentService');
 const { validationResult } = require('express-validator');
 const Course = require('../../models/Course');
 const CourseLesson = require('../../models/CourseLesson');
@@ -72,12 +73,12 @@ async function showLesson(request, response) {
       return response.status(403).json({ success: false, message: 'Nie masz dostępu do tego kursu.' });
     }
     const lesson = await CourseLesson.findBySlug(course.id, request.params.lessonSlug, { publishedOnly: true });
-    if (!lesson) {
+    if (!lesson || !await courseAccessService.hasLessonAccess(currentUserId(request), lesson.id)) {
       return response.status(404).json({ success: false, message: 'Lekcja nie istnieje.' });
     }
     const progress = await LessonProgress.findByUserAndLesson(currentUserId(request), lesson.id);
     response.setHeader('Cache-Control', 'private, no-store');
-    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, lesson: { ...lesson, contentBlocks: parseBlocks(lesson.content_blocks, lesson.content) }, progress });
+    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, lesson: { ...lesson, content_blocks: undefined, contentBlocks: await lessonAttachments.hydrate(lesson) }, progress });
   } catch (error) {
     console.error('Academy lesson error:', error);
     return response.status(500).json({ success: false, message: 'Nie udało się pobrać lekcji.' });
@@ -92,7 +93,7 @@ async function showModule(request, response) {
     const module = await CourseModule.findBySlug(course.id, request.params.moduleSlug, { publishedOnly: true });
     if (!module) return response.status(404).json({ success: false, message: 'Moduł nie istnieje.' });
     const lessons = await CourseLesson.findByModuleId(module.id, { publishedOnly: true });
-    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, module: { ...module, lessons } });
+    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, module: { ...module, lessons: lessons.map(({ content, content_blocks, ...summary }) => summary) } });
   } catch (error) { return response.status(500).json({ success: false, message: 'Nie udało się pobrać modułu.' }); }
 }
 
@@ -106,7 +107,7 @@ async function showModuleLesson(request, response) {
     const lesson = await CourseLesson.findBySlug(course.id, request.params.lessonSlug, { publishedOnly: true });
     if (!lesson || lesson.module_id !== module.id) return response.status(404).json({ success: false, message: 'Lekcja nie istnieje.' });
     const progress = await LessonProgress.findByUserAndLesson(currentUserId(request), lesson.id);
-    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, module, lesson: { ...lesson, contentBlocks: parseBlocks(lesson.content_blocks, lesson.content) }, progress });
+    return response.json({ success: true, course: { id: course.id, slug: course.slug, title: course.title }, module, lesson: { ...lesson, content_blocks: undefined, contentBlocks: await lessonAttachments.hydrate(lesson) }, progress });
   } catch (error) { return response.status(500).json({ success: false, message: 'Nie udało się pobrać lekcji.' }); }
 }
 

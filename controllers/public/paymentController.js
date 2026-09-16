@@ -90,7 +90,7 @@ async function przelewy24RefundWebhook(request, response) {
     return response.json({ success: true, ...result });
   } catch (error) {
     console.error('Przelewy24 refund webhook error:', error);
-    return response.status(500).json({ success: false, message: 'Nie udaÅ‚o siÄ™ przetworzyÄ‡ potwierdzenia zwrotu.' });
+    return response.status(500).json({ success: false, message: 'Nie udało się przetworzyć potwierdzenia zwrotu.' });
   }
 }
 

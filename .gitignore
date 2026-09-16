@@ -6,3 +6,6 @@ deploy/
 page/smtp-config.php
 dist/
 dists/
+storage/
+test-results/
+playwright-report/

@@ -1,0 +1,12 @@
+<template data-file-manager-template>
+  <section class="course-content-block course-content-block--files" data-block-type="files">
+    <header class="course-content-block__header"><strong>Pliki do pobrania</strong><button type="button" class="button button--ghost button--compact" data-remove-block>Usuń sekcję</button></header>
+    <div class="file-manager" data-file-manager>
+      <div class="file-manager__gallery" data-file-cards></div>
+      <button type="button" class="button button--ghost file-manager__add" data-file-add aria-label="Dodaj kolejny plik"><span aria-hidden="true">＋</span> Dodaj plik</button>
+      <input type="file" data-file-input hidden>
+      <p class="muted" data-file-limits></p>
+      <p class="file-manager__status" data-file-message role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</template>

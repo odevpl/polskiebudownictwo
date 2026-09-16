@@ -1,4 +1,5 @@
 <%- include('../../../partials/admin-shell-start', { title, admin }) %>
+<link rel="stylesheet" href="/css/file-manager.css?v=1">
 <section class="admin-page">
   <a class="button button--ghost" href="<%= module ? adminUrl('/academy/modules/' + module.id + '/lessons') : adminUrl('/academy/courses/' + course.id + '/lessons') %>">Wróć do lekcji</a>
   <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">L</div><div><p class="adm-kicker"><%= mode === 'edit' ? 'Edycja lekcji' : 'Nowa lekcja' %></p><h1><%= mode === 'edit' ? ('Lekcja #' + lesson.id) : 'Dodaj lekcję' %></h1><p class="admin-hero__meta"><%= module ? module.title : course.title %></p></div></div>
@@ -9,16 +10,18 @@
     <input type="hidden" name="contentType" value="text">
     <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= lesson.sort_order ?? lesson.sortOrder ?? 0 %>"></div>
     <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><textarea class="adm-control adm-textarea" id="description" name="description"><%= lesson.description || '' %></textarea></div>
-    <div class="adm-field adm-form-grid__full"><span class="adm-label">Bloki treści lekcji</span><div class="course-content-editor" data-course-content-editor>
+    <div class="adm-field adm-form-grid__full"><span class="adm-label">Bloki treści lekcji</span><div class="course-content-editor" data-course-content-editor data-file-config="<%= JSON.stringify(fileManagerConfig) %>">
+      <%- include('../../../components/fileManager/index') %>
       <div class="course-content-editor__blocks" data-content-blocks></div>
-      <div class="course-content-editor__actions"><button type="button" class="button button--ghost" data-add-content-block="richText">Dodaj tekst</button><button type="button" class="button button--ghost" data-add-content-block="youtube">Dodaj YouTube</button></div>
+      <div class="course-content-editor__actions"><button type="button" class="button button--ghost" data-add-content-block="richText">Dodaj tekst</button><button type="button" class="button button--ghost" data-add-content-block="youtube">Dodaj YouTube</button><button type="button" class="button button--ghost" data-add-content-block="files">Dodaj pliki</button></div>
+      <p data-editor-status role="status" tabindex="-1"></p>
       <textarea name="contentBlocks" data-content-blocks-value hidden><%= JSON.stringify(lesson.contentBlocks || []) %></textarea>
-      <p class="muted">Treść buduj z niezależnych bloków. Możesz mieszać tekst i filmy YouTube.</p>
+      <p class="muted">Treść buduj z niezależnych bloków. Możesz mieszać tekst, filmy YouTube i sekcje plików.</p>
     </div></div>
     <label class="adm-check"><input name="isPublished" type="checkbox" value="1" <%= lesson.is_published || lesson.isPublished ? 'checked' : '' %>><span>Opublikowana</span></label>
     <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Zapisz lekcję</button><a class="button button--ghost" href="<%= module ? adminUrl('/academy/modules/' + module.id + '/lessons') : adminUrl('/academy/courses/' + course.id + '/lessons') %>">Anuluj</a></div>
   </div></form>
   <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/lessons/' + lesson.id + '/delete') %>" onsubmit="return confirm('Usunąć lekcję?');"><button class="button button--ghost" type="submit">Usuń lekcję</button></form><% } %>
 </section>
-<script type="module" src="/js/admin/courseContent/editor.js?v=3"></script>
+<script type="module" src="/js/admin/courseContent/editor.js?v=4"></script>
 <%- include('../../../partials/admin-shell-end') %>

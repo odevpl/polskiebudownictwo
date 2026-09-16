@@ -1,3 +1,4 @@
+const lessonAttachments = require('../../services/lessonAttachmentService');
 const Course = require('../../models/Course');
 const CourseModule = require('../../models/CourseModule');
 const CourseLesson = require('../../models/CourseLesson');
@@ -49,7 +50,7 @@ async function lesson(request, response) {
       title: lessonRecord.title,
       course: courseRecord,
       module: moduleRecord,
-      lesson: { ...lessonRecord, contentBlocks: parseBlocks(lessonRecord.content_blocks, lessonRecord.content) },
+      lesson: { ...lessonRecord, contentBlocks: await lessonAttachments.hydrate(lessonRecord) },
       lessons: lessons.map(item => ({ ...item, progress: progressByLesson.get(item.id) || null })),
       progress: progressByLesson.get(lessonRecord.id) || null,
     });

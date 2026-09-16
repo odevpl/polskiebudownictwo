@@ -14,6 +14,8 @@ const { requireUser, requireUserApi } = require('../middleware/userAuth');
 const { accountBillingValidation, accountProfileValidation, authenticatedPasswordChangeValidation, deleteAccountValidation } = require('../middleware/validate');
 
 const router = express.Router();
+const fileDownloadLimiter = require('express-rate-limit').rateLimit({ windowMs: 60000, limit: 60, keyGenerator: request => String(request.session.user.id), standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Zbyt wiele pobrań. Spróbuj za minutę.' } });
+router.get('/api/academy/attachments/:id/download', requireUserApi, fileDownloadLimiter, require('../controllers/public/filesController').download);
 
 router.post('/api/submit', submitLimiter, submitValidation, submitController.store);
 router.get('/api/auth/registration-settings', authController.registrationSettings);

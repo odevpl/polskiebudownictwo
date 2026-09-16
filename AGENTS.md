@@ -52,6 +52,9 @@ Nie zapisuj sekretów SMTP ani danych dostępowych do bazy w plikach śledzonych
 
 ## Zasady zmian
 
+- Nie uruchamiaj testów automatycznych ani ręcznych bez nowego, wyraźnego polecenia użytkownika. Dotyczy to również testów E2E i komend diagnostycznych wykonujących operacje testowe.
+- Nie dotykaj środowiska produkcyjnego bez uprzedniego pytania i wyraźnej zgody użytkownika na konkretną czynność. Dotyczy to także odczytów przez SSH/panel/API produkcyjne, wdrożeń, migracji, konfiguracji, restartów, plików, danych, backupów i testów produkcyjnych. Autoryzacja pracy lokalnej nie jest zgodą na działania produkcyjne. Publiczną dokumentację hostingu można czytać bez takiej zgody.
+
 - Nie dodawaj frameworków ani procesu kompilacji frontendu bez wyraźnej potrzeby.
 - Nie zmieniaj niepowiązanych sekcji strony.
 - Zachowuj działanie na urządzeniach mobilnych i komputerach.

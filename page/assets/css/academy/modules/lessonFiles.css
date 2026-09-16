@@ -1,0 +1,6 @@
+.lesson-files { margin-block:28px; }
+.lesson-files__gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:16px; list-style:none; padding:0; }
+.lesson-files__card { min-width:0; padding:20px; border:1px solid #dce0e5; border-radius:12px; overflow-wrap:anywhere; }
+.lesson-files__card h3 { font-size:1rem; margin:14px 0 8px; }
+.lesson-files__type { display:inline-block; padding:6px 10px; background:#f1f3f5; color:#252c35; border-radius:6px; font-size:.8rem; font-weight:700; }
+.lesson-files__card .button { max-width:100%; box-sizing:border-box; }

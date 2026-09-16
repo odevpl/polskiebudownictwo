@@ -1,0 +1,11 @@
+.file-manager__gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:16px; margin:16px 0; }
+.file-manager__card { min-width:0; padding:16px; border:1px solid var(--adm-border); border-radius:12px; background:var(--adm-bg); color:var(--adm-text); overflow-wrap:anywhere; }
+.file-manager__card label { display:grid; gap:8px; font-size:.85rem; }
+.file-manager__card input { width:100%; min-width:0; box-sizing:border-box; }
+.file-manager__type { display:inline-block; padding:6px 10px; background:var(--adm-bg-soft); color:var(--adm-text); border-radius:6px; font-weight:700; margin-bottom:12px; }
+.file-manager__actions { display:flex; flex-wrap:wrap; gap:8px; }
+.file-manager__card progress { width:100%; margin:8px 0; }
+.file-manager__status { min-height:1.5em; overflow-wrap:anywhere; }
+.file-manager__add span { font-size:1.4rem; }
+.course-content-block__order { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.file-manager button:focus-visible,.file-manager a:focus-visible { outline:3px solid #2763c5; outline-offset:3px; }

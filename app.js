@@ -15,6 +15,7 @@ const { startWorker } = require('./modules/mailerLite');
 
 const app = express();
 startWorker();
+require('./modules/files/cleanup').startCleanupWorker();
 const port = Number(process.env.PORT || 3000);
 const publicRoot = path.join(__dirname, 'page');
 const appPublicRoot = path.join(__dirname, 'public');

@@ -9,6 +9,7 @@
       <% lesson.contentBlocks.forEach(block => { %>
         <% if (block.type === 'richText') { %><%- include('../contentBlock/richText', { block }) %><% } %>
         <% if (block.type === 'youtube') { %><%- include('../contentBlock/youtube', { block }) %><% } %>
+        <% if (block.type === 'files') { %><%- include('../contentBlock/files', { block }) %><% } %>
       <% }) %>
     <% } else { %><p>Treść modułu zostanie dodana.</p><% } %>
   </div>

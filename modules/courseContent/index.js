@@ -71,6 +71,9 @@ function parseBlocks(value, legacyContent = '') {
 
 function normalizeBlock(block) {
   if (!block || typeof block !== 'object') return null;
+  if (block.type === 'files') {
+    return { type: 'files', id: String(block.id || ''), data: { files: Array.isArray(block.data?.files) ? block.data.files.map(file => ({ id: String(file?.id || ''), name: String(file?.name || '').trim() })) : [] } };
+  }
   if (block.type === 'richText') {
     const html = sanitizeRichText(block.data?.html || block.html || '');
     return html ? { type: 'richText', data: { html } } : null;

@@ -133,7 +133,7 @@ async function requestRefund(order, request) {
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || result.data?.status === 'error') {
-    const error = new Error('Przelewy24 nie przyjÄ™Å‚y zlecenia zwrotu.');
+    const error = new Error('Przelewy24 nie przyjęły zlecenia zwrotu.');
     error.details = result;
     throw error;
   }

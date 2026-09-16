@@ -1,0 +1,15 @@
+<% if (block.data.files.length) { %>
+<section class="lesson-files" aria-label="Pliki do pobrania">
+  <h2>Pliki do pobrania</h2>
+  <ul class="lesson-files__gallery">
+    <% block.data.files.forEach(file => { %>
+    <li class="lesson-files__card">
+      <span class="lesson-files__type" aria-hidden="true"><%= file.mime === 'application/pdf' ? 'PDF' : file.mime === 'image/jpeg' ? 'JPG' : file.mime === 'image/webp' ? 'WEBP' : 'DOCX' %></span>
+      <h3><%= file.name %></h3>
+      <p><%= file.size >= 1048576 ? (file.size / 1048576).toFixed(1) + ' MB' : Math.ceil(file.size / 1024) + ' KB' %></p>
+      <a class="button button--ghost" href="<%= file.url %>" aria-label="Pobierz: <%= file.name %>">Pobierz plik</a>
+    </li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>

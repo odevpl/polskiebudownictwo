@@ -29,6 +29,8 @@ async function migrate() {
     await ensureAcademyPriceColumns(connection);
     await ensureAcademyContentBlocksColumn(connection);
     await ensureAcademyModules(connection);
+    const filesSchema = await fs.readFile(path.join(__dirname, '..', 'sql', 'files.sql'), 'utf8');
+    for (const statement of filesSchema.split(';').map(value => value.trim()).filter(Boolean)) await connection.query(statement);
     await ensureUserAnonymizedAtColumn(connection);
     await ensureOrderRefundColumns(connection);
     console.log('Migracje zakonczone.');

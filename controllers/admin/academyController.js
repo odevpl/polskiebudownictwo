@@ -1,3 +1,5 @@
+const lessonAttachments = require('../../services/lessonAttachmentService');
+const { FileError, config: fileConfig } = require('../../modules/files/config');
 const Course = require('../../models/Course');
 const CourseAccess = require('../../models/CourseAccess');
 const CourseLesson = require('../../models/CourseLesson');
@@ -195,6 +197,7 @@ async function createLesson(request, response) {
   const module = request.params.moduleId ? await CourseModule.findById(request.params.moduleId) : null;
   if (request.params.moduleId && (!module || module.course_id !== course.id)) return response.status(404).send('Moduł nie istnieje.');
   const data = lessonFromBody(request.body, course.id, module?.id);
+  data.adminId = request.session.admin.id;
   const errors = [...validateLesson(data), ...validateContentBlocks(data)];
   if (errors.length) return renderLessonForm(response, request, course, data, 'create', errors, 422, module);
   try {
@@ -202,6 +205,7 @@ async function createLesson(request, response) {
     return response.redirect(request.app.locals.adminUrl(`/academy/lessons/${lesson.id}/edit`));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderLessonForm(response, request, course, data, 'create', ['Slug lekcji musi być unikalny w tym kursie.'], 409, module);
+    if (error instanceof FileError) return renderLessonForm(response, request, course, data, 'create', [error.message], error.status, module);
     console.error('Admin academy lesson create error:', error);
     return response.status(500).send('Nie udało się dodać lekcji.');
   }
@@ -217,6 +221,7 @@ async function updateLesson(request, response) {
   if (!lesson) return response.status(404).send('Lekcja nie istnieje.');
   const course = await Course.findById(lesson.course_id);
   const data = lessonFromBody(request.body, lesson.course_id, lesson.module_id);
+  data.adminId = request.session.admin.id;
   const errors = [...validateLesson(data), ...validateContentBlocks(data)];
   if (errors.length) return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', errors, 422, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
   try {
@@ -224,6 +229,7 @@ async function updateLesson(request, response) {
     return response.redirect(request.app.locals.adminUrl(`/academy/lessons/${updated.id}/edit`));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', ['Slug lekcji musi być unikalny w tym kursie.'], 409, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
+    if (error instanceof FileError) return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', [error.message], error.status, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
     console.error('Admin academy lesson update error:', error);
     return response.status(500).send('Nie udało się zapisać lekcji.');
   }
@@ -351,8 +357,16 @@ function renderModuleForm(response, request, course, module, mode, errors, statu
   return response.status(status).render('admin/academy/modules/form', { title: mode === 'edit' ? `Edycja modułu #${module.id}` : 'Nowy moduł', admin: request.session.admin, course, module, mode, errors, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/modules/${module.id}/edit` : `/academy/courses/${course.id}/modules/new`) });
 }
 
-function renderLessonForm(response, request, course, lesson, mode, errors, status = 200, module = null) {
-  return response.status(status).render('admin/academy/lessons/form', { title: mode === 'edit' ? `Edycja lekcji #${lesson.id}` : 'Nowa lekcja', admin: request.session.admin, course, module, lesson, mode, errors, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/lessons/${lesson.id}/edit` : module ? `/academy/modules/${module.id}/lessons/new` : `/academy/courses/${course.id}/lessons/new`) });
+async function renderLessonForm(response, request, course, lesson, mode, errors, status = 200, module = null) {
+  try {
+  lesson = { ...lesson, contentBlocks: await lessonAttachments.hydrate(lesson, request.session.admin.id, request.app.locals.adminUrl) };
+  const settings = fileConfig();
+  const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.docx' : '.pdf,.jpg,.jpeg,.webp' };
+  return response.status(status).render('admin/academy/lessons/form', { fileManagerConfig, title: mode === 'edit' ? `Edycja lekcji #${lesson.id}` : 'Nowa lekcja', admin: request.session.admin, course, module, lesson, mode, errors, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/lessons/${lesson.id}/edit` : module ? `/academy/modules/${module.id}/lessons/new` : `/academy/courses/${course.id}/lessons/new`) });
+  } catch (error) {
+    console.error('Lesson file metadata error:', error.code || error.name);
+    return response.status(500).send('Nie udało się wczytać materiałów lekcji.');
+  }
 }
 
 async function renderAccessWithErrors(request, response, errors, status) {
@@ -414,6 +428,7 @@ function validateContentBlocks(data) {
   let blocks;
   try { blocks = Array.isArray(data.rawContentBlocks) ? data.rawContentBlocks : JSON.parse(String(data.rawContentBlocks || '[]')); } catch { return ['Treść modułu ma nieprawidłowy format.']; }
   if (!Array.isArray(blocks)) return ['Treść modułu ma nieprawidłowy format.'];
+  try { lessonAttachments.validateBlocks(blocks); } catch (error) { errors.push(error.message); }
   blocks.filter(block => block?.type === 'youtube').forEach(block => {
     const url = block.data?.url || block.url || block.data?.videoId || block.videoId;
     if (!youtubeVideoId(url)) errors.push('Podaj poprawny adres filmu YouTube w bloku wideo.');

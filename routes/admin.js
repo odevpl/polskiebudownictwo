@@ -8,7 +8,14 @@ const { adminUrl } = require('../config/adminPath');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { loginLimiter, sensitiveActionLimiter } = require('../middleware/rateLimiter');
 
+const filesController = require('../controllers/admin/filesController');
+const { rateLimit } = require('express-rate-limit');
 const router = express.Router();
+const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 100, standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Zbyt wiele uploadów. Spróbuj później.' } });
+router.post('/files', filesController.requireFileAdmin, uploadLimiter, filesController.create);
+router.get('/files/:id/download', filesController.requireFileAdmin, filesController.download);
+router.delete('/files/:id', filesController.requireFileAdmin, filesController.remove);
+router.use('/academy', (request, response, next) => request.method === 'POST' ? filesController.requireFileAdmin(request, response, next) : next());
 
 router.get('/login', authController.showLogin);
 router.post('/login', loginLimiter, authController.login);

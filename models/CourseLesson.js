@@ -1,4 +1,6 @@
 const pool = require('../config/database');
+const { transaction } = require('../modules/files/repository');
+const attachments = require('../services/lessonAttachmentService');
 
 async function findByCourseId(courseId, { publishedOnly = false } = {}) {
   const where = publishedOnly ? 'AND is_published = 1' : '';
@@ -42,7 +44,8 @@ async function findById(id) {
 }
 
 async function create(data) {
-  const [result] = await pool.execute(
+  const id = await transaction(async connection => {
+  const [result] = await connection.execute(
     `INSERT INTO course_lessons
        (course_id, module_id, slug, title, description, content_type, content, content_blocks, sort_order, is_published)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -59,17 +62,27 @@ async function create(data) {
       data.isPublished ? 1 : 0,
     ],
   );
-  await syncLessonCount(data.courseId);
-  return findBySlug(data.courseId, data.slug);
+  await attachments.sync(connection, result.insertId, data.contentBlocks || [], data.adminId);
+  await syncLessonCount(data.courseId, connection);
+  return result.insertId;
+  });
+  attachments.saved(id, data.adminId, (data.contentBlocks || []).filter(b => b.type === 'files').length);
+  return findById(id);
 }
 
 async function update(id, data) {
-  await pool.execute(
+  await transaction(async connection => {
+  const [[existing]] = await connection.execute('SELECT id FROM course_lessons WHERE id = ? FOR UPDATE', [id]);
+  if (!existing) throw new Error('Lesson no longer exists');
+  await attachments.sync(connection, id, data.contentBlocks || [], data.adminId);
+  await connection.execute(
     `UPDATE course_lessons
      SET module_id = ?, slug = ?, title = ?, description = ?, content_type = ?, content = ?, content_blocks = ?, sort_order = ?, is_published = ?
      WHERE id = ?`,
     [data.moduleId || null, data.slug, data.title, data.description || null, data.contentType || 'text', data.content || null, data.contentBlocks ? JSON.stringify(data.contentBlocks) : null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
   );
+  });
+  attachments.saved(id, data.adminId, (data.contentBlocks || []).filter(b => b.type === 'files').length);
   return findById(id);
 }
 
@@ -81,8 +94,8 @@ async function remove(id) {
   return result.affectedRows > 0;
 }
 
-async function syncLessonCount(courseId) {
-  await pool.execute(
+async function syncLessonCount(courseId, connection = pool) {
+  await connection.execute(
     `UPDATE courses c
      SET lesson_count = (SELECT COUNT(*) FROM course_lessons l WHERE l.course_id = c.id)
      WHERE c.id = ?`,
