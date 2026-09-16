@@ -1,23 +1,20 @@
 (() => {
-  function sync(editor, value) { value.value = editor.innerHTML.trim(); }
+  function sync(editor, value) { value.value = editor.root.innerHTML.trim(); }
   document.querySelectorAll('[data-rich-textarea]').forEach(wrapper => {
-    const editor = wrapper.querySelector('[data-rich-text-input]');
+    const element = wrapper.querySelector('[data-rich-text-input]');
     const value = wrapper.querySelector('textarea');
-    editor.innerHTML = value.value;
-    wrapper.querySelectorAll('[data-rich-text-command]').forEach(button => {
-      button.addEventListener('mousedown', event => event.preventDefault());
-      button.addEventListener('click', () => {
-        editor.focus();
-        document.execCommand(button.dataset.richTextCommand, false, button.dataset.richTextValue || null);
-        sync(editor, value);
-      });
+    const editor = new window.Quill(element, {
+      theme: 'snow',
+      modules: { toolbar: [['bold', 'italic'], [{ list: 'ordered' }, { list: 'bullet' }]] },
+      formats: ['bold', 'italic', 'list'],
     });
-    editor.addEventListener('input', () => sync(editor, value));
-    editor.addEventListener('paste', event => {
-      event.preventDefault();
-      document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));
-      sync(editor, value);
-    });
+    const initial = value.value.trim();
+    if (initial) {
+      if (/<[a-z][\s\S]*>/i.test(initial)) editor.clipboard.dangerouslyPasteHTML(initial);
+      else editor.setText(initial);
+    }
+    sync(editor, value);
+    editor.on('text-change', () => sync(editor, value));
     wrapper.closest('form')?.addEventListener('submit', () => sync(editor, value));
   });
 })();

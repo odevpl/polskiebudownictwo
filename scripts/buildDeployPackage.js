@@ -59,6 +59,14 @@ function removeBlockedItems(destinationRoot) {
   }
 }
 
+function copyQuillAssets(destinationRoot) {
+  const source = path.join(root, 'node_modules', 'quill', 'dist');
+  const destination = path.join(destinationRoot, 'public', 'vendor', 'quill');
+  if (!fs.existsSync(source)) throw new Error('Quill assets are missing. Run npm install before building the package.');
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.cpSync(source, destination, { recursive: true, force: true });
+}
+
 function newMainPackage() {
   const destinationRoot = path.join(distsDir, 'polskiebudownictwo.org');
   fs.rmSync(destinationRoot, { recursive: true, force: true });
@@ -85,6 +93,8 @@ function newMainPackage() {
   ];
 
   for (const item of items) copyDeployItem(root, destinationRoot, item);
+
+  copyQuillAssets(destinationRoot);
 
   renderDirectory(path.join(destinationRoot, 'page'), 'main');
   renderJoinCtas(path.join(destinationRoot, 'page'));

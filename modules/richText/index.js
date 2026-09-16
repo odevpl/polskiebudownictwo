@@ -17,7 +17,13 @@ function sanitizeRichText(value) {
     .replace(/<\s*\/?\s*([a-z0-9]+)(?:\s[^>]*)?>/gi, (match, tagName) => {
       const tag = tagName.toLowerCase();
       if (!allowedTags.has(tag)) return '';
-      return match.startsWith('</') ? `</${tag}>` : tag === 'br' ? '<br>' : `<${tag}>`;
+      if (match.startsWith('</')) return `</${tag}>`;
+      if (tag === 'br') return '<br>';
+      if (tag === 'li') {
+        const listType = /data-list\s*=\s*["'](ordered|bullet)["']/i.exec(match)?.[1]?.toLowerCase();
+        return listType ? `<li data-list="${listType}">` : '<li>';
+      }
+      return `<${tag}>`;
     })
     .trim();
   return /<\/?(?:p|br|strong|b|em|i|ul|ol|li)>/i.test(source) ? source : plainTextToHtml(source);

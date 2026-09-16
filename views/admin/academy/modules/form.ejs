@@ -14,5 +14,6 @@
   </div></form>
   <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/modules/' + module.id + '/delete') %>" onsubmit="return confirm('Usunąć moduł i jego lekcje?');"><button class="button button--ghost" type="submit">Usuń moduł</button></form><% } %>
 </section>
-<script src="/js/admin/richTextTextarea.js" defer></script>
+<link rel="stylesheet" href="/vendor/quill/quill.snow.css">
+<script src="/vendor/quill/quill.js" defer></script><script src="/js/admin/richTextTextarea.js" defer></script>
 <%- include('../../../partials/admin-shell-end') %>

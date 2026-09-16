@@ -1616,6 +1616,7 @@ p {
 .academy-rich-text > :last-child { margin-bottom: 0; }
 .academy-rich-text ul,
 .academy-rich-text ol { padding-left: 1.4em; }
+.academy-rich-text ol:has(> li[data-list="bullet"]) { list-style-type: disc; }
 
 .academy-courses__state {
   grid-column: 1 / -1;

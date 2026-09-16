@@ -92,6 +92,7 @@ app.use('/api/mediacje', (request, response, next) => {
 });
 
 app.use(express.static(appPublicRoot));
+app.use('/vendor/quill', express.static(path.join(__dirname, 'node_modules', 'quill', 'dist')));
 app.use(express.static(publicRoot, {
   extensions: ['html'],
 }));
