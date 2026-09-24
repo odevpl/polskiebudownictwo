@@ -1,4 +1,5 @@
-import { createFileManager } from '../../fileManager/index.js';
+import { createFileManager } from '../../file-manager/index.js';
+
 export function createFilesBlock(block, editor) {
   const wrapper = editor.root.querySelector('[data-file-manager-template]').content.firstElementChild.cloneNode(true);
   wrapper.dataset.blockId = block.id || crypto.randomUUID();

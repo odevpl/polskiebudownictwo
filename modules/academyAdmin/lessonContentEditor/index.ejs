@@ -1,0 +1,15 @@
+<div class="adm-field adm-form-grid__full">
+  <span class="adm-label">Bloki treści lekcji</span>
+  <div class="course-content-editor" data-course-content-editor data-file-config="<%= JSON.stringify(fileManagerConfig) %>">
+    <%- include('./fileManager') %>
+    <div class="course-content-editor__blocks" data-content-blocks></div>
+    <div class="course-content-editor__actions">
+      <button type="button" class="button button--ghost" data-add-content-block="richText">Dodaj tekst</button>
+      <button type="button" class="button button--ghost" data-add-content-block="youtube">Dodaj YouTube</button>
+      <button type="button" class="button button--ghost" data-add-content-block="files">Dodaj pliki</button>
+    </div>
+    <p data-editor-status role="status" tabindex="-1"></p>
+    <textarea name="contentBlocks" data-content-blocks-value hidden><%= JSON.stringify(lesson.contentBlocks || []) %></textarea>
+    <p class="muted">Treść buduj z niezależnych bloków. Możesz mieszać tekst, filmy YouTube i sekcje plików.</p>
+  </div>
+</div>

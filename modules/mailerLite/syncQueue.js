@@ -13,7 +13,8 @@ function maskEmail(email) {
 }
 
 function retryDelayMs(attempts) {
-  return Math.min(60 * 60 * 1000, 1000 * (2 ** Math.min(attempts, 10)));
+  const cappedAttempts = Math.min(Math.max(Number(attempts) || 0, 0), 12);
+  return Math.min(60 * 60 * 1000, 1000 * (2 ** cappedAttempts));
 }
 
 async function enqueue(submissionId) {

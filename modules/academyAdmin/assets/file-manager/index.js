@@ -34,7 +34,6 @@ export function createFileManager(root, initialFiles, options) {
       button(entry.state === 'uploading' ? 'Anuluj' : 'Usuń', () => {
         entry.removed = true; entry.xhr?.abort(); entries.splice(index, 1); render(); options.onChange(); say('Plik usunięty z sekcji.');
         root.querySelector('[data-file-add]').focus();
-        // Saved files are detached only on lesson save. Temporary uploads can be discarded now.
         if (entry.file?.temporary) fetch(`${options.uploadUrl}/${entry.file.id}`, { method: 'DELETE', credentials: 'same-origin' }).catch(() => {});
       });
       card.append(actions); cardsRoot.append(card);

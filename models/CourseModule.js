@@ -26,16 +26,16 @@ async function findBySlug(courseId, slug, { publishedOnly = false } = {}) {
 
 async function create(data) {
   const [result] = await pool.execute(
-    `INSERT INTO course_modules (course_id, slug, title, description, image_url, sort_order, is_published) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [data.courseId, data.slug, data.title, data.description || null, data.imageUrl || null, data.sortOrder || 0, data.isPublished ? 1 : 0],
+    `INSERT INTO course_modules (course_id, slug, title, sort_order, is_published) VALUES (?, ?, ?, ?, ?)`,
+    [data.courseId, data.slug, data.title, data.sortOrder || 0, data.isPublished ? 1 : 0],
   );
   return findById(result.insertId);
 }
 
 async function update(id, data) {
   const [result] = await pool.execute(
-    `UPDATE course_modules SET slug = ?, title = ?, description = ?, image_url = ?, sort_order = ?, is_published = ? WHERE id = ?`,
-    [data.slug, data.title, data.description || null, data.imageUrl || null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
+    `UPDATE course_modules SET slug = ?, title = ?, sort_order = ?, is_published = ? WHERE id = ?`,
+    [data.slug, data.title, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
   );
   return result.affectedRows ? findById(id) : null;
 }
@@ -45,4 +45,8 @@ async function remove(id) {
   return result.affectedRows > 0;
 }
 
-module.exports = { create, findByCourseId, findById, findBySlug, remove, update };
+async function updateSortOrder(ids) {
+  await Promise.all(ids.map((id, index) => pool.execute('UPDATE course_modules SET sort_order = ? WHERE id = ?', [index, id])));
+}
+
+module.exports = { create, findByCourseId, findById, findBySlug, remove, update, updateSortOrder };

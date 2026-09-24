@@ -29,6 +29,7 @@ async function migrate() {
     await ensureAcademyPriceColumns(connection);
     await ensureAcademyContentBlocksColumn(connection);
     await ensureAcademyModules(connection);
+    await removeAcademyModuleDisplayColumns(connection);
     const filesSchema = await fs.readFile(path.join(__dirname, '..', 'sql', 'files.sql'), 'utf8');
     for (const statement of filesSchema.split(';').map(value => value.trim()).filter(Boolean)) await connection.query(statement);
     await ensureUserAnonymizedAtColumn(connection);
@@ -74,10 +75,17 @@ async function ensureAcademyModules(connection) {
     const [existing] = await connection.execute('SELECT id FROM course_modules WHERE course_id = ? ORDER BY id ASC LIMIT 1', [course.id]);
     let moduleId = existing[0]?.id;
     if (!moduleId) {
-      const [result] = await connection.execute('INSERT INTO course_modules (course_id, slug, title, description, sort_order, is_published) VALUES (?, \'materialy-szkolenia\', ?, ?, 0, 1)', [course.id, 'Materiały szkolenia', `Moduł utworzony podczas migracji szkolenia „${course.title}”.`]);
+      const [result] = await connection.execute('INSERT INTO course_modules (course_id, slug, title, sort_order, is_published) VALUES (?, \'materialy-szkolenia\', ?, 0, 1)', [course.id, 'Materiały szkolenia']);
       moduleId = result.insertId;
     }
     await connection.execute('UPDATE course_lessons SET module_id = ? WHERE course_id = ? AND module_id IS NULL', [moduleId, course.id]);
+  }
+}
+
+async function removeAcademyModuleDisplayColumns(connection) {
+  for (const column of ['description', 'image_url']) {
+    const [existing] = await connection.query('SHOW COLUMNS FROM course_modules LIKE ?', [column]);
+    if (existing.length) await connection.query(`ALTER TABLE course_modules DROP COLUMN ${column}`);
   }
 }
 

@@ -94,6 +94,10 @@ async function remove(id) {
   return result.affectedRows > 0;
 }
 
+async function updateSortOrder(ids) {
+  await Promise.all(ids.map((id, index) => pool.execute('UPDATE course_lessons SET sort_order = ? WHERE id = ?', [index, id])));
+}
+
 async function syncLessonCount(courseId, connection = pool) {
   await connection.execute(
     `UPDATE courses c
@@ -103,4 +107,4 @@ async function syncLessonCount(courseId, connection = pool) {
   );
 }
 
-module.exports = { create, findByCourseId, findById, findByModuleId, findBySlug, remove, syncLessonCount, update };
+module.exports = { create, findByCourseId, findById, findByModuleId, findBySlug, remove, syncLessonCount, update, updateSortOrder };

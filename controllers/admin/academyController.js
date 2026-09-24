@@ -11,6 +11,7 @@ const { normalizeForStorage, youtubeVideoId } = require('../../modules/courseCon
 const { sanitizeRichText } = require('../../modules/richText');
 
 async function coursesIndex(request, response) {
+  if (request.query.classic !== '1') return response.redirect(request.app.locals.adminUrl('/academy/workspace'));
   try {
     const courses = await Course.findAll();
     return response.render('admin/academy/courses/index', { title: 'Akademia', admin: request.session.admin, courses, error: null });
@@ -41,7 +42,7 @@ async function createCourse(request, response) {
   if (errors.length) return renderCourseForm(response, request, data, 'create', errors, 422);
   try {
     const course = await Course.create(data);
-    return response.redirect(request.app.locals.adminUrl(`/academy/courses/${course.id}/edit`));
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id }));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderCourseForm(response, request, data, 'create', ['Slug kursu musi być unikalny.'], 409);
     console.error('Admin academy course create error:', error);
@@ -56,7 +57,7 @@ async function updateCourse(request, response) {
   try {
     const course = await Course.update(request.params.id, data);
     if (!course) return response.status(404).send('Kurs nie istnieje.');
-    return response.redirect(request.app.locals.adminUrl(`/academy/courses/${course.id}/edit`));
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id }));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderCourseForm(response, request, { id: request.params.id, ...data }, 'edit', ['Slug kursu musi być unikalny.'], 409);
     console.error('Admin academy course update error:', error);
@@ -67,6 +68,7 @@ async function updateCourse(request, response) {
 async function deleteCourse(request, response) {
   try {
     await Course.remove(request.params.id);
+    if (request.body.workspace === '1') return response.redirect(academyWorkspaceUrl(request));
     return response.redirect(request.app.locals.adminUrl('/academy/courses'));
   } catch (error) {
     console.error('Admin academy course delete error:', error);
@@ -78,8 +80,7 @@ async function modulesIndex(request, response) {
   try {
     const course = await Course.findById(request.params.courseId);
     if (!course) return response.status(404).send('Kurs nie istnieje.');
-    const modules = await CourseModule.findByCourseId(course.id);
-    return response.render('admin/academy/modules/index', { title: `Moduły: ${course.title}`, admin: request.session.admin, course, modules, error: null });
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id }));
   } catch (error) {
     console.error('Admin academy modules error:', error);
     return response.status(500).send('Nie udało się pobrać modułów.');
@@ -114,7 +115,7 @@ async function createModule(request, response) {
   if (errors.length) return renderModuleForm(response, request, course, data, 'create', errors, 422);
   try {
     const module = await CourseModule.create(data);
-    return response.redirect(request.app.locals.adminUrl(`/academy/modules/${module.id}/edit`));
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id, moduleId: module.id }));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, data, 'create', ['Slug modułu musi być unikalny w tym szkoleniu.'], 409);
     return response.status(500).send('Nie udało się dodać modułu.');
@@ -130,7 +131,7 @@ async function updateModule(request, response) {
   if (errors.length) return renderModuleForm(response, request, course, { id: module.id, ...data }, 'edit', errors, 422);
   try {
     const updated = await CourseModule.update(module.id, data);
-    return response.redirect(request.app.locals.adminUrl(`/academy/modules/${updated.id}/edit`));
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id, moduleId: updated.id }));
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, { id: module.id, ...data }, 'edit', ['Slug modułu musi być unikalny w tym szkoleniu.'], 409);
     return response.status(500).send('Nie udało się zapisać modułu.');
@@ -141,6 +142,7 @@ async function deleteModule(request, response) {
   const module = await CourseModule.findById(request.params.id);
   if (!module) return response.status(404).send('Moduł nie istnieje.');
   await CourseModule.remove(module.id);
+  if (request.body.workspace === '1') return response.redirect(academyWorkspaceUrl(request, { courseId: module.course_id }));
   return response.redirect(request.app.locals.adminUrl(`/academy/courses/${module.course_id}/modules`));
 }
 
@@ -148,8 +150,7 @@ async function lessonsIndex(request, response) {
   try {
     const course = await Course.findById(request.params.courseId);
     if (!course) return response.status(404).send('Kurs nie istnieje.');
-    const lessons = await CourseLesson.findByCourseId(course.id);
-    return response.render('admin/academy/lessons/index', { title: `Lekcje: ${course.title}`, admin: request.session.admin, course, module: null, lessons, error: null });
+    return response.redirect(academyWorkspaceUrl(request, { courseId: course.id }));
   } catch (error) {
     console.error('Admin academy lessons error:', error);
     return response.status(500).send('Nie udało się pobrać lekcji.');
@@ -160,9 +161,7 @@ async function moduleLessonsIndex(request, response) {
   try {
     const module = await CourseModule.findById(request.params.moduleId);
     if (!module) return response.status(404).send('Moduł nie istnieje.');
-    const course = await Course.findById(module.course_id);
-    const lessons = await CourseLesson.findByModuleId(module.id);
-    return response.render('admin/academy/lessons/index', { title: `Lekcje: ${module.title}`, admin: request.session.admin, course, module, lessons, error: null });
+    return response.redirect(academyWorkspaceUrl(request, { courseId: module.course_id, moduleId: module.id }));
   } catch (error) { return response.status(500).send('Nie udało się pobrać lekcji.'); }
 }
 
@@ -175,17 +174,16 @@ async function newLesson(request, response) {
 }
 
 async function newModuleLesson(request, response) {
-  request.params.courseId = String((await CourseModule.findById(request.params.moduleId))?.course_id || '');
-  return newLesson(request, response);
+  const module = await CourseModule.findById(request.params.moduleId);
+  if (!module) return response.status(404).send('Moduł nie istnieje.');
+  return response.redirect(academyWorkspaceUrl(request, { courseId: module.course_id, moduleId: module.id, newLesson: true }));
 }
 
 async function editLesson(request, response) {
   try {
     const lesson = await CourseLesson.findById(request.params.id);
     if (!lesson) return response.status(404).send('Lekcja nie istnieje.');
-    const course = await Course.findById(lesson.course_id);
-    const module = lesson.module_id ? await CourseModule.findById(lesson.module_id) : null;
-    return renderLessonForm(response, request, course, lessonForForm(lesson), 'edit', [], 200, module);
+    return response.redirect(academyWorkspaceUrl(request, { courseId: lesson.course_id, moduleId: lesson.module_id, lessonId: lesson.id }));
   } catch (error) {
     console.error('Admin academy lesson edit error:', error);
     return response.status(500).send('Nie udało się pobrać lekcji.');
@@ -200,13 +198,21 @@ async function createLesson(request, response) {
   const data = lessonFromBody(request.body, course.id, module?.id);
   data.adminId = request.session.admin.id;
   const errors = [...validateLesson(data), ...validateContentBlocks(data)];
-  if (errors.length) return renderLessonForm(response, request, course, data, 'create', errors, 422, module);
+  if (errors.length) return request.body.workspace === '1'
+    ? renderWorkspaceLessonErrors(request, response, course, module, data, 'create', errors, 422)
+    : renderLessonForm(response, request, course, data, 'create', errors, 422, module);
   try {
     const lesson = await CourseLesson.create(data);
-    return response.redirect(request.app.locals.adminUrl(`/academy/lessons/${lesson.id}/edit`));
+    return response.redirect(request.body.workspace === '1'
+      ? academyWorkspaceUrl(request, { courseId: course.id, moduleId: module?.id, lessonId: lesson.id })
+      : request.app.locals.adminUrl(`/academy/lessons/${lesson.id}/edit`));
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') return renderLessonForm(response, request, course, data, 'create', ['Slug lekcji musi być unikalny w tym kursie.'], 409, module);
-    if (error instanceof FileError) return renderLessonForm(response, request, course, data, 'create', [error.message], error.status, module);
+    if (error.code === 'ER_DUP_ENTRY') return request.body.workspace === '1'
+      ? renderWorkspaceLessonErrors(request, response, course, module, data, 'create', ['Slug lekcji musi być unikalny w tym kursie.'], 409)
+      : renderLessonForm(response, request, course, data, 'create', ['Slug lekcji musi być unikalny w tym kursie.'], 409, module);
+    if (error instanceof FileError) return request.body.workspace === '1'
+      ? renderWorkspaceLessonErrors(request, response, course, module, data, 'create', [error.message], error.status)
+      : renderLessonForm(response, request, course, data, 'create', [error.message], error.status, module);
     console.error('Admin academy lesson create error:', error);
     return response.status(500).send('Nie udało się dodać lekcji.');
   }
@@ -224,13 +230,22 @@ async function updateLesson(request, response) {
   const data = lessonFromBody(request.body, lesson.course_id, lesson.module_id);
   data.adminId = request.session.admin.id;
   const errors = [...validateLesson(data), ...validateContentBlocks(data)];
-  if (errors.length) return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', errors, 422, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
+  const module = lesson.module_id ? await CourseModule.findById(lesson.module_id) : null;
+  if (errors.length) return request.body.workspace === '1'
+    ? renderWorkspaceLessonErrors(request, response, course, module, { id: lesson.id, ...data }, 'edit', errors, 422)
+    : renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', errors, 422, module);
   try {
     const updated = await CourseLesson.update(lesson.id, data);
-    return response.redirect(request.app.locals.adminUrl(`/academy/lessons/${updated.id}/edit`));
+    return response.redirect(request.body.workspace === '1'
+      ? academyWorkspaceUrl(request, { courseId: course.id, moduleId: module?.id, lessonId: updated.id })
+      : request.app.locals.adminUrl(`/academy/lessons/${updated.id}/edit`));
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', ['Slug lekcji musi być unikalny w tym kursie.'], 409, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
-    if (error instanceof FileError) return renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', [error.message], error.status, lesson.module_id ? await CourseModule.findById(lesson.module_id) : null);
+    if (error.code === 'ER_DUP_ENTRY') return request.body.workspace === '1'
+      ? renderWorkspaceLessonErrors(request, response, course, module, { id: lesson.id, ...data }, 'edit', ['Slug lekcji musi być unikalny w tym kursie.'], 409)
+      : renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', ['Slug lekcji musi być unikalny w tym kursie.'], 409, module);
+    if (error instanceof FileError) return request.body.workspace === '1'
+      ? renderWorkspaceLessonErrors(request, response, course, module, { id: lesson.id, ...data }, 'edit', [error.message], error.status)
+      : renderLessonForm(response, request, course, { id: lesson.id, ...data }, 'edit', [error.message], error.status, module);
     console.error('Admin academy lesson update error:', error);
     return response.status(500).send('Nie udało się zapisać lekcji.');
   }
@@ -241,6 +256,9 @@ async function deleteLesson(request, response) {
     const lesson = await CourseLesson.findById(request.params.id);
     if (!lesson) return response.status(404).send('Lekcja nie istnieje.');
     await CourseLesson.remove(lesson.id);
+    if (request.body.workspace === '1') {
+      return response.redirect(academyWorkspaceUrl(request, { courseId: lesson.course_id, moduleId: lesson.module_id }));
+    }
     const target = lesson.module_id
       ? `/academy/modules/${lesson.module_id}/lessons`
       : `/academy/courses/${lesson.course_id}/lessons`;
@@ -363,11 +381,139 @@ async function renderLessonForm(response, request, course, lesson, mode, errors,
   lesson = { ...lesson, contentBlocks: await lessonAttachments.hydrate(lesson, request.session.admin.id, request.app.locals.adminUrl) };
   const settings = fileConfig();
   const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.docx' : '.pdf,.jpg,.jpeg,.webp' };
-  return response.status(status).render('admin/academy/lessons/form', { fileManagerConfig, title: mode === 'edit' ? `Edycja lekcji #${lesson.id}` : 'Nowa lekcja', admin: request.session.admin, course, module, lesson, mode, errors, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/lessons/${lesson.id}/edit` : module ? `/academy/modules/${module.id}/lessons/new` : `/academy/courses/${course.id}/lessons/new`) });
+  return response.status(status).render('admin/academy/lessons/form', { fileManagerConfig, title: mode === 'edit' ? `Edycja lekcji #${lesson.id}` : 'Nowa lekcja', admin: request.session.admin, course, module, lesson, mode, errors, embedded: false, returnUrl: null, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/lessons/${lesson.id}/edit` : module ? `/academy/modules/${module.id}/lessons/new` : `/academy/courses/${course.id}/lessons/new`) });
   } catch (error) {
     console.error('Lesson file metadata error:', error.code || error.name);
     return response.status(500).send('Nie udało się wczytać materiałów lekcji.');
   }
+}
+
+async function workspace(request, response) {
+  try {
+    const data = await workspaceData(request.query);
+    return renderWorkspace(response, request, data);
+  } catch (error) {
+    console.error('Admin academy workspace error:', error);
+    return response.status(500).send('Nie udało się wczytać panelu roboczego Akademii.');
+  }
+}
+
+async function workspaceDataEndpoint(request, response) {
+  try {
+    return response.json(await workspaceData(request.query));
+  } catch (error) {
+    console.error('Admin academy workspace data error:', error);
+    return response.status(500).json({ success: false, message: 'Nie udało się pobrać danych panelu Akademii.' });
+  }
+}
+
+async function reorderWorkspace(request, response) {
+  const ids = Array.isArray(request.body.ids) ? request.body.ids.map(positiveInteger) : [];
+  if (!ids.length || ids.some(id => !id) || new Set(ids).size !== ids.length) {
+    return response.status(422).json({ success: false, message: 'Nieprawidłowa kolejność elementów.' });
+  }
+
+  try {
+    const type = String(request.body.type || '');
+    const courseId = positiveInteger(request.body.courseId);
+    const moduleId = positiveInteger(request.body.moduleId);
+    let items;
+    let update;
+
+    if (type === 'courses') {
+      items = await Course.findAll();
+      update = Course.updateSortOrder;
+    } else if (type === 'modules' && courseId) {
+      items = await CourseModule.findByCourseId(courseId);
+      update = CourseModule.updateSortOrder;
+    } else if (type === 'lessons' && moduleId) {
+      items = await CourseLesson.findByModuleId(moduleId);
+      update = CourseLesson.updateSortOrder;
+    } else {
+      return response.status(422).json({ success: false, message: 'Nieprawidłowy zakres kolejności.' });
+    }
+
+    const expected = new Set(items.map(item => item.id));
+    if (expected.size !== ids.length || ids.some(id => !expected.has(id))) {
+      return response.status(422).json({ success: false, message: 'Lista zawiera element spoza wybranego zakresu.' });
+    }
+    await update(ids);
+    return response.json({ success: true });
+  } catch (error) {
+    console.error('Admin academy workspace reorder error:', error);
+    return response.status(500).json({ success: false, message: 'Nie udało się zapisać kolejności.' });
+  }
+}
+
+async function workspaceData(query = {}) {
+  const courses = await Course.findAll();
+  const courseId = positiveInteger(query.courseId);
+  const selectedCourse = courses.find(course => course.id === courseId) || null;
+  const modules = selectedCourse ? await CourseModule.findByCourseId(selectedCourse.id) : [];
+  const moduleId = positiveInteger(query.moduleId);
+  const selectedModule = modules.find(module => module.id === moduleId) || null;
+  const lessons = selectedModule ? await CourseLesson.findByModuleId(selectedModule.id) : [];
+  const lessonId = positiveInteger(query.lessonId);
+  const selectedLesson = lessons.find(lesson => lesson.id === lessonId) || null;
+  const isCreatingLesson = query.newLesson === '1' && selectedModule;
+
+  return { courses, modules, lessons, selectedCourse, selectedModule, selectedLesson, isCreatingLesson };
+}
+
+async function renderWorkspace(response, request, data, { lessonDraft = null, lessonErrors = [], status = 200 } = {}) {
+  const editorLesson = lessonDraft || data.selectedLesson || (data.isCreatingLesson ? emptyLesson(data.selectedCourse.id, data.selectedModule.id) : null);
+  let lessonEditor = null;
+
+  if (editorLesson) {
+    const hydratedLesson = { ...editorLesson, contentBlocks: await lessonAttachments.hydrate(editorLesson, request.session.admin.id, request.app.locals.adminUrl) };
+    const settings = fileConfig();
+    const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.docx' : '.pdf,.jpg,.jpeg,.webp' };
+    const isEdit = Boolean(data.selectedLesson && !data.isCreatingLesson);
+    lessonEditor = {
+      lesson: hydratedLesson,
+      mode: isEdit ? 'edit' : 'create',
+      errors: lessonErrors,
+      fileManagerConfig,
+      action: request.app.locals.adminUrl(isEdit ? `/academy/lessons/${hydratedLesson.id}/edit` : `/academy/modules/${data.selectedModule.id}/lessons/new`),
+      returnUrl: academyWorkspaceUrl(request, { courseId: data.selectedCourse.id, moduleId: data.selectedModule.id, lessonId: isEdit ? hydratedLesson.id : null }),
+    };
+  }
+
+  return response.status(status).render('admin/academy/workspace', {
+    title: 'Panel roboczy Akademii',
+    admin: request.session.admin,
+    ...data,
+    lessonEditor,
+    workspaceUrl: selection => academyWorkspaceUrl(request, selection),
+  });
+}
+
+async function renderWorkspaceLessonErrors(request, response, course, module, lesson, mode, errors, status) {
+  const data = await workspaceData({
+    courseId: course.id,
+    moduleId: module?.id,
+    lessonId: mode === 'edit' ? lesson.id : null,
+    newLesson: mode === 'create' ? '1' : null,
+  });
+  return renderWorkspace(response, request, data, { lessonDraft: lesson, lessonErrors: errors, status });
+}
+
+function academyWorkspaceUrl(request, selection = {}) {
+  const params = new URLSearchParams();
+  const courseId = positiveInteger(selection.courseId);
+  const moduleId = positiveInteger(selection.moduleId);
+  const lessonId = positiveInteger(selection.lessonId);
+  if (courseId) params.set('courseId', String(courseId));
+  if (moduleId) params.set('moduleId', String(moduleId));
+  if (lessonId) params.set('lessonId', String(lessonId));
+  if (selection.newLesson) params.set('newLesson', '1');
+  const query = params.toString();
+  return `${request.app.locals.adminUrl('/academy/workspace')}${query ? `?${query}` : ''}`;
+}
+
+function positiveInteger(value) {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : null;
 }
 
 async function renderAccessWithErrors(request, response, errors, status) {
@@ -405,11 +551,11 @@ function validateLesson(data) {
 }
 
 function emptyCourse() { return { slug: '', title: '', description: '', category: '', level: '', lesson_count: 0, is_free: 0, is_active: 0, sort_order: 0 }; }
-function emptyModule(courseId) { return { course_id: courseId, slug: '', title: '', description: '', image_url: '', sort_order: 0, is_published: 0 }; }
+function emptyModule(courseId) { return { course_id: courseId, slug: '', title: '', sort_order: 0, is_published: 0 }; }
 function emptyLesson(courseId, moduleId = null) { return { course_id: courseId, module_id: moduleId, slug: '', title: '', description: '', content_type: 'text', content: '', contentBlocks: [], sort_order: 0, is_published: 0 }; }
 
 function moduleFromBody(body, courseId) {
-  return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), imageUrl: String(body.imageUrl || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
+  return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
 }
 
 function validateModule(data) {
@@ -418,10 +564,6 @@ function validateModule(data) {
   if (!data.title || data.title.length > 255) errors.push('Podaj tytuł modułu.');
   if (!Number.isSafeInteger(data.sortOrder) || data.sortOrder < 0) errors.push('Kolejność musi być liczbą nieujemną.');
   return errors;
-}
-
-function lessonForForm(lesson) {
-  return { ...lesson, contentBlocks: normalizeForStorage(lesson.content_blocks, lesson.content) };
 }
 
 function validateContentBlocks(data) {
@@ -437,4 +579,4 @@ function validateContentBlocks(data) {
   return errors;
 }
 
-module.exports = { accessIndex, coursesIndex, createCourse, createLesson, createModule, createModuleLesson, deactivateUser, deleteCourse, deleteLesson, deleteModule, editCourse, editLesson, editModule, grantAccess, lessonsIndex, moduleLessonsIndex, modulesIndex, newCourse, newLesson, newModule, newModuleLesson, orderDetail, ordersIndex, requestOrderRefund, revokeAccess, updateCourse, updateLesson, usersIndex, updateModule };
+module.exports = { accessIndex, coursesIndex, createCourse, createLesson, createModule, createModuleLesson, deactivateUser, deleteCourse, deleteLesson, deleteModule, editCourse, editLesson, editModule, grantAccess, lessonsIndex, moduleLessonsIndex, modulesIndex, newCourse, newLesson, newModule, newModuleLesson, orderDetail, ordersIndex, reorderWorkspace, requestOrderRefund, revokeAccess, updateCourse, updateLesson, usersIndex, updateModule, workspace, workspaceDataEndpoint };

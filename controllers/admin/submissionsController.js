@@ -399,6 +399,45 @@ function formatDateOnly(value) {
   return new Date(value).toLocaleDateString('pl-PL');
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function mailerLiteStatusCell(row) {
+  const status = String(row.mailerlite_status || 'pending').toLowerCase();
+  const definitions = {
+    synced: { icon: '✓', label: 'Zsynchronizowano z MailerLite' },
+    pending: { icon: '◷', label: 'Oczekuje na synchronizację z MailerLite' },
+    syncing: { icon: '↻', label: 'Synchronizacja z MailerLite w toku' },
+    failed: { icon: '!', label: 'Błąd synchronizacji z MailerLite' },
+    skipped: { icon: '—', label: 'Synchronizacja z MailerLite pominięta' },
+  };
+  const definition = definitions[status] || definitions.pending;
+  const details = [definition.label];
+
+  if (status === 'synced' && row.mailerlite_synced_at) {
+    details.push(`Data: ${formatDate(row.mailerlite_synced_at)}`);
+  }
+  if (status === 'failed') {
+    const error = String(row.mailerlite_last_error || 'Nieznany błąd').replace(/\s+/g, ' ').trim();
+    details.push(`Błąd: ${error}`);
+    details.push(`Próby: ${Number(row.mailerlite_attempts || 0)}`);
+  }
+  if ((status === 'pending' || status === 'failed') && row.mailerlite_next_retry_at) {
+    details.push(`Następna próba: ${formatDate(row.mailerlite_next_retry_at)}`);
+  }
+  if (status === 'skipped' && !row.consent_marketing) {
+    details.push('Brak zgody marketingowej.');
+  }
+
+  return `<span class="adm-mailerlite-status adm-mailerlite-status--${status}" role="img" aria-label="${escapeHtml(definition.label)}" title="${escapeHtml(details.join('. '))}"><span aria-hidden="true">${definition.icon}</span></span>`;
+}
+
 function submissionTableColumns(request) {
   return [
     { label: 'Imie', value: row => row.first_name || '-' },
@@ -408,6 +447,11 @@ function submissionTableColumns(request) {
     { label: 'Role', value: row => row.roles.join(', ') || '-' },
     { label: 'Grupy', value: row => row.groups.join(', ') || '-' },
     { label: 'Statusy dodatkowe', value: row => row.status_tags.join(', ') || '-' },
+    {
+      label: 'MailerLite',
+      html: true,
+      value: mailerLiteStatusCell,
+    },
     {
       label: 'Akcje',
       html: true,

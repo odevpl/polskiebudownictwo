@@ -95,6 +95,7 @@ app.use('/api/mediacje', (request, response, next) => {
 });
 
 app.use(express.static(appPublicRoot));
+app.use('/assets/modules/academy-admin', express.static(path.join(__dirname, 'modules', 'academyAdmin', 'assets')));
 app.use('/vendor/quill', express.static(path.join(__dirname, 'node_modules', 'quill', 'dist')));
 app.use(express.static(publicRoot, {
   extensions: ['html'],

@@ -19,7 +19,6 @@
   --adm-shadow: 0 24px 80px rgb(0 0 0 / 38%);
   --adm-font: Inter, Arial, sans-serif;
   --adm-sidebar-width: 248px;
-  --adm-right-width: 232px;
   --adm-topbar-height: 64px;
   --adm-transition: 160ms ease;
 }
@@ -297,7 +296,7 @@ svg {
 .admin-shell {
   display: grid;
   min-height: 100dvh;
-  grid-template-columns: var(--adm-sidebar-width) minmax(0, 1fr) var(--adm-right-width);
+  grid-template-columns: var(--adm-sidebar-width) minmax(0, 1fr);
   background: var(--adm-bg);
 }
 
@@ -407,18 +406,6 @@ svg {
   margin-left: auto;
   color: var(--adm-text);
   font-weight: 800;
-}
-
-.admin-main::after {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: var(--adm-right-width);
-  height: 100dvh;
-  border-left: 1px solid rgb(255 255 255 / 4%);
-  background: var(--adm-bg-deep);
-  content: "";
-  pointer-events: none;
 }
 
 .admin-page {
@@ -598,6 +585,33 @@ th {
   min-height: 34px;
   padding: 8px 12px;
   font-size: 12px;
+}
+
+.adm-mailerlite-status {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--adm-text-muted);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: help;
+}
+
+.adm-mailerlite-status--synced {
+  color: #65cf85;
+}
+
+.adm-mailerlite-status--pending,
+.adm-mailerlite-status--syncing {
+  color: #f2bd4c;
+}
+
+.adm-mailerlite-status--failed {
+  color: #ff6478;
 }
 
 .adm-table tbody tr,
@@ -1063,16 +1077,6 @@ textarea.adm-control.adm-textarea {
 
 .detail-row span {
   color: var(--adm-text);
-}
-
-@media (max-width: 1120px) {
-  .admin-shell {
-    grid-template-columns: var(--adm-sidebar-width) minmax(0, 1fr);
-  }
-
-  .admin-main::after {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {

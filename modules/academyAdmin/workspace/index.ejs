@@ -1,0 +1,102 @@
+<link rel="stylesheet" href="/assets/modules/academy-admin/workspace/index.css?v=2">
+<section class="admin-page academy-workspace" data-academy-workspace>
+  <div class="academy-workspace__header">
+    <div>
+      <p class="adm-kicker">Akademia · beta</p>
+      <h1>Panel roboczy kursów</h1>
+      <p class="admin-hero__meta">Wybierz kurs, moduł i lekcję. Edytor pozostaje w prawej kolumnie.</p>
+    </div>
+    <a class="button button--ghost" href="<%= adminUrl('/academy/workspace') %>">Wróć do listy kursów</a>
+  </div>
+
+  <div class="academy-workspace__grid">
+    <nav class="academy-workspace__pane academy-workspace__pane--courses" aria-labelledby="workspace-courses-title">
+      <div class="academy-workspace__pane-header">
+        <div><p class="adm-kicker">1. Kursy</p><h2 id="workspace-courses-title">Kursy</h2></div>
+        <a class="adm-icon-button" href="<%= adminUrl('/academy/courses/new') %>" aria-label="Dodaj kurs">+</a>
+      </div>
+      <% if (!courses.length) { %>
+        <p class="academy-workspace__empty">Nie ma jeszcze kursów.</p>
+      <% } else { %>
+        <ol class="academy-workspace__list" data-sortable data-sort-type="courses" data-sort-url="<%= adminUrl('/academy/workspace/order') %>">
+          <% courses.forEach(course => { %>
+            <li data-sort-id="<%= course.id %>" draggable="true">
+              <a class="academy-workspace__item <%= selectedCourse?.id === course.id ? 'is-selected' : '' %>" href="<%= workspaceUrl({ courseId: course.id }) %>" <%= selectedCourse?.id === course.id ? 'aria-current="page"' : '' %>>
+                <span class="academy-workspace__item-title"><%= course.title %></span>
+                <span class="academy-workspace__item-meta"><%= course.is_active ? 'Aktywny' : 'Szkic' %> · <%= course.lesson_count || 0 %> lekcji</span>
+              </a>
+              <div class="academy-workspace__item-actions">
+                <a href="<%= adminUrl('/academy/courses/' + course.id + '/edit') %>">Edytuj</a>
+                <form method="post" action="<%= adminUrl('/academy/courses/' + course.id + '/delete') %>" onsubmit="return confirm('Usunąć kurs i jego zawartość?');"><input type="hidden" name="workspace" value="1"><button type="submit">Usuń</button></form>
+              </div>
+            </li>
+          <% }) %>
+        </ol>
+      <% } %>
+    </nav>
+
+    <nav class="academy-workspace__pane academy-workspace__pane--modules" aria-labelledby="workspace-modules-title">
+      <div class="academy-workspace__pane-header">
+        <div><p class="adm-kicker">2. Moduły i lekcje</p><h2 id="workspace-modules-title">Program kursu</h2></div>
+        <% if (selectedCourse) { %><a class="adm-icon-button" href="<%= adminUrl('/academy/courses/' + selectedCourse.id + '/modules/new') %>" aria-label="Dodaj moduł">+</a><% } %>
+      </div>
+      <% if (!selectedCourse) { %>
+        <p class="academy-workspace__empty">Wybierz kurs z pierwszej kolumny.</p>
+      <% } else if (!modules.length) { %>
+        <p class="academy-workspace__empty">Ten kurs nie ma jeszcze modułów.</p>
+      <% } else { %>
+        <ol class="academy-workspace__accordion" data-sortable data-sort-type="modules" data-course-id="<%= selectedCourse.id %>" data-sort-url="<%= adminUrl('/academy/workspace/order') %>">
+          <% modules.forEach(module => { const isExpanded = selectedModule?.id === module.id; %>
+            <li class="academy-workspace__accordion-item <%= isExpanded ? 'is-expanded' : '' %>" data-sort-id="<%= module.id %>" draggable="true">
+              <a class="academy-workspace__accordion-trigger" href="<%= workspaceUrl({ courseId: selectedCourse.id, moduleId: module.id }) %>" <%= isExpanded ? 'aria-current="page"' : '' %>>
+                <span class="academy-workspace__accordion-order"><%= module.sort_order + 1 %>.</span>
+                <span class="academy-workspace__accordion-title"><%= module.title %></span>
+                <span class="academy-workspace__accordion-meta"><%= module.lesson_count || 0 %></span>
+                <span class="academy-workspace__accordion-icon" aria-hidden="true"></span>
+              </a>
+              <div class="academy-workspace__item-actions academy-workspace__item-actions--module">
+                <a href="<%= adminUrl('/academy/modules/' + module.id + '/edit') %>">Edytuj</a>
+                <form method="post" action="<%= adminUrl('/academy/modules/' + module.id + '/delete') %>" onsubmit="return confirm('Usunąć moduł i jego lekcje?');"><input type="hidden" name="workspace" value="1"><button type="submit">Usuń</button></form>
+              </div>
+              <% if (isExpanded) { %>
+                <div class="academy-workspace__accordion-panel">
+                  <div class="academy-workspace__accordion-panel-header">
+                    <span><%= module.is_published ? 'Opublikowany' : 'Szkic' %></span>
+                    <a href="<%= workspaceUrl({ courseId: selectedCourse.id, moduleId: module.id, newLesson: true }) %>">+ Lekcja</a>
+                  </div>
+                  <% if (!lessons.length) { %>
+                    <p class="academy-workspace__empty">Ten moduł nie ma jeszcze lekcji.</p>
+                  <% } else { %>
+                    <ol class="academy-workspace__lesson-list" data-sortable data-sort-type="lessons" data-module-id="<%= module.id %>" data-sort-url="<%= adminUrl('/academy/workspace/order') %>">
+                      <% lessons.forEach(lesson => { %>
+                        <li data-sort-id="<%= lesson.id %>" draggable="true">
+                          <a class="academy-workspace__lesson-tab <%= selectedLesson?.id === lesson.id ? 'is-selected' : '' %>" href="<%= workspaceUrl({ courseId: selectedCourse.id, moduleId: module.id, lessonId: lesson.id }) %>" <%= selectedLesson?.id === lesson.id ? 'aria-current="page"' : '' %>>
+                            <span class="academy-workspace__lesson-order"><%= lesson.sort_order + 1 %>.</span>
+                            <span><%= lesson.title %></span>
+                          </a>
+                        </li>
+                      <% }) %>
+                    </ol>
+                  <% } %>
+                </div>
+              <% } %>
+            </li>
+          <% }) %>
+        </ol>
+      <% } %>
+    </nav>
+
+    <section class="academy-workspace__pane academy-workspace__pane--editor" aria-labelledby="workspace-editor-title">
+      <div class="academy-workspace__pane-header">
+        <div><p class="adm-kicker">3. Edytor lekcji</p><h2 id="workspace-editor-title"><%= selectedLesson ? selectedLesson.title : 'Edytor' %></h2></div>
+      </div>
+
+      <% if (!lessonEditor) { %>
+        <div class="academy-workspace__blank"><p>Wybierz lekcję z rozwiniętego modułu, aby otworzyć jej edytor.</p></div>
+      <% } else { %>
+        <%- include('../lessonEditor/index', { embedded: true, course: selectedCourse, module: selectedModule, lesson: lessonEditor.lesson, mode: lessonEditor.mode, errors: lessonEditor.errors, action: lessonEditor.action, returnUrl: lessonEditor.returnUrl, fileManagerConfig: lessonEditor.fileManagerConfig }) %>
+      <% } %>
+    </section>
+  </div>
+</section>
+<script type="module" src="/assets/modules/academy-admin/workspace/index.js?v=2"></script>

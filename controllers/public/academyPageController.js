@@ -11,8 +11,17 @@ async function course(request, response) {
     const record = await Course.findBySlug(request.params.slug);
     if (!record || !record.is_active) return response.status(404).send('Szkolenie nie istnieje.');
     if (!await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.status(403).send('Nie masz dostępu do tego szkolenia.');
-    const modules = await CourseModule.findByCourseId(record.id, { publishedOnly: true });
-    return response.render('public/academy/course', { title: record.title, course: record, modules });
+    const [modules, lessons] = await Promise.all([
+      CourseModule.findByCourseId(record.id, { publishedOnly: true }),
+      CourseLesson.findByCourseId(record.id, { publishedOnly: true }),
+    ]);
+    const lessonsByModule = new Map(modules.map(module => [module.id, []]));
+    lessons.forEach(lesson => lessonsByModule.get(lesson.module_id)?.push(lesson));
+    return response.render('public/academy/course', {
+      title: record.title,
+      course: record,
+      modules: modules.map(module => ({ ...module, lessons: lessonsByModule.get(module.id) || [] })),
+    });
   } catch (error) {
     console.error('Academy course page error:', error);
     return response.status(500).send('Nie udało się pobrać szkolenia.');
@@ -25,8 +34,7 @@ async function modulePage(request, response) {
     if (!courseRecord) return response.status(404).send('Szkolenie nie istnieje.');
     const moduleRecord = await CourseModule.findBySlug(courseRecord.id, request.params.moduleSlug, { publishedOnly: true });
     if (!moduleRecord) return response.status(404).send('Moduł nie istnieje.');
-    const lessons = await CourseLesson.findByModuleId(moduleRecord.id, { publishedOnly: true });
-    return response.render('public/academy/module', { title: `${moduleRecord.title} | ${courseRecord.title}`, course: courseRecord, module: moduleRecord, lessons });
+    return response.redirect(`/akademia/kurs/${encodeURIComponent(courseRecord.slug)}#modul-${encodeURIComponent(moduleRecord.slug)}`);
   } catch (error) {
     console.error('Academy module page error:', error);
     return response.status(500).send('Nie udało się pobrać modułu.');

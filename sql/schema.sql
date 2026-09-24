@@ -142,8 +142,6 @@ CREATE TABLE IF NOT EXISTS course_modules (
   course_id INT UNSIGNED NOT NULL,
   slug VARCHAR(160) NOT NULL,
   title VARCHAR(255) NOT NULL,
-  description TEXT,
-  image_url VARCHAR(500),
   sort_order INT NOT NULL DEFAULT 0,
   is_published TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

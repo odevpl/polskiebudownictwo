@@ -1,16 +1,16 @@
 const groupIds = Object.freeze({
-  'Generalny wykonawca': '192174106703037566',
-  Wykonawca: '192174121393588053',
-  Podwykonawca: '192174136389273291',
-  'Dostawca materiałów': '192174150210553036',
-  'Producent materiałów': '192174179865330813',
-  'Inżynier, projektant lub architekt': '192174192328705065',
-  'Usługodawca dla budownictwa': '192174998790604347',
-  Rzeczoznawca: '19217493319587568',
-  Prawnik: '191875008252871787',
-  Mediator: '192174909181396766',
-  'Organizacja Branżowa': '192176612860495094',
-  Inna: '1921750209658889393',
+  'Generalny wykonawca': '196350440890173388',
+  Wykonawca: '196350289705436579',
+  Podwykonawca: '196350344642430396',
+  'Dostawca materiałów': '196350326114092898',
+  'Producent materiałów': '19635035955517189',
+  'Inżynier, projektant lub architekt': '196350402794357855',
+  'Usługodawca dla budownictwa': '196350498772616993',
+  Rzeczoznawca: '196350427251345070',
+  Prawnik: '196350262987720007',
+  Mediator: '196350433130710443',
+  'Organizacja Branżowa': '196350197315010416',
+  Inna: '196350539689100897',
 });
 
 function getConfig() {

@@ -1,0 +1,15 @@
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/academy/courses/' + course.id + '/modules') %>">Wróć do modułów</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">M</div><div><p class="adm-kicker"><%= mode === 'edit' ? 'Edycja modułu' : 'Nowy moduł' %></p><h1><%= mode === 'edit' ? 'Moduł #' + module.id : 'Dodaj moduł' %></h1><p class="admin-hero__meta"><%= course.title %></p></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form" method="post" action="<%= action %>"><div class="adm-form-grid">
+    <div class="adm-field"><label class="adm-label" for="slug">Slug</label><input class="adm-control" id="slug" name="slug" value="<%= module.slug || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="title">Tytuł modułu</label><input class="adm-control" id="title" name="title" value="<%= module.title || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= module.sort_order ?? module.sortOrder ?? 0 %>"></div>
+    <label class="adm-check"><input name="isPublished" type="checkbox" value="1" <%= module.is_published || module.isPublished ? 'checked' : '' %>><span>Opublikowany</span></label>
+    <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Zapisz moduł</button><a class="button button--ghost" href="<%= adminUrl('/academy/courses/' + course.id + '/modules') %>">Anuluj</a><% if (mode === 'edit') { %><a class="button button--ghost" href="<%= adminUrl('/academy/modules/' + module.id + '/lessons') %>">Zarządzaj lekcjami</a><% } %></div>
+  </div></form>
+  <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/modules/' + module.id + '/delete') %>" onsubmit="return confirm('Usunąć moduł i jego lekcje?');"><button class="button button--ghost" type="submit">Usuń moduł</button></form><% } %>
+</section>
+<link rel="stylesheet" href="/vendor/quill/quill.snow.css">
+<script src="/vendor/quill/quill.js" defer></script><script src="/assets/modules/academy-admin/rich-text-textarea.js?v=1" defer></script>
