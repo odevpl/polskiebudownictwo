@@ -117,7 +117,7 @@ async function createModule(request, response) {
     const module = await CourseModule.create(data);
     return response.redirect(academyWorkspaceUrl(request, { courseId: course.id, moduleId: module.id }));
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, data, 'create', ['Slug modułu musi być unikalny w tym szkoleniu.'], 409);
+    if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, data, 'create', ['Slug modułu musi być unikalny w tym kursie.'], 409);
     return response.status(500).send('Nie udało się dodać modułu.');
   }
 }
@@ -133,7 +133,7 @@ async function updateModule(request, response) {
     const updated = await CourseModule.update(module.id, data);
     return response.redirect(academyWorkspaceUrl(request, { courseId: course.id, moduleId: updated.id }));
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, { id: module.id, ...data }, 'edit', ['Slug modułu musi być unikalny w tym szkoleniu.'], 409);
+    if (error.code === 'ER_DUP_ENTRY') return renderModuleForm(response, request, course, { id: module.id, ...data }, 'edit', ['Slug modułu musi być unikalny w tym kursie.'], 409);
     return response.status(500).send('Nie udało się zapisać modułu.');
   }
 }
@@ -380,7 +380,7 @@ async function renderLessonForm(response, request, course, lesson, mode, errors,
   try {
   lesson = { ...lesson, contentBlocks: await lessonAttachments.hydrate(lesson, request.session.admin.id, request.app.locals.adminUrl) };
   const settings = fileConfig();
-  const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.docx' : '.pdf,.jpg,.jpeg,.webp' };
+  const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.xlsx,.xlsm,.csv,.docx' : '.pdf,.jpg,.jpeg,.webp,.xlsx,.xlsm,.csv' };
   return response.status(status).render('admin/academy/lessons/form', { fileManagerConfig, title: mode === 'edit' ? `Edycja lekcji #${lesson.id}` : 'Nowa lekcja', admin: request.session.admin, course, module, lesson, mode, errors, embedded: false, returnUrl: null, action: request.app.locals.adminUrl(mode === 'edit' ? `/academy/lessons/${lesson.id}/edit` : module ? `/academy/modules/${module.id}/lessons/new` : `/academy/courses/${course.id}/lessons/new`) });
   } catch (error) {
     console.error('Lesson file metadata error:', error.code || error.name);
@@ -467,7 +467,7 @@ async function renderWorkspace(response, request, data, { lessonDraft = null, le
   if (editorLesson) {
     const hydratedLesson = { ...editorLesson, contentBlocks: await lessonAttachments.hydrate(editorLesson, request.session.admin.id, request.app.locals.adminUrl) };
     const settings = fileConfig();
-    const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.docx' : '.pdf,.jpg,.jpeg,.webp' };
+    const fileManagerConfig = { uploadUrl: request.app.locals.adminUrl('/files'), maxBytes: settings.maxBytes, lessonFiles: settings.lessonFiles, lessonBytes: settings.lessonBytes, maxBlocks: settings.maxBlocks, accept: settings.docx ? '.pdf,.jpg,.jpeg,.webp,.xlsx,.xlsm,.csv,.docx' : '.pdf,.jpg,.jpeg,.webp,.xlsx,.xlsm,.csv' };
     const isEdit = Boolean(data.selectedLesson && !data.isCreatingLesson);
     lessonEditor = {
       lesson: hydratedLesson,
@@ -522,7 +522,9 @@ async function renderAccessWithErrors(request, response, errors, status) {
 }
 
 function courseFromBody(body) {
-  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), category: String(body.category || '').trim(), level: String(body.level || '').trim(), priceAmount: body.priceAmount === undefined ? null : Number(body.priceAmount || 0), currency: String(body.currency || 'PLN').trim().toUpperCase(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
+  const introVideoUrl = String(body.introVideoUrl || '').trim();
+  const detailsUrlInput = String(body.detailsUrl || '').trim();
+  return { slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), introVideoUrl, introVideoId: youtubeVideoId(introVideoUrl), detailsUrlInput, detailsUrl: normalizedDetailsUrl(detailsUrlInput), category: String(body.category || '').trim(), level: String(body.level || '').trim(), priceAmount: body.priceAmount === undefined ? null : Number(body.priceAmount || 0), currency: String(body.currency || 'PLN').trim().toUpperCase(), lessonCount: body.lessonCount === undefined ? null : Number(body.lessonCount || 0), moduleCount: body.moduleCount === undefined ? null : Number(body.moduleCount || 0), isFree: Boolean(body.isFree), isActive: Boolean(body.isActive), sortOrder: Number(body.sortOrder || 0) };
 }
 
 function lessonFromBody(body, courseId, moduleId = null) {
@@ -535,7 +537,10 @@ function validateCourse(data) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) errors.push('Slug może zawierać małe litery, cyfry i myślniki.');
   if (!data.title || data.title.length > 255) errors.push('Podaj tytuł kursu (maksymalnie 255 znaków).');
   if (!data.description) errors.push('Podaj opis kursu.');
+  if (data.introVideoUrl && !data.introVideoId) errors.push('Podaj poprawny adres filmu YouTube.');
+  if (data.detailsUrlInput && !data.detailsUrl) errors.push('Podaj poprawny link do strony z opisem kursu.');
   if (data.priceAmount !== null && (!Number.isFinite(data.priceAmount) || data.priceAmount < 0)) errors.push('Cena musi być liczbą nieujemną.');
+  if (data.moduleCount !== null && (!Number.isSafeInteger(data.moduleCount) || data.moduleCount < 0)) errors.push('Planowana liczba modułów musi być liczbą nieujemną.');
   if (!/^[A-Z]{3}$/.test(data.currency)) errors.push('Waluta musi mieć 3 wielkie litery.');
   if (!Number.isSafeInteger(data.sortOrder) || data.sortOrder < 0) errors.push('Kolejność musi być liczbą nieujemną.');
   return errors;
@@ -550,12 +555,23 @@ function validateLesson(data) {
   return errors;
 }
 
-function emptyCourse() { return { slug: '', title: '', description: '', category: '', level: '', lesson_count: 0, is_free: 0, is_active: 0, sort_order: 0 }; }
+function emptyCourse() { return { slug: '', title: '', description: '', intro_video_id: null, details_url: '', category: '', level: '', lesson_count: 0, module_count: 0, is_free: 0, is_active: 0, sort_order: 0 }; }
 function emptyModule(courseId) { return { course_id: courseId, slug: '', title: '', sort_order: 0, is_published: 0 }; }
 function emptyLesson(courseId, moduleId = null) { return { course_id: courseId, module_id: moduleId, slug: '', title: '', description: '', content_type: 'text', content: '', contentBlocks: [], sort_order: 0, is_published: 0 }; }
 
 function moduleFromBody(body, courseId) {
   return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
+}
+
+function normalizedDetailsUrl(value) {
+  if (!value) return '';
+  if (value.startsWith('/') && !value.startsWith('//')) return value;
+  try {
+    const url = new URL(value);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
 }
 
 function validateModule(data) {

@@ -1,8 +1,8 @@
 <%- include('../../../partials/admin-shell-start', { title, admin }) %>
 <section class="admin-page">
-  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker">Akademia</p><h1>Szkolenia</h1><p class="admin-hero__meta">Zarządzaj szkoleniami, modułami i lekcjami.</p></div></div>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker">Akademia</p><h1>Kursy</h1><p class="admin-hero__meta">Zarządzaj kursami, modułami i lekcjami.</p></div></div>
   <% if (error) { %><p class="alert"><%= error %></p><% } %>
-  <div class="adm-page-actions"><a class="button" href="<%= adminUrl('/academy/courses/new') %>">Dodaj szkolenie</a><a class="button button--ghost" href="<%= adminUrl('/academy/workspace') %>">Panel roboczy</a><a class="button button--ghost" href="<%= adminUrl('/academy/access') %>">Zarządzaj dostępami</a></div>
+  <div class="adm-page-actions"><a class="button" href="<%= adminUrl('/academy/courses/new') %>">Dodaj kurs</a><a class="button button--ghost" href="<%= adminUrl('/academy/workspace') %>">Panel roboczy</a><a class="button button--ghost" href="<%= adminUrl('/academy/access') %>">Zarządzaj dostępami</a></div>
   <div class="adm-table-panel"><%- include('../../../components/Table', { columns: [
     { label: 'Tytuł', value: item => item.title },
     { label: 'Slug', value: item => item.slug },

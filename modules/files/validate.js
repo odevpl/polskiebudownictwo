@@ -5,19 +5,33 @@ const { config, FileError } = require('./config');
 
 function safeName(input) {
   const name = String(input || '').normalize('NFC');
-  if (!name || name.length > 180 || /[\\/<>:"|?*\x00-\x1f\x7f\u202a-\u202e\u2066-\u2069]/u.test(name) || name.startsWith('.') || name.includes('..') || /[. ]$/.test(name) || /\ufffd/.test(name)) throw new FileError('Nazwa pliku jest nieprawidłowa (maksymalnie 180 znaków, bez znaków specjalnych).');
+  if (!name || name.length > 180 || /[\\/:"|?*\x00-\x1f\x7f\u202a-\u202e\u2066-\u2069]/u.test(name) || name.startsWith('.') || name.includes('..') || /[. ]$/.test(name) || /\ufffd/.test(name)) throw new FileError('Nazwa pliku jest nieprawidłowa (maksymalnie 180 znaków, bez znaków specjalnych).');
   return name;
 }
-const types = { '.pdf': 'application/pdf', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+
+const types = {
+  '.pdf': { mime: 'application/pdf' },
+  '.jpg': { mime: 'image/jpeg' },
+  '.jpeg': { mime: 'image/jpeg' },
+  '.webp': { mime: 'image/webp' },
+  '.docx': { mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+  '.xlsx': { mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+  '.xlsm': { mime: 'application/vnd.ms-excel.sheet.macroEnabled.12' },
+  '.csv': { mime: 'text/csv', declared: new Set(['text/csv', 'application/vnd.ms-excel']) },
+};
+
+function allowedFormats() {
+  return 'Dozwolone formaty: PDF, JPG, WebP, XLSX, XLSM, CSV' + (config().docx ? ', DOCX.' : '.');
+}
+
 async function inspect(filename, originalName, declaredMime) {
   const name = safeName(originalName);
   const extension = path.extname(name).toLowerCase();
-  const mime = types[extension];
-  if (!mime || (extension === '.docx' && !config().docx)) throw new FileError('Dozwolone formaty: PDF, JPG, WebP' + (config().docx ? ', DOCX.' : '.'));
-  if (declaredMime !== mime && declaredMime !== 'application/octet-stream') throw new FileError('Typ pliku nie zgadza się z rozszerzeniem.');
+  const type = types[extension];
+  if (!type || (extension === '.docx' && !config().docx)) throw new FileError(allowedFormats());
+  if (declaredMime !== type.mime && !type.declared?.has(declaredMime) && declaredMime !== 'application/octet-stream') throw new FileError('Typ pliku nie zgadza się z rozszerzeniem.');
   const stat = await fs.stat(filename);
   if (!stat.size || stat.size > config().maxBytes) throw new FileError('Plik jest pusty lub przekracza limit rozmiaru.');
-  // Parse untrusted documents off the HTTP event loop with a hard execution deadline.
   await new Promise((resolve, reject) => {
     const worker = new Worker(__filename, { workerData: { filename, extension, maxPixels: config().maxPixels }, resourceLimits: { maxOldGenerationSizeMb: 192 } });
     let settled = false;
@@ -27,7 +41,7 @@ async function inspect(filename, originalName, declaredMime) {
     worker.once('error', () => finish(new FileError('Nie udało się zweryfikować pliku.')));
     worker.once('exit', () => { if (!settled) finish(new FileError('Nie udało się zweryfikować pliku.')); });
   });
-  return { name, mime, size: stat.size };
+  return { name, mime: type.mime, size: stat.size };
 }
 
 async function validateDocument({ filename, extension, maxPixels }) {
@@ -42,41 +56,58 @@ async function validateDocument({ filename, extension, maxPixels }) {
       if (object instanceof PDFDict && forbidden.some(key => object.has(PDFName.of(key)))) throw new Error('Active PDF');
     }
   } else if (extension === '.docx') {
-    await validateDocx(filename);
+    await validateOoxml(filename, { mainPart: 'word/document.xml', mainContentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml', mainTag: 'document' });
+  } else if (extension === '.xlsx') {
+    await validateOoxml(filename, { mainPart: 'xl/workbook.xml', mainContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml', mainTag: 'workbook' });
+  } else if (extension === '.xlsm') {
+    await validateOoxml(filename, { mainPart: 'xl/workbook.xml', mainContentType: 'application/vnd.ms-excel.sheet.macroEnabled.main+xml', mainTag: 'workbook', allowVba: true });
+  } else if (extension === '.csv') {
+    await validateCsv(filename);
   } else {
     const sharp = require('sharp');
     sharp.cache(false);
     const image = sharp(filename, { limitInputPixels: maxPixels, failOn: 'warning' });
     const metadata = await image.metadata();
     if (metadata.format !== (extension === '.webp' ? 'webp' : 'jpeg') || (metadata.pages || 1) !== 1) throw new Error('Not supported image');
-    await image.stats(); // Decode pixels as well as the header; no public thumbnail is created.
+    await image.stats();
   }
 }
-async function validateDocx(filename) {
+
+async function validateOoxml(filename, { mainPart, mainContentType, mainTag, allowVba = false }) {
   const yauzl = require('yauzl');
   await new Promise((resolve, reject) => {
     yauzl.open(filename, { lazyEntries: true, validateEntrySizes: true, strictFileNames: true }, (error, zip) => {
       if (error) return reject(error);
-      let count = 0, total = 0; const entries = new Set();
+      let count = 0;
+      let total = 0;
+      const entries = new Set();
       const fail = error => { zip.close(); reject(error); };
       zip.on('error', fail);
-      zip.on('end', () => entries.has('[Content_Types].xml') && entries.has('word/document.xml') && entries.has('_rels/.rels') ? resolve() : reject(new Error('Not OOXML')));
+      zip.on('end', () => entries.has('[Content_Types].xml') && entries.has(mainPart) && entries.has('_rels/.rels') ? resolve() : reject(new Error('Not OOXML')));
       zip.on('entry', entry => {
         const name = entry.fileName;
         total += entry.uncompressedSize;
-        if (++count > 1000 || total > 50 * 1024 * 1024 || entry.uncompressedSize > 10 * 1024 * 1024 || entries.has(name) || /(^\/|\.\.|:|\\|vba|activex|embeddings)/i.test(name) || (entry.generalPurposeBitFlag & 1)) return fail(new Error('Unsafe ZIP'));
+        const forbiddenPath = allowVba
+          ? /(^\/|\.\.|:|\\|activex|embeddings|macrosheets|dialogsheet|connections|externalLinks)/i
+          : /(^\/|\.\.|:|\\|vba|activex|embeddings|macrosheets|dialogsheet|connections|externalLinks)/i;
+        if (++count > 1000 || total > 50 * 1024 * 1024 || entry.uncompressedSize > 10 * 1024 * 1024 || entries.has(name) || forbiddenPath.test(name) || (entry.generalPurposeBitFlag & 1)) return fail(new Error('Unsafe ZIP'));
         entries.add(name);
         if (name.endsWith('/')) return zip.readEntry();
         zip.openReadStream(entry, (error, stream) => {
           if (error) return fail(error);
-          const chunks = []; let bytes = 0;
+          const chunks = [];
+          let bytes = 0;
           stream.on('error', fail);
-          stream.on('data', chunk => { bytes += chunk.length; if (bytes > 10 * 1024 * 1024) { stream.destroy(); fail(new Error('ZIP limit')); } else if (/\.(xml|rels)$/i.test(name)) chunks.push(chunk); });
+          stream.on('data', chunk => {
+            bytes += chunk.length;
+            if (bytes > 10 * 1024 * 1024) { stream.destroy(); fail(new Error('ZIP limit')); }
+            else if (/\.(xml|rels)$/i.test(name)) chunks.push(chunk);
+          });
           stream.on('end', () => {
             const xml = Buffer.concat(chunks).toString('utf8');
-            if (/<!DOCTYPE|<!ENTITY|macroEnabled|vbaProject|TargetMode\s*=\s*["']External/i.test(xml) || xml.includes('\0')) return fail(new Error('Unsafe XML'));
-            if (name === '[Content_Types].xml' && !xml.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml')) return fail(new Error('Not DOCX'));
-            if (name === 'word/document.xml' && !/<(?:\w+:)?document\b/.test(xml)) return fail(new Error('Not document'));
+            if (/<!DOCTYPE|<!ENTITY|TargetMode\s*=\s*["']External/i.test(xml) || (!allowVba && /macroEnabled|vbaProject/i.test(xml)) || xml.includes('\0')) return fail(new Error('Unsafe XML'));
+            if (name === '[Content_Types].xml' && !xml.includes(mainContentType)) return fail(new Error('Not OOXML document'));
+            if (name === mainPart && !new RegExp(`<(?:\\w+:)?${mainTag}\\b`).test(xml)) return fail(new Error('Not OOXML document'));
             if (/\.(xml|rels)$/i.test(name)) {
               try {
                 const { SaxesParser } = require('saxes');
@@ -84,7 +115,7 @@ async function validateDocx(filename) {
                 parser.on('doctype', () => { throw new Error('DTD forbidden'); });
                 parser.on('opentag', tag => {
                   for (const attribute of Object.values(tag.attributes)) {
-                    if ((attribute.local === 'TargetMode' && attribute.value === 'External') || /macroEnabled|vbaProject/i.test(attribute.value)) throw new Error('Active document');
+                    if ((attribute.local === 'TargetMode' && attribute.value === 'External') || (!allowVba && /macroEnabled|vbaProject/i.test(attribute.value))) throw new Error('Active document');
                   }
                 });
                 parser.write(xml).close();
@@ -98,5 +129,37 @@ async function validateDocx(filename) {
     });
   });
 }
+
+async function validateCsv(filename) {
+  const bytes = await fs.readFile(filename);
+  const offset = bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf])) ? 3 : 0;
+  let text;
+  try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(offset)); } catch { throw new Error('CSV encoding'); }
+  if (!text || text.includes('\0')) throw new Error('Unsafe CSV');
+  let quoted = false;
+  let field = '';
+  const checkField = () => {
+    const value = field.trimStart();
+    field = '';
+    if (!value) return;
+    if (/^[=+@]/.test(value) || (/^-/.test(value) && !/^-\d+(?:[.,]\d+)?(?:e[+-]?\d+)?$/i.test(value))) throw new Error('CSV formula');
+  };
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (character === '"') {
+      if (quoted && text[index + 1] === '"') { field += character; index += 1; } else quoted = !quoted;
+    } else if (!quoted && (character === ',' || character === ';' || character === '\t' || character === '\n' || character === '\r')) {
+      checkField();
+      if (character === '\r' && text[index + 1] === '\n') index += 1;
+    } else {
+      field += character;
+      if (field.length > 1024 * 1024) throw new Error('CSV field limit');
+    }
+  }
+  if (quoted) throw new Error('CSV quotes');
+  checkField();
+}
+
 if (!isMainThread) validateDocument(workerData).then(() => parentPort.postMessage(true)).catch(() => parentPort.postMessage(false));
+
 module.exports = { inspect, safeName };

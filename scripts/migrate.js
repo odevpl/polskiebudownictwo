@@ -26,9 +26,13 @@ async function migrate() {
     await ensureEventsUpcomingColumn(connection);
     await ensureEventScheduleNullable(connection);
     await ensureAcademyLessonCountColumn(connection);
+    await ensureAcademyModuleCountColumn(connection);
     await ensureAcademyPriceColumns(connection);
+    await ensureAcademyIntroVideoColumn(connection);
+    await ensureAcademyDetailsUrlColumn(connection);
     await ensureAcademyContentBlocksColumn(connection);
     await ensureAcademyModules(connection);
+    await renameLegacyAcademyModule(connection);
     await removeAcademyModuleDisplayColumns(connection);
     const filesSchema = await fs.readFile(path.join(__dirname, '..', 'sql', 'files.sql'), 'utf8');
     for (const statement of filesSchema.split(';').map(value => value.trim()).filter(Boolean)) await connection.query(statement);
@@ -55,6 +59,20 @@ async function ensureAcademyLessonCountColumn(connection) {
   }
 }
 
+async function ensureAcademyModuleCountColumn(connection) {
+  const [columns] = await connection.query(
+    `SHOW COLUMNS
+     FROM courses
+     LIKE 'module_count'`,
+  );
+
+  if (!columns.length) {
+    await connection.query(
+      'ALTER TABLE courses ADD COLUMN module_count SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER lesson_count',
+    );
+  }
+}
+
 async function ensureAcademyContentBlocksColumn(connection) {
   const [columns] = await connection.query('SHOW COLUMNS FROM course_lessons LIKE \'content_blocks\'');
   if (!columns.length) {
@@ -75,11 +93,17 @@ async function ensureAcademyModules(connection) {
     const [existing] = await connection.execute('SELECT id FROM course_modules WHERE course_id = ? ORDER BY id ASC LIMIT 1', [course.id]);
     let moduleId = existing[0]?.id;
     if (!moduleId) {
-      const [result] = await connection.execute('INSERT INTO course_modules (course_id, slug, title, sort_order, is_published) VALUES (?, \'materialy-szkolenia\', ?, 0, 1)', [course.id, 'Materiały szkolenia']);
+      const [result] = await connection.execute('INSERT INTO course_modules (course_id, slug, title, sort_order, is_published) VALUES (?, \'materialy-szkolenia\', ?, 0, 1)', [course.id, 'Materiały kursu']);
       moduleId = result.insertId;
     }
     await connection.execute('UPDATE course_lessons SET module_id = ? WHERE course_id = ? AND module_id IS NULL', [moduleId, course.id]);
   }
+}
+
+async function renameLegacyAcademyModule(connection) {
+  await connection.execute(
+    "UPDATE course_modules SET title = 'Materiały kursu' WHERE slug = 'materialy-szkolenia' AND title = 'Materiały szkolenia'",
+  );
 }
 
 async function removeAcademyModuleDisplayColumns(connection) {
@@ -98,6 +122,16 @@ async function ensureAcademyPriceColumns(connection) {
   if (!currencyColumns.length) {
     await connection.query('ALTER TABLE courses ADD COLUMN currency CHAR(3) NOT NULL DEFAULT \'PLN\' AFTER price_amount');
   }
+}
+
+async function ensureAcademyIntroVideoColumn(connection) {
+  const [columns] = await connection.query('SHOW COLUMNS FROM courses LIKE \'intro_video_id\'');
+  if (!columns.length) await connection.query('ALTER TABLE courses ADD COLUMN intro_video_id VARCHAR(32) NULL AFTER description');
+}
+
+async function ensureAcademyDetailsUrlColumn(connection) {
+  const [columns] = await connection.query('SHOW COLUMNS FROM courses LIKE \'details_url\'');
+  if (!columns.length) await connection.query('ALTER TABLE courses ADD COLUMN details_url VARCHAR(500) NULL AFTER intro_video_id');
 }
 
 async function ensureUserAnonymizedAtColumn(connection) {

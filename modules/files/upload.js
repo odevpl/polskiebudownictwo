@@ -6,6 +6,10 @@ const allowedMimeTypes = new Set([
   'image/jpeg',
   'image/webp',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel.sheet.macroEnabled.12',
+  'text/csv',
+  'application/vnd.ms-excel',
   'application/octet-stream',
 ]);
 
@@ -23,7 +27,7 @@ const upload = multer({
   storage: diskStorage,
   fileFilter(request, file, callback) {
     const allowed = allowedMimeTypes.has(file.mimetype);
-    callback(allowed ? null : new FileError('Dozwolone formaty: PDF, JPG, WebP' + (config().docx ? ', DOCX.' : '.')), allowed);
+    callback(allowed ? null : new FileError('Dozwolone formaty: PDF, JPG, WebP, XLSX, XLSM, CSV' + (config().docx ? ', DOCX.' : '.')), allowed);
   },
   limits: { fileSize: config().maxBytes, files: 1, fields: 0, parts: 1, headerPairs: 20 },
 });

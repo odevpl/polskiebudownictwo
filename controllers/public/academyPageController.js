@@ -9,8 +9,8 @@ const { parseBlocks } = require('../../modules/courseContent');
 async function course(request, response) {
   try {
     const record = await Course.findBySlug(request.params.slug);
-    if (!record || !record.is_active) return response.status(404).send('Szkolenie nie istnieje.');
-    if (!await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.status(403).send('Nie masz dostępu do tego szkolenia.');
+    if (!record || !record.is_active) return response.status(404).send('Kurs nie istnieje.');
+    if (!await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.status(403).send('Nie masz dostępu do tego kursu.');
     const [modules, lessons] = await Promise.all([
       CourseModule.findByCourseId(record.id, { publishedOnly: true }),
       CourseLesson.findByCourseId(record.id, { publishedOnly: true }),
@@ -24,14 +24,14 @@ async function course(request, response) {
     });
   } catch (error) {
     console.error('Academy course page error:', error);
-    return response.status(500).send('Nie udało się pobrać szkolenia.');
+    return response.status(500).send('Nie udało się pobrać kursu.');
   }
 }
 
 async function modulePage(request, response) {
   try {
     const courseRecord = await getAccessibleCourse(request);
-    if (!courseRecord) return response.status(404).send('Szkolenie nie istnieje.');
+    if (!courseRecord) return response.status(404).send('Kurs nie istnieje.');
     const moduleRecord = await CourseModule.findBySlug(courseRecord.id, request.params.moduleSlug, { publishedOnly: true });
     if (!moduleRecord) return response.status(404).send('Moduł nie istnieje.');
     return response.redirect(`/akademia/kurs/${encodeURIComponent(courseRecord.slug)}#modul-${encodeURIComponent(moduleRecord.slug)}`);
@@ -44,7 +44,7 @@ async function modulePage(request, response) {
 async function lesson(request, response) {
   try {
     const courseRecord = await getAccessibleCourse(request);
-    if (!courseRecord) return response.status(404).send('Szkolenie nie istnieje.');
+    if (!courseRecord) return response.status(404).send('Kurs nie istnieje.');
     const moduleRecord = await CourseModule.findBySlug(courseRecord.id, request.params.moduleSlug, { publishedOnly: true });
     if (!moduleRecord) return response.status(404).send('Moduł nie istnieje.');
     const [lessons, progress] = await Promise.all([
@@ -80,10 +80,10 @@ async function legacyLesson(request, response) {
 async function checkout(request, response) {
   try {
     const record = await Course.findBySlug(request.params.slug);
-    if (!record || !record.is_active) return response.status(404).send('Szkolenie nie istnieje.');
+    if (!record || !record.is_active) return response.status(404).send('Kurs nie istnieje.');
     if (record.is_free || Number(record.price_amount) <= 0) return response.redirect(`/akademia/kurs/${encodeURIComponent(record.slug)}`);
     if (await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.redirect(`/akademia/kurs/${encodeURIComponent(record.slug)}`);
-    return response.render('public/academy/checkout', { title: `Kup szkolenie — ${record.title}`, course: record });
+    return response.render('public/academy/checkout', { title: `Kup kurs — ${record.title}`, course: record });
   } catch (error) { return response.status(500).send('Nie udało się przygotować zakupu.'); }
 }
 

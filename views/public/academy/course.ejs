@@ -1,8 +1,69 @@
 <!doctype html>
 <html lang="pl">
-  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow"><title><%= title %> | Akademia</title><link rel="stylesheet" href="/global.css"><link rel="stylesheet" href="/assets/css/academy/modules/courseCards.css"></head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title><%= title %> | Akademia</title>
+    <link rel="stylesheet" href="/global.css">
+    <link rel="stylesheet" href="/assets/css/academy/modules/courseCards.css">
+  </head>
   <body class="academy-page academy-course-page">
-    <header class="site-header"><div class="container site-header__inner"><a class="site-logo" href="/akademia/" aria-label="Akademia Polskiego Budownictwa"><img src="/assets/images/logo.png" alt="Polskie Budownictwo"></a><nav class="site-nav" aria-label="Główna nawigacja"><a href="/akademia/">Dostępne szkolenia</a><a href="/akademia/ustawienia/">Ustawienia konta</a><a href="/o_fundacji.html">O fundacji</a></nav></div></header>
-    <main class="academy-detail"><section class="section section--dark academy-courses__hero"><div class="container"><p class="eyebrow"><%= course.category || 'Akademia' %></p><h1><%= course.title %></h1></div></section><section class="section"><div class="container academy-detail__content"><a class="button button--ghost" href="/akademia/">← Wróć do szkoleń</a><section class="academy-modules-list" aria-labelledby="academy-modules-title"><h2 id="academy-modules-title">Moduły</h2><% if (!modules.length) { %><p class="academy-modules-list__empty">To szkolenie nie ma jeszcze opublikowanych modułów.</p><% } else { %><ol><% modules.forEach((module, index) => { %><li id="modul-<%= encodeURIComponent(module.slug) %>"><details class="academy-module-accordion"><summary><span class="academy-modules-list__number"><%= index + 1 %></span><span class="academy-modules-list__title"><%= module.title %></span><span class="academy-module-accordion__count"><%= module.lessons.length %> <%= module.lessons.length === 1 ? 'lekcja' : module.lessons.length < 5 ? 'lekcje' : 'lekcji' %></span><span class="academy-module-accordion__icon" aria-hidden="true"></span></summary><div class="academy-module-accordion__content"><% if (!module.lessons.length) { %><p>Ten moduł nie ma jeszcze opublikowanych lekcji.</p><% } else { %><ol><% module.lessons.forEach((lesson, lessonIndex) => { %><li><a href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>/lekcja/<%= encodeURIComponent(lesson.slug) %>"><span class="academy-modules-list__number"><%= lessonIndex + 1 %>.</span><span class="academy-modules-list__title"><%= lesson.title %></span><span class="academy-modules-list__arrow" aria-hidden="true">→</span></a></li><% }) %></ol><% } %></div></details></li><% }) %></ol><% } %></section></div></section></main>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="site-logo" href="/akademia/" aria-label="Akademia Polskiego Budownictwa"><img src="/assets/images/logo.png" alt="Polskie Budownictwo"></a>
+        <nav class="site-nav" aria-label="Główna nawigacja"><a href="/akademia/">Dostępne kursy</a><a href="/akademia/ustawienia/">Ustawienia konta</a><a href="/o_fundacji.html">O fundacji</a></nav>
+      </div>
+    </header>
+    <main class="academy-detail">
+      <section class="section section--dark academy-courses__hero">
+        <div class="container">
+          <p class="eyebrow"><%= course.category || 'Akademia' %></p>
+          <h1><%= course.title %></h1>
+          <% if (course.intro_video_id) { %>
+            <div class="academy-course-intro-video">
+              <iframe src="https://www.youtube-nocookie.com/embed/<%= encodeURIComponent(course.intro_video_id) %>" title="Film wprowadzający do kursu <%= course.title %>" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          <% } %>
+        </div>
+      </section>
+      <section class="section">
+        <div class="container academy-detail__content">
+          <a class="button button--ghost" href="/akademia/">← Wróć do szkoleń</a>
+          <section class="academy-modules-list" aria-labelledby="academy-modules-title">
+            <h2 id="academy-modules-title">Moduły</h2>
+            <% if (!modules.length) { %>
+              <p class="academy-modules-list__empty">Ten kurs nie ma jeszcze opublikowanych modułów.</p>
+            <% } else { %>
+              <ol>
+                <% modules.forEach((module, index) => { %>
+                  <li id="modul-<%= encodeURIComponent(module.slug) %>">
+                    <details class="academy-module-accordion">
+                      <summary>
+                        <span class="academy-modules-list__number"><%= index %></span>
+                        <span class="academy-modules-list__title"><%= module.title %></span>
+                        <span class="academy-module-accordion__count"><%= module.lessons.length %> <%= module.lessons.length === 1 ? 'lekcja' : module.lessons.length < 5 ? 'lekcje' : 'lekcji' %></span>
+                        <span class="academy-module-accordion__icon" aria-hidden="true"></span>
+                      </summary>
+                      <div class="academy-module-accordion__content">
+                        <% if (!module.lessons.length) { %>
+                          <p>Ten moduł nie ma jeszcze opublikowanych lekcji.</p>
+                        <% } else { %>
+                          <ol>
+                            <% module.lessons.forEach((lesson, lessonIndex) => { %>
+                              <li><a href="/akademia/kurs/<%= encodeURIComponent(course.slug) %>/modul/<%= encodeURIComponent(module.slug) %>/lekcja/<%= encodeURIComponent(lesson.slug) %>"><span class="academy-modules-list__number"><%= lessonIndex %>.</span><span class="academy-modules-list__title"><%= lesson.title %></span><span class="academy-modules-list__arrow" aria-hidden="true">→</span></a></li>
+                            <% }) %>
+                          </ol>
+                        <% } %>
+                      </div>
+                    </details>
+                  </li>
+                <% }) %>
+              </ol>
+            <% } %>
+          </section>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

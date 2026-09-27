@@ -6,6 +6,7 @@
 .lesson-view-module__body :first-child { margin-top: 0; }
 .lesson-view-module__body :last-child { margin-bottom: 0; }
 .lesson-content-block--rich-text h2, .lesson-content-block--rich-text h3, .lesson-content-block--rich-text h4 { margin-top: 1.6rem; }
+.lesson-content-block--title { margin: 0 0 1.25rem; }
 .lesson-content-block--rich-text ul, .lesson-content-block--rich-text ol { padding-left: 1.5rem; }
 .lesson-content-block--rich-text a { text-decoration: underline; }
 .lesson-content-block--youtube { margin: 1.5rem 0; }

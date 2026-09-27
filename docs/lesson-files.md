@@ -6,7 +6,7 @@ W edytorze wybierz „Dodaj pliki”, a następnie „+ Dodaj plik” w utworzon
 
 Upload zapisuje plik tymczasowo, również w nowej lekcji bez ID. Powiązania i nazwy materiałów zatwierdza dopiero „Zapisz lekcję”. Anulowanie edycji pozostawia dotychczasową opublikowaną lekcję bez zmian. Błąd walidacji formularza zachowuje poprawne uploady. Trwający lub nieudany upload blokuje zapis do czasu zakończenia, ponowienia albo usunięcia karty. Porzucone pliki wygasają po 24 godzinach; po tym czasie trzeba przesłać je ponownie.
 
-Domyślnie dostępne są PDF, JPG/JPEG i WebP, maksymalnie 20 MB na plik, 10 plików i 100 MB łącznie na lekcję. DOCX jest zaimplementowany jako opcjonalny format (`UPLOAD_DOCX_ENABLED=1`), domyślnie wyłączony. Pierwsza wersja pokazuje ikony typów i linki pobrania; nie osadza dokumentów ani nie generuje miniaturek.
+Domyślnie dostępne są PDF, JPG/JPEG, WebP, XLSX, XLSM i CSV, maksymalnie 20 MB na plik, 10 plików i 100 MB łącznie na lekcję. DOCX jest zaimplementowany jako opcjonalny format (`UPLOAD_DOCX_ENABLED=1`), domyślnie wyłączony. Pierwsza wersja pokazuje ikony typów i linki pobrania; nie osadza dokumentów ani nie generuje miniaturek.
 
 ## Kontrakt i odpowiedzialności
 
@@ -42,6 +42,9 @@ Obszar kwarantanny stanowią prywatne obiekty ze statusem `uploading`, bez tras 
 - obrazy: wykryty format, pełne dekodowanie i limit 25 mln pikseli; brak animacji/wielu stron;
 - PDF: nagłówek, zakończenie, parsowanie dokumentu, co najmniej jedna strona i odrzucanie wybranych aktywnych funkcji; dokumenty zaszyfrowane są odrzucane;
 - DOCX: struktura ZIP/OOXML, wymagane części, poprawny XML, limity 1000 wpisów, 50 MB po rozpakowaniu i 10 MB na wpis; odrzucanie makr, osadzonych obiektów, DTD/encji, zewnętrznych relacji i niebezpiecznych ścieżek.
+- XLSX: struktura ZIP/OOXML arkusza, wymagane części, poprawny XML i te same limity; odrzucanie makr VBA, arkuszy makr, osadzonych obiektów, połączeń oraz zewnętrznych relacji.
+- XLSM: struktura ZIP/OOXML arkusza i te same limity; makra VBA są dozwolone, ale odrzucane są osadzone obiekty ActiveX, arkusze makr, połączenia i zewnętrzne relacje. Plik jest wyłącznie przechowywany do pobrania — aplikacja nie wykonuje jego makr.
+- CSV: poprawne UTF-8, brak bajtów NUL, limit 1 MB na pole i odrzucanie wartości rozpoczynających formułę Excela (`=`, `+`, `@` oraz niebędący liczbą `-`).
 
 Zasady projektowe: [OWASP File Upload](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html) i [Multer](https://github.com/expressjs/multer).
 

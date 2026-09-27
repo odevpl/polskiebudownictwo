@@ -83,10 +83,6 @@ if (completeLessonButton) {
 if (courseList) {
   const state = courseList.querySelector('[data-course-state]');
 
-  function formatPrice(course) {
-    return `${Number(course.price_amount).toFixed(2).replace('.', ',')} ${course.currency || 'PLN'}`;
-  }
-
   function courseCard(course, catalogMode = false) {
     const card = document.createElement('article');
     card.className = 'course-card';
@@ -94,7 +90,7 @@ if (courseList) {
       <p class="course-card__tag"></p>
       <h3></h3>
       <div class="course-card__description academy-rich-text"></div>
-      <a class="course-card__more" href="#" target="_blank" rel="noopener noreferrer">Przeczytaj więcej <span aria-hidden="true">→</span></a>
+      <a class="course-card__more" href="#" hidden>Przeczytaj więcej <span aria-hidden="true">→</span></a>
       <ul class="course-card__meta" aria-label="Informacje o kursie"><li></li><li></li></ul>
       <a class="course-card__link" href="#">Zobacz kurs <span aria-hidden="true">→</span></a>`;
     card.querySelector('.course-card__tag').textContent = course.category || 'Kurs Akademii';
@@ -105,17 +101,23 @@ if (courseList) {
       .replace(/<\/\s*(p|li)\s*>/gi, '\n');
     card.querySelector('.course-card__description').textContent = description.textContent.trim();
     card.querySelector('.course-card__meta li:first-child').textContent = course.level || 'Poziom podstawowy';
-    card.querySelector('.course-card__meta li:last-child').textContent = `${course.lesson_count || 0} lekcji`;
+    const availableModules = Number(course.available_module_count || 0);
+    const plannedModules = Number(course.module_count || 0);
+    card.querySelector('.course-card__meta li:last-child').textContent = plannedModules > 0
+      ? `Dostępne moduły: ${availableModules}/${plannedModules}`
+      : `Dostępne moduły: ${availableModules}`;
     const link = card.querySelector('.course-card__link');
     const moreLink = card.querySelector('.course-card__more');
     const hasAccess = Number(course.has_access) === 1;
     const isFree = Number(course.is_free) === 1;
-    if (['bezpieczny-pod-wykonawca', 'bezpieczny-podwykonawca'].includes(course.slug)) {
-      moreLink.href = '/akademia/bezpieczny-pod-wykonawca';
+    if (!hasAccess && course.details_url) {
+      moreLink.href = course.details_url;
+      moreLink.hidden = false;
     } else {
       moreLink.hidden = true;
     }
     if (hasAccess) {
+      link.classList.add('course-card__link--primary');
       link.textContent = 'Przejdź do kursu ';
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');
@@ -123,14 +125,14 @@ if (courseList) {
       link.append(arrow);
       link.href = `/akademia/kurs/${encodeURIComponent(course.slug)}`;
     } else if (catalogMode && !isFree) {
-      link.textContent = `Kup szkolenie · ${formatPrice(course)} `;
+      link.textContent = 'Kup kurs ';
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');
       arrow.textContent = '→';
       link.append(arrow);
       link.href = `/akademia/kup/${encodeURIComponent(course.slug)}`;
     } else {
-      link.textContent = hasAccess ? 'Rozpocznij szkolenie ' : 'Rozpocznij bezpłatnie ';
+      link.textContent = hasAccess ? 'Rozpocznij kurs ' : 'Rozpocznij bezpłatnie ';
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');
       arrow.textContent = '→';
@@ -234,7 +236,7 @@ if (settings) {
       const labels = { pending: 'Oczekuje na płatność', paid: 'Opłacone', cancelled: 'Anulowane', refunded: 'Zwrócone' };
       result.orders.forEach(order => {
         const row = document.createElement('article'); row.className = 'academy-order-history__row';
-        const title = document.createElement('h3'); title.textContent = order.item_titles || 'Szkolenie';
+        const title = document.createElement('h3'); title.textContent = order.item_titles || 'Kurs';
         const meta = document.createElement('p'); meta.textContent = `${order.order_number} · ${new Date(order.created_at).toLocaleDateString('pl-PL')}`;
         const status = document.createElement('strong'); status.textContent = labels[order.status] || order.status;
         const amount = document.createElement('span'); amount.textContent = `${Number(order.total_amount).toFixed(2)} ${order.currency}`;

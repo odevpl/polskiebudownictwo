@@ -160,6 +160,12 @@ p {
   background: var(--color-primary);
 }
 
+/* Akademia: wspólny rozmiar tekstów użytkownika; nagłówki zachowują własną skalę. */
+.academy-page { font-size: 16px; }
+.academy-page :where(p, a, abbr, b, button, dd, dt, em, figcaption, input, label, li, option, select, small, span, strong, textarea):not(:is(h1 *, h2 *, h3 *, h4 *, h5 *, h6 *)) {
+  font-size: 16px !important;
+}
+
 .join-cta__inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1606,6 +1612,26 @@ p {
 .course-card__link:hover span {
   margin-left: 0.6rem;
 }
+
+.course-card__link--primary {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: .35rem;
+  padding: .8rem 1.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.course-card__link--primary:hover,
+.course-card__link--primary:focus-visible {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+
+.course-card__link--primary span { margin-left: 0; }
+.course-card__link--primary:hover span { margin-left: .25rem; }
 
 .academy-courses__back {
   margin-top: 2.5rem;

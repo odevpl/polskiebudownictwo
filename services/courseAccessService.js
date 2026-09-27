@@ -25,8 +25,10 @@ async function hasActiveAccess(userId, courseId) {
 
 async function findAvailableCourses(userId) {
   const [rows] = await pool.execute(
-    `SELECT c.id, c.slug, c.title, c.description, c.category, c.level,
-            c.price_amount, c.currency, c.lesson_count, c.is_free, c.sort_order,
+    `SELECT c.id, c.slug, c.title, c.description, c.details_url, c.category, c.level,
+            c.price_amount, c.currency, c.module_count,
+            (SELECT COUNT(*) FROM course_modules m WHERE m.course_id = c.id AND m.is_published = 1) AS available_module_count,
+            c.is_free, c.sort_order,
             1 AS has_access
      FROM courses c
      LEFT JOIN user_course_access a
@@ -44,8 +46,10 @@ async function findAvailableCourses(userId) {
 
 async function findCatalogCourses(userId) {
   const [rows] = await pool.execute(
-    `SELECT c.id, c.slug, c.title, c.description, c.category, c.level,
-            c.price_amount, c.currency, c.lesson_count, c.is_free, c.sort_order,
+    `SELECT c.id, c.slug, c.title, c.description, c.details_url, c.category, c.level,
+            c.price_amount, c.currency, c.module_count,
+            (SELECT COUNT(*) FROM course_modules m WHERE m.course_id = c.id AND m.is_published = 1) AS available_module_count,
+            c.is_free, c.sort_order,
             CASE WHEN c.is_free = 1 OR a.id IS NOT NULL THEN 1 ELSE 0 END AS has_access
      FROM courses c
      LEFT JOIN user_course_access a

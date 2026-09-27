@@ -88,8 +88,8 @@ async function showLesson(request, response) {
 async function showModule(request, response) {
   try {
     const course = await Course.findBySlug(request.params.slug);
-    if (!course || !course.is_active) return response.status(404).json({ success: false, message: 'Szkolenie nie istnieje.' });
-    if (!await courseAccessService.hasActiveAccess(currentUserId(request), course.id)) return response.status(403).json({ success: false, message: 'Nie masz dostępu do tego szkolenia.' });
+    if (!course || !course.is_active) return response.status(404).json({ success: false, message: 'Kurs nie istnieje.' });
+    if (!await courseAccessService.hasActiveAccess(currentUserId(request), course.id)) return response.status(403).json({ success: false, message: 'Nie masz dostępu do tego kursu.' });
     const module = await CourseModule.findBySlug(course.id, request.params.moduleSlug, { publishedOnly: true });
     if (!module) return response.status(404).json({ success: false, message: 'Moduł nie istnieje.' });
     const lessons = await CourseLesson.findByModuleId(module.id, { publishedOnly: true });
@@ -100,8 +100,8 @@ async function showModule(request, response) {
 async function showModuleLesson(request, response) {
   try {
     const course = await Course.findBySlug(request.params.slug);
-    if (!course || !course.is_active) return response.status(404).json({ success: false, message: 'Szkolenie nie istnieje.' });
-    if (!await courseAccessService.hasActiveAccess(currentUserId(request), course.id)) return response.status(403).json({ success: false, message: 'Nie masz dostępu do tego szkolenia.' });
+    if (!course || !course.is_active) return response.status(404).json({ success: false, message: 'Kurs nie istnieje.' });
+    if (!await courseAccessService.hasActiveAccess(currentUserId(request), course.id)) return response.status(403).json({ success: false, message: 'Nie masz dostępu do tego kursu.' });
     const module = await CourseModule.findBySlug(course.id, request.params.moduleSlug, { publishedOnly: true });
     if (!module) return response.status(404).json({ success: false, message: 'Moduł nie istnieje.' });
     const lesson = await CourseLesson.findBySlug(course.id, request.params.lessonSlug, { publishedOnly: true });

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/assets/modules/academy-admin/lesson-content/editor.css?v=1">
+<link rel="stylesheet" href="/assets/modules/academy-admin/lesson-content/editor.css?v=2">
 <% if (!embedded) { %>
   <section class="admin-page">
     <a class="button button--ghost" href="<%= module ? adminUrl('/academy/modules/' + module.id + '/lessons') : adminUrl('/academy/courses/' + course.id + '/lessons') %>">Wróć do lekcji</a>
@@ -18,4 +18,4 @@
   </div></form>
   <% if (mode === 'edit') { %><form method="post" action="<%= adminUrl('/academy/lessons/' + lesson.id + '/delete') %>" onsubmit="return confirm('Usunąć lekcję?');"><% if (embedded) { %><input type="hidden" name="workspace" value="1"><% } %><button class="button button--ghost" type="submit">Usuń lekcję</button></form><% } %>
 <% if (!embedded) { %></section><% } %>
-<script type="module" src="/assets/modules/academy-admin/lesson-content/editor.js?v=1"></script>
+<script type="module" src="/assets/modules/academy-admin/lesson-content/editor.js?v=3"></script>

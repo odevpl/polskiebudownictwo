@@ -1,11 +1,13 @@
 import { createRichTextBlock } from './modules/richText.js';
 import { createYoutubeBlock } from './modules/youtube.js';
 import { createFilesBlock } from './modules/files.js';
+import { createLessonTitleBlock } from './modules/lessonTitle.js';
 
 const blockModules = new Map([
   ['richText', createRichTextBlock],
   ['youtube', createYoutubeBlock],
   ['files', createFilesBlock],
+  ['lessonTitle', createLessonTitleBlock],
 ]);
 
 function initCourseContentEditor(root) {
@@ -13,15 +15,21 @@ function initCourseContentEditor(root) {
   const blocksRoot = root.querySelector('[data-content-blocks]');
   const fileConfig = JSON.parse(root.dataset.fileConfig || '{}');
   const status = root.querySelector('[data-editor-status]');
+  const titleButton = root.querySelector('[data-add-content-block="lessonTitle"]');
+  const updateTitleButton = () => {
+    if (titleButton) titleButton.hidden = Boolean(blocksRoot.querySelector('[data-block-type="lessonTitle"]'));
+  };
   const editor = {
     root, fileConfig,
     fileCount() { return [...blocksRoot.children].reduce((count, block) => count + (block.fileManager?.count() || 0), 0); },
     sync() {
       hidden.value = JSON.stringify([...blocksRoot.children].map(serializeBlock).filter(Boolean));
+      updateTitleButton();
     },
     add(type, block = {}) {
       const factory = blockModules.get(type);
       if (!factory) return;
+      if (type === 'lessonTitle' && blocksRoot.querySelector('[data-block-type="lessonTitle"]')) { status.textContent = 'Tytuł lekcji można dodać tylko raz.'; return; }
       if (blocksRoot.children.length >= fileConfig.maxBlocks) { status.textContent = 'Osiągnięto limit sekcji lekcji.'; return; }
       const element = factory(block, editor);
       const order = document.createElement('div'); order.className = 'course-content-block__order';
@@ -65,6 +73,7 @@ function serializeBlock(block) {
     const title = block.querySelector('[data-youtube-title]')?.value.trim() || '';
     return url ? { type, data: { url, title } } : null;
   }
+  if (type === 'lessonTitle') return { type, data: {} };
   return null;
 }
 

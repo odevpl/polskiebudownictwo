@@ -66,7 +66,14 @@ function parseBlocks(value, legacyContent = '') {
     const legacy = sanitizeRichText(legacyContent);
     return legacy ? [{ type: 'richText', data: { html: legacy } }] : [];
   }
-  return blocks.map(normalizeBlock).filter(Boolean);
+  let hasLessonTitle = false;
+  return blocks.map(normalizeBlock).filter(block => {
+    if (!block) return false;
+    if (block.type !== 'lessonTitle') return true;
+    if (hasLessonTitle) return false;
+    hasLessonTitle = true;
+    return true;
+  });
 }
 
 function normalizeBlock(block) {
@@ -84,6 +91,7 @@ function normalizeBlock(block) {
     const title = String(block.data?.title || block.title || '').trim().slice(0, 255);
     return { type: 'youtube', data: { videoId, title } };
   }
+  if (block.type === 'lessonTitle') return { type: 'lessonTitle', data: {} };
   return null;
 }
 
