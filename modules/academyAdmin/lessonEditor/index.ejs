@@ -11,7 +11,6 @@
     <div class="adm-field"><label class="adm-label" for="title">Tytuł lekcji</label><input class="adm-control" id="title" name="title" value="<%= lesson.title || '' %>" required></div>
     <input type="hidden" name="contentType" value="text">
     <div class="adm-field"><label class="adm-label" for="sortOrder">Kolejność</label><input class="adm-control" id="sortOrder" name="sortOrder" type="number" min="0" value="<%= lesson.sort_order ?? lesson.sortOrder ?? 0 %>"></div>
-    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="description">Opis</label><%- include('../richTextEditor/index', { id: 'description', name: 'description', label: 'Opis lekcji', value: lesson.description, required: false }) %></div>
     <%- include('../lessonContentEditor/index') %>
     <label class="adm-check"><input name="isPublished" type="checkbox" value="1" <%= lesson.is_published || lesson.isPublished ? 'checked' : '' %>><span>Opublikowana</span></label>
     <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Zapisz lekcję</button><a class="button button--ghost" href="<%= embedded ? returnUrl : (module ? adminUrl('/academy/modules/' + module.id + '/lessons') : adminUrl('/academy/courses/' + course.id + '/lessons')) %>">Anuluj</a></div>

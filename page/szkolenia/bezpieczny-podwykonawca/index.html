@@ -3,40 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Bezpieczny (Pod)wykonawca – praktyczny program dla właścicieli firm budowlanych, którzy chcą lepiej kontrolować ryzyko kontraktów." />
+    <meta name="description" content="Bezpieczny (Pod)wykonawca — program dla firm, które chcą świadomie prowadzić kontrakty, chronić marżę i płynność." />
     <title>Bezpieczny (Pod)wykonawca | Polskie Budownictwo</title>
     <link rel="icon" type="image/png" href="/assets/favicon-144x144.png" />
     <link rel="stylesheet" href="/global.css?v=5" />
-    <link rel="stylesheet" href="/assets/css/trainings.css?v=1" />
   </head>
-  <body class="training-page training-detail-page">
+  <body>
     <header class="site-header">
       <div class="container site-header__inner">
-        <a class="site-logo" href="/" aria-label="Polskie Budownictwo – strona główna"><img src="/assets/images/logo.png" alt="Polskie Budownictwo" /></a>
-        <!-- Menu rendered by modules/menu -->
-        <button class="site-menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Otwórz menu">
-          <span></span><span></span><span></span>
-        </button>
+        <a class="site-logo" href="/" aria-label="Polskie Budownictwo — strona główna"><img src="/assets/images/logo.png" alt="Polskie Budownictwo" /></a>
+        <button class="site-menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Otwórz menu"><span></span><span></span><span></span></button>
         <nav class="site-nav" id="site-nav" aria-label="Główna nawigacja">
-          <div class="site-nav__dropdown">
-            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">O nas</button>
-            <div class="site-nav__dropdown-menu">
-              <a href="/#misja">Misja</a>
-              <a href="/o_fundacji.html">O fundacji</a>
-              <a href="/#spolecznosc">Społeczność</a>
-            </div>
-          </div>
-          <div class="site-nav__dropdown">
-            <button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Działania</button>
-            <div class="site-nav__dropdown-menu">
-              <a href="/#dzialania">Obszary działania</a>
-              <a href="/wydarzenia">Wydarzenia</a>
-              <a href="/postulaty">Postulaty</a>
-            </div>
-          </div>
-          <a href="/#kontakt">Kontakt</a>
-          <span class="site-nav__account" data-auth-menu><a href="/logowanie.html">Zaloguj się</a></span>
-          <a class="social-link social-link--icon" href="https://www.linkedin.com/newsletters/polskie-budownictwo-7446992061150584832/" target="_blank" rel="noopener noreferrer" aria-label="Newsletter Polskie Budownictwo na LinkedIn"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.5 8.25H3V21h3.5V8.25ZM4.75 3A2.06 2.06 0 1 0 4.75 7.12 2.06 2.06 0 0 0 4.75 3ZM21 13.69c0-3.84-2.05-5.63-4.79-5.63a4.15 4.15 0 0 0-3.77 2.07h-.05V8.25H9.03V21h3.5v-6.31c0-1.66.31-3.28 2.38-3.28 2.04 0 2.06 1.91 2.06 3.39V21H21v-7.31Z" /></svg></a>
+          <div class="site-nav__dropdown"><button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">O nas</button><div class="site-nav__dropdown-menu"><a href="/#misja">Misja</a><a href="/o_fundacji.html">O fundacji</a><a href="/#spolecznosc">Społeczność</a></div></div>
+          <div class="site-nav__dropdown"><button class="site-nav__dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Działania</button><div class="site-nav__dropdown-menu"><a href="/#dzialania">Obszary działania</a><a href="/wydarzenia">Wydarzenia</a><a href="/postulaty">Postulaty</a></div></div>
+          <a href="/#kontakt">Kontakt</a><span class="site-nav__account" data-auth-menu><a href="/logowanie.html">Zaloguj się</a></span>
           <a class="button button--nav" href="/#dolacz">Dołącz bezpłatnie</a>
         </nav>
         <a class="button button--nav site-header__mobile-cta" href="/#dolacz">Dołącz</a>
@@ -44,73 +24,103 @@
     </header>
 
     <main>
-      <section class="training-hero">
-        <div class="container training-hero__inner">
-          <div class="training-hero__content">
+      <section class="section section--dark" aria-labelledby="hero-title">
+        <div class="container grid grid--2">
+          <div>
             <p class="eyebrow">Program edukacyjny i certyfikacyjny</p>
-            <h1>Bezpieczny<br /><span>(Pod)wykonawca</span></h1>
-            <p class="training-hero__tagline">Od kontraktu prowadzonego pod presją do firmy, która wie, co podpisuje, co dokumentuje i kiedy reaguje.</p>
-            <a class="button" href="#kontakt-programu">Sprawdź, czy program jest dla Twojej firmy <span aria-hidden="true">→</span></a>
+            <h1 id="hero-title">Bezpieczny <span class="text-primary">(Pod)wykonawca</span></h1>
+            <p class="lead">Kurs dla firm, które chcą świadomie prowadzić kontrakty, chronić marżę i płynność oraz wcześniej reagować na ryzyko.</p>
+            <p>Od oceny umowy do ostatniego rozliczenia: wiesz, co podpisujesz, co dokumentujesz i kiedy warto działać.</p>
+            <div class="actions"><a class="button" href="#kontakt-programu">Sprawdź, czy program jest dla Twojej firmy <span aria-hidden="true">→</span></a><a class="button button--hero-outline" href="#program">Poznaj program</a></div>
           </div>
-          <div class="training-hero__aside"><span>Rozwój firmy</span><strong>bez utraty kontroli</strong><span>nad rentownością i płynnością</span></div>
+          <figure class="media-frame"><img src="/assets/images/trainings/hero.png" alt="Osoba pracująca przy dokumentacji kontraktu budowlanego" /></figure>
         </div>
       </section>
 
-      <section class="section video-promo" aria-labelledby="training-video-title">
+      <section class="section video-promo" aria-labelledby="video-title">
         <div class="container">
-          <h2 class="video-promo__title" id="training-video-title">Poznaj program Bezpieczny (Pod)wykonawca</h2>
-          <div class="video-promo__frame">
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/50JT5ru0ZNQ"
-              title="Film o programie Bezpieczny (Pod)wykonawca"
-              loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-            ></iframe>
+          <p class="eyebrow">Zaproszenie do programu</p>
+          <h2 class="video-promo__title" id="video-title">Obejrzyj film i poznaj nasze zaproszenie.</h2>
+          <div class="video-promo__frame"><iframe src="https://www.youtube-nocookie.com/embed/50JT5ru0ZNQ" title="Film o programie Bezpieczny (Pod)wykonawca" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+      </section>
+
+      <section class="section section--muted" aria-labelledby="risk-title">
+        <div class="container">
+          <div class="section-heading"><p class="eyebrow">Większy kontrakt to większa odpowiedzialność</p><h2 id="risk-title">Jak firma może upaść na jednym kontrakcie?</h2><p>Wzrost obrotów nie zawsze oznacza wzrost bezpieczeństwa. Pojedyncze decyzje pod presją mogą angażować ludzi, pieniądze i zasoby w sposób, który zagrozi całej firmie.</p></div>
+          <div class="grid grid--3">
+            <article class="card"><span class="card__icon" aria-hidden="true">01</span><h3>Cena wygląda dobrze. Marża znika.</h3><p>Sprawdź, ile ryzyka, kosztów i odpowiedzialności naprawdę przyjmuje Twoja firma.</p></article>
+            <article class="card"><span class="card__icon" aria-hidden="true">02</span><h3>Ekipa czeka, a koszty już biegną.</h3><p>Rozpoznaj warunki startu, front robót i zdarzenia, które należy od razu dokumentować.</p></article>
+            <article class="card"><span class="card__icon" aria-hidden="true">03</span><h3>Roboty są wykonane. Odbiór się przesuwa.</h3><p>Uporządkuj komunikację, odbiory i rozliczenia, zanim problem uderzy w płynność.</p></article>
           </div>
         </div>
       </section>
 
-      <section class="section training-intro">
-        <div class="container training-two-column">
-          <div><p class="eyebrow">Większy kontrakt to większa odpowiedzialność</p><h2>Wzrost obrotów nie zawsze oznacza wzrost bezpieczeństwa.</h2></div>
-          <div><p>Chcesz rozwijać firmę, przyjmować większe kontrakty i pracować dla poważnych zamawiających. Nie chcesz jednak przekonać się po kilku miesiącach, że wzrost obrotów nie przyniósł zysku, a Twoja firma finansuje cudze opóźnienia, zmiany i błędy.</p><p>Duży kontrakt może przyspieszyć rozwój przedsiębiorstwa. Może też zaangażować jego ludzi, pieniądze i zasoby w sposób, który zagrozi rentowności i płynności całej firmy.</p></div>
+      <section class="section" aria-labelledby="audience-title">
+        <div class="container">
+          <div class="section-heading"><p class="eyebrow">Dla kogo jest kurs?</p><h2 id="audience-title">Dla osób, które podejmują decyzje o kontraktach.</h2><p>Program jest dla właścicieli i osób zarządzających firmami wykonawczymi, podwykonawczymi, instalacyjnymi, wykończeniowymi oraz specjalistycznymi.</p></div>
+          <div class="grid grid--3">
+            <article class="card"><h3>Rozwijasz firmę</h3><p>Przechodzisz od klientów indywidualnych do większych inwestycji lub realizujesz wiele lokali i odpowiadasz za powtarzalny standard.</p></article>
+            <article class="card"><h3>Chcesz kontrolować ryzyko</h3><p>Zmiany, przestoje, opóźnienia albo brak zapłaty nie powinny odbierać Ci kontroli nad marżą i płynnością.</p></article>
+            <article class="card"><h3>Szukasz praktyki</h3><p>Chcesz lepiej rozumieć źródła sporów budowlanych, prowadzić kontrakt od strony realizacji i wymieniać doświadczenia po lekcjach.</p></article>
+          </div>
         </div>
       </section>
 
-      <section class="section training-dark-section">
-        <div class="container training-two-column">
-          <div><p class="eyebrow">Ten program pomaga działać wcześniej</p><h2>Problem nie zaczyna się w chwili odmowy zapłaty.</h2></div>
-          <div><p>Zwykle zaczyna się znacznie wcześniej: w niekorzystnym zapisie umowy, harmonogramie, którego nie da się wykonać, braku dostępu do frontu robót, ustnym poleceniu dodatkowego zakresu albo protokole podpisanym bez zastrzeżeń.</p><p>Pojedyncze decyzje podejmowane pod presją czasu mogą stopniowo pozbawić wykonawcę kontroli nad rentownością realizacji, płynnością finansową i możliwością skutecznego dochodzenia zapłaty.</p></div>
+      <section class="section section--muted" aria-labelledby="practice-title">
+        <div class="container grid grid--2">
+          <figure class="media-frame"><img src="/assets/images/trainings/front-robot.png" alt="Prace budowlane prowadzone na froncie robót" loading="lazy" /></figure>
+          <div><p class="eyebrow">Wiedza z realnych realizacji</p><h2 id="practice-title">Problem nie zaczyna się w chwili odmowy zapłaty.</h2><p class="lead">Zwykle zaczyna się znacznie wcześniej: w umowie, harmonogramie, braku frontu robót, ustnym poleceniu zmiany albo protokole podpisanym bez zastrzeżeń.</p><p>Program pomaga rozpoznać te momenty wcześniej, by firma mogła podejmować decyzje na podstawie faktów, dokumentów i swojej rzeczywistej sytuacji.</p></div>
         </div>
       </section>
 
-      <section class="section training-change">
-        <div class="container"><p class="eyebrow">Jakiej zmiany możesz oczekiwać?</p><h2>Program pomaga przejść:</h2><div class="training-shift-grid">
-          <div><strong>Od wartości kontraktu</strong><span>do sprawdzania, ile ryzyka, kosztów i odpowiedzialności naprawdę przyjmuje Twoja firma.</span></div>
-          <div><strong>Od ustnych ustaleń</strong><span>do świadomego dokumentowania ważnych zdarzeń.</span></div>
-          <div><strong>Od reakcji po braku zapłaty</strong><span>do zauważania problemu już przy pierwszych odstępstwach od umowy i harmonogramu.</span></div>
-          <div><strong>Od podpisywania pod presją</strong><span>do zadawania pytań i zgłaszania zastrzeżeń przed decyzją.</span></div>
-          <div><strong>Od pomocy prawnej w ostatniej chwili</strong><span>do rozpoznawania momentu, w którym warto skonsultować się z prawnikiem.</span></div>
-          <div><strong>Od intuicji</strong><span>do rozwoju wspieranego przez wiedzę, procedury i lepiej przygotowane decyzje.</span></div>
-        </div></div>
+      <section class="section section--dark" id="program" aria-labelledby="program-title">
+        <div class="container program__grid">
+          <div class="program__content"><p class="eyebrow">Program kursu</p><h2 id="program-title">Od oceny umowy do ostatniego rozliczenia.</h2><p>Po każdej lekcji zostaje decyzja lub narzędzie do użycia. Kurs łączy perspektywę przedsiębiorcy i prawnika z materiałami pomocnymi w codziennej pracy.</p></div>
+          <div class="program__scope"><p class="program__scope-title">9 modułów pracy z kontraktem</p><ol class="program-list"><li><span>01</span>Fundament bezpieczeństwa kontraktu</li><li><span>02</span>Decyzja przed podpisaniem umowy</li><li><span>03</span>Bezpieczny start realizacji</li><li><span>04</span>Zmiany i prace dodatkowe</li><li><span>05</span>Dokumentacja, komunikacja i odbiory</li><li><span>06</span>Rozliczenia, płatności i płynność</li><li><span>07</span>Opóźnienia, kary i roszczenia</li><li><span>08</span>Negocjacje i mediacja</li><li><span>09</span>Kontrakt kryzysowy i przygotowanie sporu</li></ol></div>
+        </div>
       </section>
 
-      <section class="section training-audience">
-        <div class="container training-two-column"><div><p class="eyebrow">Dla kogo jest ten program?</p><h2>Dla właścicieli małych i średnich firm.</h2></div><ul class="training-list"><li>budowlanych, instalacyjnych, wykończeniowych i specjalistycznych,</li><li>przygotowujących się do pierwszego dużego kontraktu,</li><li>realizujących większe inwestycje i chcących lepiej kontrolować ryzyko,</li><li>doświadczających problemów z rozliczeniami, zmianami, opóźnieniami lub pracami dodatkowymi,</li><li>chcących uporządkować prowadzenie kontraktów i dokumentowanie realizacji,</li><li>szukających wiedzy, wsparcia i kontaktu z innymi przedsiębiorcami z branży.</li></ul></div>
+      <section class="section" aria-labelledby="tools-title">
+        <div class="container grid grid--2">
+          <div><p class="eyebrow">Materiał do pracy</p><h2 id="tools-title">Nie zostajesz sam z nagraniami.</h2><p class="lead">Materiał, do którego wracasz podczas kontraktu.</p><p>Kurs obejmuje lekcje, pliki do pracy, praktyczne narzędzia, komentarze prawne, sesje pytań i odpowiedzi oraz społeczność uczestników.</p><ul><li>Kalkulator marży i kosztów, lista warunków startu oraz karta decyzji.</li><li>Rejestry frontów, poleceń, zmian, przeszkód, odbiorów i należności.</li><li>Zwięzły komentarz prawny przy każdej lekcji.</li><li>Forum, sesje Q&amp;A i spotkania networkingowe.</li></ul></div>
+          <figure class="media-frame"><img src="/assets/images/trainings/dokumenty-kontraktu.png" alt="Dokumenty kontraktu analizowane na budowie" loading="lazy" /></figure>
+        </div>
       </section>
 
-      <section class="section training-tools">
-        <div class="container"><p class="eyebrow">Nie zostajesz sam z nagraniami</p><h2>Wiedza, narzędzia i społeczność</h2><div class="training-tool-grid"><article><span>01</span><h3>Materiały kursowe</h3><p>Pomagają zrozumieć mechanizmy i ryzyka kontraktowe.</p></article><article><span>02</span><h3>Praktyczne narzędzia i wzory</h3><p>Wspierają porządkowanie działań i dokumentacji.</p></article><article><span>03</span><h3>Sesje pytań i odpowiedzi</h3><p>Pozwalają pogłębiać zagadnienia i wyjaśniać wątpliwości.</p></article><article><span>04</span><h3>Networking i społeczność</h3><p>Dają możliwość wymiany doświadczeń z przedsiębiorcami z branży.</p></article></div></div>
+      <section class="section section--muted" aria-labelledby="story-title">
+        <div class="container grid grid--2">
+          <div><p class="eyebrow">Ode mnie</p><h2 id="story-title">Dlaczego powstał ten kurs?</h2><p>Anna Sadowska-Wójcik przez ponad 15 lat prowadziła firmę w branży wykończeniowej — od realizacji dla klientów indywidualnych po pracę z inwestorami, deweloperami i generalnymi wykonawcami.</p></div>
+          <div class="card"><p>„Samo przesłanie kontraktu i przeczytanie komentarzy nie tworzy jeszcze procesu, który chroni firmę. Przedsiębiorca musi znać swoje prawa, prowadzić powtarzalny zapis zdarzeń i wiedzieć, kiedy reagować.”</p><p><strong>Anna Sadowska-Wójcik</strong></p></div>
+        </div>
       </section>
 
-      <section class="section training-expertise"><div class="container training-two-column"><div><p class="eyebrow">Program oparty na doświadczeniu</p><h2>Praktyka prowadzenia firmy połączona z komentarzem prawnym.</h2></div><div><p>„Bezpieczny (Pod)wykonawca” to autorski program Fundacji „Polskie Budownictwo”. Program prowadzi Anna Sadowska-Wójcik — przedsiębiorczyni z ponad 15-letnim doświadczeniem w branży wykończenia wnętrz, założycielka Fundacji i laureatka tytułu Businesswoman Roku 2016.</p><p>Każdą lekcję uzupełniają praktyczne komentarze prawne Katarzyny Kaliszczak-Turczyn, przydatne odniesienia do przepisów oraz wybrane orzeczenia. To wiedza prawna połączona z praktyką prowadzenia firm i realizowania kontraktów — nie kurs prawny dla prawników.</p></div></div></section>
+      <section class="section" aria-labelledby="presenters-title">
+        <div class="container"><div class="section-heading"><p class="eyebrow">Prowadzące kurs</p><h2 id="presenters-title">Dwie perspektywy. Jeden kontrakt.</h2><p>Praktyka prowadzenia firmy połączona z komentarzem prawnym.</p></div>
+          <div class="grid grid--2">
+            <article class="card"><figure class="media-frame"><img src="/assets/images/trainings/anna.png" alt="Anna Sadowska-Wójcik" loading="lazy" /></figure><p class="eyebrow">Praktyka przedsiębiorcy</p><h3>Anna Sadowska-Wójcik</h3><p>Pokazuje kontrakt oczami przedsiębiorcy odpowiedzialnego za ludzi, terminy, koszty i płynność firmy.</p></article>
+            <article class="card"><figure class="media-frame"><img src="/assets/images/trainings/katarzyna.png" alt="Mecenas Katarzyna Kaliszczak-Turczyn" loading="lazy" /></figure><p class="eyebrow">Perspektywa prawnika</p><h3>mec. Katarzyna Kaliszczak-Turczyn</h3><p>Wyjaśnia praktyczne znaczenie zapisów umowy, terminów, dowodów i sposobu zakończenia współpracy.</p></article>
+          </div>
+        </div>
+      </section>
 
-      <section class="training-cta" id="kontakt-programu"><div class="container training-cta__inner"><p class="eyebrow">Zacznij od krótkiej rozmowy</p><h2>Sprawdź, czy program jest dla Twojej firmy.</h2><p>Porozmawiamy o etapie rozwoju Twojej firmy, realizowanych kontraktach, obszarach wymagających uporządkowania i właściwym wariancie udziału.</p><a class="button button--light" href="/#kontakt">Umów rozmowę wprowadzającą <span aria-hidden="true">→</span></a><small>Rozmowa nie jest poradą prawną ani analizą konkretnej umowy. Służy sprawdzeniu, czy program odpowiada na potrzeby Twojej firmy.</small></div></section>
+      <section class="section section--muted" aria-labelledby="faq-title">
+        <div class="container"><div class="section-heading"><p class="eyebrow">FAQ</p><h2 id="faq-title">Pytania o kurs i udział.</h2></div>
+          <div class="grid">
+            <details class="card"><summary><strong>Czy kurs jest tylko dla podwykonawców?</strong></summary><p>Nie. Jest dla właścicieli mikro, małych i średnich firm wykonawczych oraz podwykonawczych, a także osób współpracujących przy obsłudze kontraktów.</p></details>
+            <details class="card"><summary><strong>Czy to program certyfikacyjny?</strong></summary><p>Tak. Szczegółowe warunki uzyskania certyfikatu, zakres oceny i regulamin zostaną podane uczestnikom.</p></details>
+            <details class="card"><summary><strong>Czy mogę zacząć, jeśli już mam problem z kontraktem?</strong></summary><p>Program pomaga uporządkować zdarzenia, dokumenty i pytania. Pilne sprawy wymagające oceny konkretnej umowy lub strategii należy skonsultować indywidualnie z prawnikiem.</p></details>
+            <details class="card"><summary><strong>Czy Q&amp;A oznacza indywidualną poradę prawną?</strong></summary><p>Nie. Sesje pomagają zrozumieć materiał. Ocena konkretnej umowy, pisma, terminu lub strategii wymaga osobnej konsultacji.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-band" id="kontakt-programu" aria-labelledby="contact-program-title">
+        <div class="container feature-band__inner"><div><p class="eyebrow">Zacznij od krótkiej rozmowy</p><h2 id="contact-program-title">Sprawdź, czy kurs odpowiada na Twoje potrzeby.</h2><p>Powiedz, jakie kontrakty realizujesz i z czym dziś masz największy problem.</p></div><a class="button button--light" href="/#kontakt">Umów rozmowę wprowadzającą <span aria-hidden="true">→</span></a></div>
+      </section>
     </main>
 
-    <footer class="training-footer"><div class="container"><a href="/szkolenia">← Wszystkie kursy</a><span>© Fundacja Polskie Budownictwo</span></div></footer>
+    <footer class="site-footer"><div class="container site-footer__inner"><a class="site-logo site-logo--footer" href="/" aria-label="Polskie Budownictwo"><img src="/assets/images/logo.png" alt="Polskie Budownictwo" /></a><p>© 2026 Polskie Budownictwo. Wszelkie prawa zastrzeżone.</p></div></footer>
     <script src="/assets/js/menu.js?v=3" defer></script>
   </body>
 </html>

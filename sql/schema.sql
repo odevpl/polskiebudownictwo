@@ -160,7 +160,6 @@ CREATE TABLE IF NOT EXISTS course_lessons (
   module_id INT UNSIGNED NULL,
   slug VARCHAR(160) NOT NULL,
   title VARCHAR(255) NOT NULL,
-  description TEXT,
   content_type ENUM('text', 'video', 'material') NOT NULL DEFAULT 'text',
   content MEDIUMTEXT,
   content_blocks JSON NULL,

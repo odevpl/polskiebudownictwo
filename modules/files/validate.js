@@ -48,12 +48,18 @@ async function validateDocument({ filename, extension, maxPixels }) {
   if (extension === '.pdf') {
     const bytes = await fs.readFile(filename);
     if (!bytes.subarray(0, 8).toString('ascii').startsWith('%PDF-') || !bytes.subarray(-1024).includes(Buffer.from('%%EOF'))) throw new Error('Not PDF');
-    const { PDFDocument, PDFName, PDFDict } = require('pdf-lib');
+    const { PDFDocument, PDFArray, PDFDict, PDFHexString, PDFName, PDFString } = require('pdf-lib');
     const doc = await PDFDocument.load(bytes, { throwOnInvalidObject: true });
     if (!doc.getPageCount()) throw new Error('No pages');
-    const forbidden = ['JavaScript', 'JS', 'AA', 'OpenAction', 'Launch', 'EmbeddedFiles', 'RichMedia', 'XFA'];
+    const forbidden = ['JavaScript', 'JS', 'AA', 'Launch', 'EmbeddedFiles', 'RichMedia', 'XFA'];
     for (const [, object] of doc.context.enumerateIndirectObjects()) {
-      if (object instanceof PDFDict && forbidden.some(key => object.has(PDFName.of(key)))) throw new Error('Active PDF');
+      if (!(object instanceof PDFDict)) continue;
+      if (forbidden.some(key => object.has(PDFName.of(key)))) throw new Error('Active PDF');
+      if (object.has(PDFName.of('OpenAction'))) {
+        const openAction = doc.context.lookup(object.get(PDFName.of('OpenAction')));
+        const isDestination = openAction instanceof PDFArray || openAction instanceof PDFName || openAction instanceof PDFString || openAction instanceof PDFHexString;
+        if (!isDestination) throw new Error('Active PDF');
+      }
     }
   } else if (extension === '.docx') {
     await validateOoxml(filename, { mainPart: 'word/document.xml', mainContentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml', mainTag: 'document' });

@@ -529,7 +529,7 @@ function courseFromBody(body) {
 
 function lessonFromBody(body, courseId, moduleId = null) {
   const contentBlocks = normalizeForStorage(body.contentBlocks, body.content);
-  return { courseId, moduleId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), description: sanitizeRichText(body.description), contentType: String(body.contentType || 'text'), content: String(body.content || ''), rawContentBlocks: body.contentBlocks, contentBlocks, sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
+  return { courseId, moduleId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), contentType: String(body.contentType || 'text'), content: String(body.content || ''), rawContentBlocks: body.contentBlocks, contentBlocks, sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };
 }
 
 function validateCourse(data) {
@@ -557,7 +557,7 @@ function validateLesson(data) {
 
 function emptyCourse() { return { slug: '', title: '', description: '', intro_video_id: null, details_url: '', category: '', level: '', lesson_count: 0, module_count: 0, is_free: 0, is_active: 0, sort_order: 0 }; }
 function emptyModule(courseId) { return { course_id: courseId, slug: '', title: '', sort_order: 0, is_published: 0 }; }
-function emptyLesson(courseId, moduleId = null) { return { course_id: courseId, module_id: moduleId, slug: '', title: '', description: '', content_type: 'text', content: '', contentBlocks: [], sort_order: 0, is_published: 0 }; }
+function emptyLesson(courseId, moduleId = null) { return { course_id: courseId, module_id: moduleId, slug: '', title: '', content_type: 'text', content: '', contentBlocks: [], sort_order: 0, is_published: 0 }; }
 
 function moduleFromBody(body, courseId) {
   return { courseId, slug: String(body.slug || '').trim().toLowerCase(), title: String(body.title || '').trim(), sortOrder: Number(body.sortOrder || 0), isPublished: Boolean(body.isPublished) };

@@ -1,7 +1,6 @@
 .lesson-view-module { min-width: 0; padding: 1.5rem 0; }
 .lesson-view-module__intro { padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border); }
 .lesson-view-module__intro h1 { margin: .4rem 0 0; }
-.lesson-view-module__description { margin: .75rem 0 0; color: var(--color-muted); }
 .lesson-view-module__body { padding-top: 1.5rem; line-height: 1.75; }
 .lesson-view-module__body :first-child { margin-top: 0; }
 .lesson-view-module__body :last-child { margin-bottom: 0; }

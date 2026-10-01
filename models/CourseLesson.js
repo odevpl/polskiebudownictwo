@@ -5,7 +5,7 @@ const attachments = require('../services/lessonAttachmentService');
 async function findByCourseId(courseId, { publishedOnly = false } = {}) {
   const where = publishedOnly ? 'AND is_published = 1' : '';
   const [rows] = await pool.execute(
-    `SELECT id, course_id, module_id, slug, title, description, content_type, content, content_blocks,
+    `SELECT id, course_id, module_id, slug, title, content_type, content, content_blocks,
             sort_order, is_published, created_at, updated_at
      FROM course_lessons
      WHERE course_id = ? ${where}
@@ -18,7 +18,8 @@ async function findByCourseId(courseId, { publishedOnly = false } = {}) {
 async function findBySlug(courseId, slug, { publishedOnly = false } = {}) {
   const publishedCondition = publishedOnly ? 'AND is_published = 1' : '';
   const [rows] = await pool.execute(
-    `SELECT *
+    `SELECT id, course_id, module_id, slug, title, content_type, content, content_blocks,
+            sort_order, is_published, created_at, updated_at
      FROM course_lessons
      WHERE course_id = ? AND slug = ? ${publishedCondition}
      LIMIT 1`,
@@ -30,7 +31,7 @@ async function findBySlug(courseId, slug, { publishedOnly = false } = {}) {
 async function findByModuleId(moduleId, { publishedOnly = false } = {}) {
   const where = publishedOnly ? 'AND is_published = 1' : '';
   const [rows] = await pool.execute(
-    `SELECT id, course_id, module_id, slug, title, description, content_type, content, content_blocks,
+    `SELECT id, course_id, module_id, slug, title, content_type, content, content_blocks,
             sort_order, is_published, created_at, updated_at
      FROM course_lessons WHERE module_id = ? ${where} ORDER BY sort_order ASC, id ASC`,
     [moduleId],
@@ -39,7 +40,12 @@ async function findByModuleId(moduleId, { publishedOnly = false } = {}) {
 }
 
 async function findById(id) {
-  const [rows] = await pool.execute('SELECT * FROM course_lessons WHERE id = ? LIMIT 1', [id]);
+  const [rows] = await pool.execute(
+    `SELECT id, course_id, module_id, slug, title, content_type, content, content_blocks,
+            sort_order, is_published, created_at, updated_at
+     FROM course_lessons WHERE id = ? LIMIT 1`,
+    [id],
+  );
   return rows[0] || null;
 }
 
@@ -47,14 +53,13 @@ async function create(data) {
   const id = await transaction(async connection => {
   const [result] = await connection.execute(
     `INSERT INTO course_lessons
-       (course_id, module_id, slug, title, description, content_type, content, content_blocks, sort_order, is_published)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (course_id, module_id, slug, title, content_type, content, content_blocks, sort_order, is_published)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.courseId,
       data.moduleId || null,
       data.slug,
       data.title,
-      data.description || null,
       data.contentType || 'text',
       data.content || null,
       data.contentBlocks ? JSON.stringify(data.contentBlocks) : null,
@@ -77,9 +82,9 @@ async function update(id, data) {
   await attachments.sync(connection, id, data.contentBlocks || [], data.adminId);
   await connection.execute(
     `UPDATE course_lessons
-     SET module_id = ?, slug = ?, title = ?, description = ?, content_type = ?, content = ?, content_blocks = ?, sort_order = ?, is_published = ?
+     SET module_id = ?, slug = ?, title = ?, content_type = ?, content = ?, content_blocks = ?, sort_order = ?, is_published = ?
      WHERE id = ?`,
-    [data.moduleId || null, data.slug, data.title, data.description || null, data.contentType || 'text', data.content || null, data.contentBlocks ? JSON.stringify(data.contentBlocks) : null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
+    [data.moduleId || null, data.slug, data.title, data.contentType || 'text', data.content || null, data.contentBlocks ? JSON.stringify(data.contentBlocks) : null, data.sortOrder || 0, data.isPublished ? 1 : 0, id],
   );
   });
   attachments.saved(id, data.adminId, (data.contentBlocks || []).filter(b => b.type === 'files').length);
