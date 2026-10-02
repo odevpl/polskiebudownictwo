@@ -1,21 +1,21 @@
 const pool = require('../config/database');
 
-async function findByEmail(email) {
-  const [rows] = await pool.execute('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
+async function findByEmail(email, connection = pool) {
+  const [rows] = await connection.execute('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
   return rows[0] || null;
 }
 
-async function findById(id) {
-  const [rows] = await pool.execute('SELECT * FROM users WHERE id = ? LIMIT 1', [id]);
+async function findById(id, connection = pool) {
+  const [rows] = await connection.execute('SELECT * FROM users WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 
-async function create({ email, passwordHash }) {
-  const [result] = await pool.execute(
+async function create({ email, passwordHash }, connection = pool) {
+  const [result] = await connection.execute(
     'INSERT INTO users (email, password_hash, is_active) VALUES (?, ?, 0)',
     [email, passwordHash],
   );
-  return findById(result.insertId);
+  return findById(result.insertId, connection);
 }
 
 async function verifyEmail(id) {

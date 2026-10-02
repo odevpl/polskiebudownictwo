@@ -12,6 +12,7 @@ Ten dokument opisuje implementację techniczną. Nie zastępuje zatwierdzonej pr
 | Bezpieczeństwo i przeciwdziałanie nadużyciom | sesja, IP zgłoszeń, logi techniczne | prawnie uzasadniony interes |
 | Kontakt i obsługa zgłoszeń | dane ze zgłoszenia, e-mail | zgoda lub prawnie uzasadniony interes — do zatwierdzenia |
 | Marketing | e-mail i zgoda marketingowa | zgoda |
+| Program afiliacyjny | właściciel linku, kod/alias, e-mail zarejestrowanego użytkownika i data przypisania | prawnie uzasadniony interes — do zatwierdzenia |
 
 ## Retencja — wartości do zatwierdzenia
 
@@ -21,6 +22,7 @@ Ten dokument opisuje implementację techniczną. Nie zastępuje zatwierdzonej pr
 - postęp i dostęp: przez okres korzystania z kursu oraz przez czas niezbędny do obsługi reklamacji,
 - zamówienia i faktury: przez okres wymagany przepisami rachunkowymi/podatkowymi — dokładny okres wymaga potwierdzenia księgowego,
 - zgłoszenia i marketing: okres określony w polityce retencji organizacji — do uzupełnienia,
+- historia afiliacji: okres określony w polityce retencji programu partnerskiego — do uzupełnienia; dostęp wyłącznie dla administratorów panelu,
 - kopie zapasowe: zgodnie z cyklem backupów; usunięcie z backupu może nastąpić przy jego rotacji.
 
 ## Realizacja praw użytkownika

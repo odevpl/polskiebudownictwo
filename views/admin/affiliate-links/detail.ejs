@@ -1,0 +1,12 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/affiliate-links') %>">Wróć do linków afiliacyjnych</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker">Link afiliacyjny</p><h1><%= link.owner_name %></h1><p class="admin-hero__meta"><%= link.owner_email %> · <%= link.is_active ? 'Aktywny' : 'Nieaktywny' %></p></div></div>
+  <div class="adm-card affiliate-link-detail"><dl class="adm-detail-list"><div><dt>URL rejestracji</dt><dd><a href="<%= registrationUrl %>" target="_blank" rel="noopener"><%= registrationUrl %></a> <button class="button button--ghost button--compact" type="button" data-copy-affiliation="<%= link.alias || link.code %>">Kopiuj</button></dd></div><div><dt>UUID</dt><dd><code><%= link.code %></code></dd></div><div><dt>Alias</dt><dd><%= link.alias || '-' %></dd></div><div><dt>Rejestracje</dt><dd><%= link.registration_count || 0 %></dd></div></dl><% if (admin.role === 'superadmin' && link.is_active) { %><form class="affiliate-link-detail__actions" method="post" action="<%= adminUrl('/affiliate-links/' + link.id + '/deactivate') %>" onsubmit="return confirm('Wyłączyć ten link? Nowe rejestracje nie będą już przypisywane.');"><button class="button button--ghost" type="submit">Dezaktywuj link</button></form><% } %></div>
+  <h2 class="adm-section-title">Historia rejestracji</h2>
+  <div class="adm-table-panel"><%- include('../../components/Table', { columns: [
+    { label: 'E-mail użytkownika', value: item => item.registered_email },
+    { label: 'Data przypisania', value: item => new Date(item.created_at).toLocaleString('pl-PL') },
+  ], rows: registrations, emptyMessage: 'Ten link nie ma jeszcze przypisanych rejestracji.' }) %></div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

@@ -16,6 +16,7 @@
     "migrate": "node scripts/migrate.js",
     "migrate:mediators": "node scripts/migrateMediators.js",
     "migrate:mediator-profile": "node scripts/migrateMediatorProfile.js",
+    "migrate:affiliate-links": "node scripts/migrateAffiliateLinks.js",
     "create-superadmin": "node scripts/createSuperadmin.js",
     "cleanup-unverified-users": "node scripts/cleanupUnverifiedUsers.js",
     "reset-admin-password": "node scripts/resetAdminPassword.js",

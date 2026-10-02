@@ -6,6 +6,8 @@ if (form) {
   if (form.action.endsWith('/api/auth/register')) {
     const startedAt = form.querySelector('[name="formStartedAt"]');
     if (startedAt) startedAt.value = String(Date.now());
+    const affiliation = form.querySelector('[name="afiliation"]');
+    if (affiliation) affiliation.value = new URLSearchParams(location.search).get('afiliation') || '';
     const captchaContainer = form.querySelector('[data-recaptcha]');
     fetch('/api/auth/registration-settings', { headers: { Accept: 'application/json' } })
       .then(response => response.json())

@@ -252,6 +252,57 @@ svg {
   box-shadow: var(--adm-shadow);
 }
 
+.adm-detail-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.adm-detail-list div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.adm-detail-list dt {
+  color: var(--adm-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.adm-detail-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.affiliate-link-detail {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.affiliate-link-detail .adm-detail-list {
+  gap: 1.35rem;
+}
+
+.affiliate-link-detail .adm-detail-list dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  line-height: 1.6;
+}
+
+.affiliate-link-detail code {
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 6%);
+}
+
+.affiliate-link-detail__actions {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--adm-border);
+}
+
 /* Login */
 .login-screen {
   display: grid;

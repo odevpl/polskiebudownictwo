@@ -1,4 +1,16 @@
 document.addEventListener('click', event => {
+  const copyAffiliateButton = event.target.closest('[data-copy-affiliation]');
+  if (copyAffiliateButton) {
+    const url = new URL('/rejestracja.html', window.location.origin);
+    url.searchParams.set('afiliation', copyAffiliateButton.dataset.copyAffiliation);
+    navigator.clipboard?.writeText(url.href).then(() => {
+      const original = copyAffiliateButton.textContent;
+      copyAffiliateButton.textContent = 'Skopiowano';
+      setTimeout(() => { copyAffiliateButton.textContent = original; }, 1800);
+    }).catch(() => {});
+    return;
+  }
+
   const openButton = event.target.closest('[data-modal-open]');
   if (openButton) {
     const modal = document.getElementById(openButton.dataset.modalOpen);

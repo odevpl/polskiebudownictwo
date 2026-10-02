@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
+const pool = require('../../config/database');
+const AffiliateLink = require('../../models/AffiliateLink');
 const User = require('../../models/User');
 const UserToken = require('../../models/UserToken');
 const RegistrationAttempt = require('../../models/RegistrationAttempt');
@@ -59,7 +61,25 @@ async function register(request, response) {
       response.status(409).json({ success: false, message: 'Konto dla tego adresu już istnieje.' });
       return;
     }
-    const user = await User.create({ email, passwordHash: await bcrypt.hash(request.body.password, 12) });
+    const affiliation = String(request.body.afiliation || '').trim().toLowerCase();
+    const passwordHash = await bcrypt.hash(request.body.password, 12);
+    const connection = await pool.getConnection();
+    let user;
+    try {
+      await connection.beginTransaction();
+      user = await User.create({ email, passwordHash }, connection);
+      await AffiliateLink.recordRegistration(affiliation, user.id, email, connection);
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      if (error.code === 'ER_DUP_ENTRY') {
+        await logAttempt('rejected', 'duplicate-email');
+        return response.status(409).json({ success: false, message: 'Konto dla tego adresu już istnieje.' });
+      }
+      throw error;
+    } finally {
+      connection.release();
+    }
     const token = await UserToken.create(user.id, 'email_verification');
     await sendAccountVerificationEmail(user.email, `${publicUrl(request)}/weryfikacja-email.html?token=${encodeURIComponent(token)}`);
     await logAttempt('accepted');

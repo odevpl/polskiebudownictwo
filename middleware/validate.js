@@ -189,7 +189,15 @@ const mediatorApplicationValidation = [
 
 const userEmailValidation = body('email').trim().isEmail().withMessage('Podaj poprawny adres e-mail.').bail().normalizeEmail().isLength({ max: 254 });
 const userPasswordValidation = body('password').isLength({ min: 12, max: 128 }).withMessage('Hasło musi mieć od 12 do 128 znaków.');
-const registrationValidation = [userEmailValidation, userPasswordValidation];
+const affiliateReferenceValidation = body('afiliation')
+  .optional({ values: 'falsy' })
+  .trim()
+  .isLength({ max: 80 })
+  .withMessage('Kod afiliacyjny jest nieprawidłowy.')
+  .bail()
+  .matches(/^(?:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|[a-z0-9]+(?:-[a-z0-9]+)*)$/i)
+  .withMessage('Kod afiliacyjny jest nieprawidłowy.');
+const registrationValidation = [userEmailValidation, userPasswordValidation, affiliateReferenceValidation];
 const loginValidation = [userEmailValidation, body('password').notEmpty().withMessage('Podaj hasło.')];
 const resetValidation = [userEmailValidation];
 const passwordChangeValidation = [body('token').trim().notEmpty().withMessage('Link jest nieprawidłowy.'), userPasswordValidation];

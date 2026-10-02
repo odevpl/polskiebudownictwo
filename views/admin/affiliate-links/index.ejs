@@ -1,0 +1,18 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker">Partnerstwa</p><h1>Linki afiliacyjne</h1><p class="admin-hero__meta">Twórz linki, sprawdzaj ich właścicieli i historię przypisanych rejestracji.</p></div></div>
+  <div class="adm-page-actions"><% if (admin.role === 'superadmin') { %><a class="button" href="<%= adminUrl('/affiliate-links/new') %>">Dodaj link afiliacyjny</a><% } %></div>
+  <form class="toolbar" method="get" action="<%= adminUrl('/affiliate-links') %>"><input name="search" type="search" placeholder="Właściciel, e-mail, alias lub UUID" value="<%= search %>"><button class="button" type="submit">Szukaj</button></form>
+  <div class="adm-table-panel"><%- include('../../components/Table', { columns: [
+    { label: 'Właściciel', value: link => link.owner_name },
+    { label: 'E-mail', value: link => link.owner_email },
+    { label: 'Alias', value: link => link.alias || '-' },
+    { label: 'Kod UUID', value: link => link.code },
+    { label: 'Link rejestracji', value: link => link.registrationUrl },
+    { label: 'Rejestracje', value: link => link.registration_count || 0 },
+    { label: 'Status', value: link => link.is_active ? 'Aktywny' : 'Nieaktywny' },
+    { label: 'Utworzono', value: link => new Date(link.created_at).toLocaleDateString('pl-PL') },
+    { label: 'Akcje', html: true, value: link => `<button class="button button--ghost" type="button" data-copy-affiliation="${link.alias || link.code}">Kopiuj link</button> <a class="button button--ghost" href="${adminUrl('/affiliate-links/' + link.id)}">Szczegóły</a>` },
+  ], rows: links, emptyMessage: 'Brak linków afiliacyjnych.' }) %></div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

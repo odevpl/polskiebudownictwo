@@ -1,0 +1,13 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/affiliate-links') %>">Wróć do linków afiliacyjnych</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">A</div><div><p class="adm-kicker">Partnerstwa</p><h1>Nowy link afiliacyjny</h1><p class="admin-hero__meta">UUID zostanie wygenerowany automatycznie po zapisie.</p></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form adm-card" method="post" action="<%= action %>"><div class="adm-form-grid">
+    <div class="adm-field"><label class="adm-label" for="ownerName">Imię i nazwisko właściciela</label><input class="adm-control" id="ownerName" name="ownerName" maxlength="160" value="<%= link.ownerName || '' %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="ownerEmail">E-mail właściciela</label><input class="adm-control" id="ownerEmail" name="ownerEmail" type="email" maxlength="254" value="<%= link.ownerEmail || '' %>" required></div>
+    <div class="adm-field adm-form-grid__full"><label class="adm-label" for="alias">Alias (opcjonalny)</label><input class="adm-control" id="alias" name="alias" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" value="<%= link.alias || '' %>" aria-describedby="alias-help"><small id="alias-help">Małe litery, cyfry i myślniki, np. anna-sadowska. Bez aliasu link użyje UUID.</small></div>
+    <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Utwórz link afiliacyjny</button><a class="button button--ghost" href="<%= adminUrl('/affiliate-links') %>">Anuluj</a></div>
+  </div></form>
+</section>
+<%- include('../../partials/admin-shell-end') %>
