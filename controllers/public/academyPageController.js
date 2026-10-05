@@ -3,6 +3,7 @@ const Course = require('../../models/Course');
 const CourseModule = require('../../models/CourseModule');
 const CourseLesson = require('../../models/CourseLesson');
 const LessonProgress = require('../../models/LessonProgress');
+const Chat = require('../../models/Chat');
 const courseAccessService = require('../../services/courseAccessService');
 const { parseBlocks } = require('../../modules/courseContent');
 
@@ -11,15 +12,17 @@ async function course(request, response) {
     const record = await Course.findBySlug(request.params.slug);
     if (!record || !record.is_active) return response.status(404).send('Kurs nie istnieje.');
     if (!await courseAccessService.hasActiveAccess(request.session.user.id, record.id)) return response.status(403).send('Nie masz dostępu do tego kursu.');
-    const [modules, lessons] = await Promise.all([
+    const [modules, lessons, chat] = await Promise.all([
       CourseModule.findByCourseId(record.id, { publishedOnly: true }),
       CourseLesson.findByCourseId(record.id, { publishedOnly: true }),
+      Chat.findActiveForCourse(record.id),
     ]);
     const lessonsByModule = new Map(modules.map(module => [module.id, []]));
     lessons.forEach(lesson => lessonsByModule.get(lesson.module_id)?.push(lesson));
     return response.render('public/academy/course', {
       title: record.title,
       course: record,
+      chatUuid: chat?.uuid || null,
       modules: modules.map(module => ({ ...module, lessons: lessonsByModule.get(module.id) || [] })),
     });
   } catch (error) {

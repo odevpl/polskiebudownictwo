@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/assets/modules/chat/chat.css">
+<section class="chat-widget" data-chat data-chat-uuid="<%= uuid %>" aria-labelledby="chat-title-<%= uuid %>">
+  <div class="chat-widget__header">
+    <div>
+      <p class="eyebrow">Dyskusja kursowa</p>
+      <h2 id="chat-title-<%= uuid %>">Czat kursu</h2>
+    </div>
+    <p class="chat-widget__status" data-chat-status aria-live="polite">Łączenie…</p>
+  </div>
+  <div class="chat-widget__messages" data-chat-messages aria-live="polite" aria-label="Wiadomości czatu"></div>
+  <p class="chat-widget__empty" data-chat-empty>Nie ma jeszcze wiadomości. Rozpocznij rozmowę.</p>
+  <form class="chat-widget__form" data-chat-form>
+    <label class="sr-only" for="chat-message-<%= uuid %>">Twoja wiadomość</label>
+    <textarea id="chat-message-<%= uuid %>" data-chat-input rows="3" maxlength="2000" placeholder="Napisz wiadomość…" required></textarea>
+    <div class="chat-widget__form-footer">
+      <span data-chat-error role="alert"></span>
+      <button class="button" type="submit">Wyślij</button>
+    </div>
+  </form>
+</section>
+<script type="module" src="/assets/modules/chat/script.js"></script>

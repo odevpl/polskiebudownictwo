@@ -1,0 +1,15 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">C</div><div><p class="adm-kicker">Komunikacja</p><h1>Chaty</h1><p class="admin-hero__meta">Twórz kanały, kontroluj dostęp i moderuj wiadomości.</p></div></div>
+  <% if (admin.role === 'superadmin') { %><div class="adm-page-actions"><a class="button" href="<%= adminUrl('/chats/new') %>">Dodaj czat</a></div><% } %>
+  <div class="adm-table-panel"><%- include('../../components/Table', { columns: [
+    { label: 'Nazwa', value: chat => chat.title },
+    { label: 'UUID', value: chat => chat.uuid },
+    { label: 'Dostęp', value: chat => chat.access_type === 'course' ? 'Uczestnicy kursu' : 'Lista uczestników' },
+    { label: 'Kurs', value: chat => chat.course_title || '-' },
+    { label: 'Wiadomości', value: chat => chat.message_count || 0 },
+    { label: 'Status', value: chat => chat.is_active ? 'Aktywny' : 'Wyłączony' },
+    { label: 'Akcje', html: true, value: chat => `<a class="button button--ghost" href="${adminUrl('/chats/' + chat.id)}">Szczegóły</a>` },
+  ], rows: chats, emptyMessage: 'Nie utworzono jeszcze żadnych czatów.' }) %></div>
+</section>
+<%- include('../../partials/admin-shell-end') %>

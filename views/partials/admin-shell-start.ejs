@@ -24,6 +24,7 @@
           <a href="<%= adminUrl('/academy/access') %>" <%= title === 'Dostępy Akademii' ? 'aria-current="page"' : '' %>>Dostępy</a>
           <a href="<%= adminUrl('/academy/users') %>" <%= title === 'Użytkownicy Akademii' ? 'aria-current="page"' : '' %>>Użytkownicy</a>
           <a href="<%= adminUrl('/affiliate-links') %>" <%= title === 'Linki afiliacyjne' || title === 'Nowy link afiliacyjny' || title.startsWith('Link afiliacyjny #') ? 'aria-current="page"' : '' %>>Linki afiliacyjne</a>
+          <a href="<%= adminUrl('/chats') %>" <%= title === 'Chaty' || title === 'Nowy czat' || title.startsWith('Czat #') ? 'aria-current="page"' : '' %>>Chaty</a>
         </nav>
       </aside>
       <main class="admin-main">

@@ -4,6 +4,7 @@ const submissionsController = require('../controllers/admin/submissionsControlle
 const eventsController = require('../controllers/admin/eventsController');
 const academyController = require('../controllers/admin/academyController');
 const affiliateLinksController = require('../controllers/admin/affiliateLinksController');
+const chatsController = require('../controllers/admin/chatsController');
 const mediatorsController = require('../controllers/admin/mediatorsController');
 const { adminUrl } = require('../config/adminPath');
 const { requireAuth, requireRole } = require('../middleware/auth');
@@ -49,6 +50,15 @@ router.get('/affiliate-links/new', requireRole('superadmin'), affiliateLinksCont
 router.post('/affiliate-links/new', requireRole('superadmin'), affiliateLinksController.create);
 router.get('/affiliate-links/:id', requireAuth, affiliateLinksController.detail);
 router.post('/affiliate-links/:id/deactivate', requireRole('superadmin'), affiliateLinksController.deactivate);
+router.get('/chats', requireAuth, chatsController.index);
+router.get('/chats/new', requireRole('superadmin'), chatsController.newForm);
+router.post('/chats/new', requireRole('superadmin'), chatsController.create);
+router.get('/chats/:id', requireAuth, chatsController.detail);
+router.post('/chats/:id/toggle', requireRole('superadmin'), chatsController.toggle);
+router.post('/chats/:id/members', requireRole('superadmin'), chatsController.addMember);
+router.post('/chats/:id/members/:userId/toggle-block', requireRole('superadmin'), chatsController.toggleMemberBlock);
+router.post('/chats/:id/messages/:messageId/block-author', requireRole('superadmin'), chatsController.blockMessageAuthor);
+router.post('/chats/:id/messages/:messageId/delete', requireRole('superadmin'), chatsController.deleteMessage);
 router.get('/academy/workspace', requireAuth, academyController.workspace);
 router.get('/academy/workspace/data', requireAuth, academyController.workspaceDataEndpoint);
 router.post('/academy/workspace/order', requireAuth, academyController.reorderWorkspace);

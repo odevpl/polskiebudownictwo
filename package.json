@@ -17,6 +17,7 @@
     "migrate:mediators": "node scripts/migrateMediators.js",
     "migrate:mediator-profile": "node scripts/migrateMediatorProfile.js",
     "migrate:affiliate-links": "node scripts/migrateAffiliateLinks.js",
+    "migrate:chats": "node scripts/migrateChats.js",
     "create-superadmin": "node scripts/createSuperadmin.js",
     "cleanup-unverified-users": "node scripts/cleanupUnverifiedUsers.js",
     "reset-admin-password": "node scripts/resetAdminPassword.js",
@@ -52,6 +53,7 @@
     "quill": "^2.0.3",
     "saxes": "^6.0.0",
     "sharp": "^0.35.4",
+    "socket.io": "^4.8.4",
     "yauzl": "^3.4.0"
   },
   "devDependencies": {

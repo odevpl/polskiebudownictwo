@@ -62,6 +62,9 @@
               </ol>
             <% } %>
           </section>
+          <% if (chatUuid) { %>
+            <%- include('../../../modules/chat/index', { uuid: chatUuid }) %>
+          <% } %>
         </div>
       </section>
     </main>

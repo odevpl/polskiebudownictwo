@@ -30,7 +30,8 @@ app.use(helmet({
 }));
 app.use(express.urlencoded({ extended: false, limit: '300kb' }));
 app.use(express.json({ limit: '30kb' }));
-app.use(createSessionMiddleware());
+const sessionMiddleware = createSessionMiddleware();
+app.use(sessionMiddleware);
 app.use(csrfProtection);
 
 app.set('view engine', 'ejs');
@@ -96,6 +97,7 @@ app.use('/api/mediacje', (request, response, next) => {
 
 app.use(express.static(appPublicRoot));
 app.use('/assets/modules/academy-admin', express.static(path.join(__dirname, 'modules', 'academyAdmin', 'assets')));
+app.use('/assets/modules/chat', express.static(path.join(__dirname, 'modules', 'chat')));
 app.use('/vendor/quill', express.static(path.join(__dirname, 'node_modules', 'quill', 'dist')));
 app.use(express.static(publicRoot, {
   extensions: ['html'],
@@ -115,6 +117,8 @@ app.use((request, response) => {
 const server = app.listen(port, () => {
   console.log(`Polskie Budownictwo running on port ${port}`);
 });
+
+require('./modules/chat/server').attach(server, sessionMiddleware);
 
 module.exports = app;
 module.exports.server = server;

@@ -1,0 +1,18 @@
+<%- include('../../partials/admin-shell-start', { title, admin }) %>
+<section class="admin-page">
+  <a class="button button--ghost" href="<%= adminUrl('/chats') %>">Wróć do czatów</a>
+  <div class="admin-hero"><div class="admin-hero__art" aria-hidden="true">C</div><div><p class="adm-kicker">Komunikacja</p><h1>Nowy czat</h1><p class="admin-hero__meta">UUID zostanie wygenerowany automatycznie po zapisie.</p></div></div>
+  <% if (errors.length) { %><div class="adm-alert"><% errors.forEach(error => { %><div><%= error %></div><% }) %></div><% } %>
+  <form class="adm-form adm-card" method="post" action="<%= action %>"><div class="adm-form-grid">
+    <div class="adm-field"><label class="adm-label" for="title">Nazwa czatu</label><input class="adm-control" id="title" name="title" maxlength="160" value="<%= chat.title %>" required></div>
+    <div class="adm-field"><label class="adm-label" for="accessType">Dostęp</label><select class="adm-control" id="accessType" name="accessType"><option value="course" <%= chat.accessType === 'course' ? 'selected' : '' %>>Uczestnicy kursu</option><option value="members" <%= chat.accessType === 'members' ? 'selected' : '' %>>Ręcznie dodani uczestnicy</option></select></div>
+    <div class="adm-field adm-form-grid__full" data-course-field><label class="adm-label" for="courseId">Kurs</label><select class="adm-control" id="courseId" name="courseId"><option value="">Wybierz kurs</option><% courses.forEach(course => { %><option value="<%= course.id %>" <%= String(chat.courseId) === String(course.id) ? 'selected' : '' %>><%= course.title %></option><% }) %></select><small>Po utworzeniu aktywny czat kursowy pojawi się pod tym kursem.</small></div>
+    <div class="adm-form-actions adm-form-grid__full"><button class="button" type="submit">Utwórz czat</button><a class="button button--ghost" href="<%= adminUrl('/chats') %>">Anuluj</a></div>
+  </div></form>
+</section>
+<script>
+  const accessType = document.getElementById('accessType'); const courseField = document.querySelector('[data-course-field]'); const courseId = document.getElementById('courseId');
+  function updateCourseField() { const required = accessType.value === 'course'; courseField.hidden = !required; courseId.required = required; }
+  accessType.addEventListener('change', updateCourseField); updateCourseField();
+</script>
+<%- include('../../partials/admin-shell-end') %>

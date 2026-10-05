@@ -303,6 +303,9 @@ svg {
   border-top: 1px solid var(--adm-border);
 }
 
+.chat-admin-section { margin-top: 32px; }
+.chat-admin-actions { display: inline-block; margin: 2px; }
+
 /* Login */
 .login-screen {
   display: grid;

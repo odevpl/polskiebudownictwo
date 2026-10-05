@@ -11,11 +11,13 @@ const { registrationDomainLimiter, registrationEmailLimiter, registrationGlobalL
 const { loginValidation, mediationCaseValidation, mediatorApplicationValidation, passwordChangeValidation, registrationValidation, resetValidation, submitValidation } = require('../middleware/validate');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { requireUser, requireUserApi } = require('../middleware/userAuth');
+const chatController = require('../controllers/public/chatController');
 const { accountBillingValidation, accountProfileValidation, authenticatedPasswordChangeValidation, deleteAccountValidation } = require('../middleware/validate');
 
 const router = express.Router();
 const fileDownloadLimiter = require('express-rate-limit').rateLimit({ windowMs: 60000, limit: 60, keyGenerator: request => String(request.session.user.id), standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Zbyt wiele pobrań. Spróbuj za minutę.' } });
 router.get('/api/academy/attachments/:id/download', requireUserApi, fileDownloadLimiter, require('../controllers/public/filesController').download);
+router.get('/api/chats/:uuid/messages', requireUserApi, chatController.history);
 
 router.post('/api/submit', submitLimiter, submitValidation, submitController.store);
 router.get('/api/auth/registration-settings', authController.registrationSettings);
