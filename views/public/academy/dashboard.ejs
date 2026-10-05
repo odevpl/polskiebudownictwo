@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title><%= title %> | Polskie Budownictwo</title>
+    <link rel="stylesheet" href="/global.css">
+  </head>
+  <body class="academy-page">
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="site-logo" href="/akademia/" aria-label="Dashboard Akademii Polskiego Budownictwa"><img src="/assets/images/logo.png" alt="Polskie Budownictwo"></a>
+        <nav class="site-nav" aria-label="Nawigacja Akademii"><a href="/akademia/" aria-current="page">Dashboard</a><a href="/akademia/kursy/">Moje kursy</a><a href="/akademia/ustawienia/">Ustawienia konta</a></nav>
+      </div>
+    </header>
+    <main>
+      <%- include('../../../modules/academyDashboard/index', { user }) %>
+    </main>
+  </body>
+</html>

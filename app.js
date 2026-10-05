@@ -54,10 +54,11 @@ app.get('/akademia/kurs/:slug/modul/:moduleSlug/lekcja/:lessonSlug', requireUser
 app.get('/akademia/kurs/:slug/lekcja/:lessonSlug', requireUser, academyPageController.legacyLesson);
 app.get('/akademia/kup/:slug', requireUser, academyPageController.checkout);
 app.get('/akademia/platnosc/wynik', requireUser, academyPageController.paymentResult);
+app.get(['/akademia', '/akademia/'], requireUser, academyPageController.dashboard);
+app.get('/akademia.html', requireUser, (request, response) => response.redirect('/akademia/'));
 const academyPages = {
-  '/akademia': 'akademia.html',
-  '/akademia/': 'akademia.html',
-  '/akademia.html': 'akademia.html',
+  '/akademia/kursy': 'akademia.html',
+  '/akademia/kursy/': 'akademia.html',
   '/akademia/ustawienia': path.join('akademia', 'ustawienia', 'index.html'),
   '/akademia/ustawienia/': path.join('akademia', 'ustawienia', 'index.html'),
   '/akademia/ustawienia/index.html': path.join('akademia', 'ustawienia', 'index.html'),
@@ -68,7 +69,7 @@ app.get([
   '/akademia/strefa-szkolen/',
   '/akademia/strefa-szkolen/index.html',
 ], requireUser, (request, response) => {
-  response.redirect('/akademia/');
+  response.redirect('/akademia/kursy/');
 });
 
 app.get(Object.keys(academyPages), requireUser, (request, response) => {
@@ -97,6 +98,7 @@ app.use('/api/mediacje', (request, response, next) => {
 
 app.use(express.static(appPublicRoot));
 app.use('/assets/modules/academy-admin', express.static(path.join(__dirname, 'modules', 'academyAdmin', 'assets')));
+app.use('/assets/modules/academy-dashboard', express.static(path.join(__dirname, 'modules', 'academyDashboard')));
 app.use('/assets/modules/chat', express.static(path.join(__dirname, 'modules', 'chat')));
 app.use('/vendor/quill', express.static(path.join(__dirname, 'node_modules', 'quill', 'dist')));
 app.use(express.static(publicRoot, {

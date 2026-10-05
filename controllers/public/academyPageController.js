@@ -4,8 +4,23 @@ const CourseModule = require('../../models/CourseModule');
 const CourseLesson = require('../../models/CourseLesson');
 const LessonProgress = require('../../models/LessonProgress');
 const Chat = require('../../models/Chat');
+const UserProfile = require('../../models/UserProfile');
 const courseAccessService = require('../../services/courseAccessService');
 const { parseBlocks } = require('../../modules/courseContent');
+
+async function dashboard(request, response) {
+  try {
+    const profile = await UserProfile.findByUserId(request.session.user.id);
+    const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim();
+    return response.render('public/academy/dashboard', {
+      title: 'Dashboard Akademii',
+      user: { email: request.session.user.email, name },
+    });
+  } catch (error) {
+    console.error('Academy dashboard error:', error);
+    return response.status(500).send('Nie udało się pobrać dashboardu Akademii.');
+  }
+}
 
 async function course(request, response) {
   try {
@@ -98,4 +113,4 @@ async function getAccessibleCourse(request) {
   return record;
 }
 
-module.exports = { checkout, course, legacyLesson, lesson, module: modulePage, paymentResult };
+module.exports = { checkout, course, dashboard, legacyLesson, lesson, module: modulePage, paymentResult };

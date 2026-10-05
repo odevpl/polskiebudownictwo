@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/assets/modules/academy-dashboard/dashboard.css">
+<section class="section academy-dashboard" aria-labelledby="academy-dashboard-title">
+  <div class="container academy-dashboard__grid">
+    <section class="academy-dashboard__main">
+      <p class="eyebrow">Akademia Polskiego Budownictwa</p>
+      <h1 id="academy-dashboard-title">Witaj<%= user.name ? `, ${user.name}` : '' %></h1>
+      <div class="academy-dashboard__placeholder" aria-label="Miejsce na przyszłe aktywności w Akademii">
+        <p>Twoja przestrzeń Akademii</p>
+        <span>Wkrótce pojawią się tu najważniejsze informacje.</span>
+      </div>
+    </section>
+    <aside class="academy-dashboard__profile" aria-labelledby="academy-profile-title">
+      <div class="academy-dashboard__avatar" aria-hidden="true"><span>PB</span></div>
+      <p class="eyebrow">Twój profil</p>
+      <h2 id="academy-profile-title"><%= user.name || 'Użytkownik Akademii' %></h2>
+      <p class="academy-dashboard__email"><%= user.email %></p>
+      <% if (!user.name) { %><p class="academy-dashboard__profile-note">Uzupełnij imię i nazwisko w ustawieniach konta.</p><% } %>
+      <a class="button academy-dashboard__courses-link" href="/akademia/kursy/">Moje kursy</a>
+    </aside>
+  </div>
+</section>
