@@ -40,7 +40,7 @@
                   <li id="modul-<%= encodeURIComponent(module.slug) %>">
                     <details class="academy-module-accordion">
                       <summary>
-                        <span class="academy-modules-list__number"><%= index %></span>
+                        <span class="academy-modules-list__number"><%= index + 1 %></span>
                         <span class="academy-modules-list__title"><%= module.title %></span>
                         <span class="academy-module-accordion__count"><%= module.lessons.length %> <%= module.lessons.length === 1 ? 'lekcja' : module.lessons.length < 5 ? 'lekcje' : 'lekcji' %></span>
                         <span class="academy-module-accordion__icon" aria-hidden="true"></span>
